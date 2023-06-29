@@ -1,0 +1,477 @@
+:root {
+    --primary-color: #091629;
+    --section-body-width: 1000px;
+    --overflow-x: hidden;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--primary-color);
+    /* background-color: black; */
+    overflow-x: var(--overflow-x);
+    overflow-y: auto;
+    min-height: 100vh;
+    cursor: none;
+}
+
+/* Style the scrollbar to use a shade lighter than primary color for background, and the primary color for the nub */
+
+::-webkit-scrollbar {
+    width: 10px;
+    background-color: #00000000;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #050e1b;
+}
+
+.section {
+    /* min-height: 100vh; */
+    width: calc(100vw - 20px);
+    position: relative;
+    /* outline: 1px solid red; */
+    outline-offset: -1px;
+}
+
+#part-1 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    padding-bottom: 100px;
+    height: calc(100vh - 100px);
+}
+
+h1 {
+    font-size: 5rem;
+}
+
+.foreground {
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--primary-color);
+    z-index: 10;
+    user-select: none;
+}
+
+.ball {
+    --background-color: rgb(60, 63, 210);
+    --ball-size: 50px;
+    width: var(--ball-size);
+    height: var(--ball-size);
+    border-radius: 50%;
+    background-color: var(--background-color);
+    position: absolute;
+    animation: glowing 4s infinite;
+    transition: animations 0.5s ease-in-out;
+}
+
+#ball-1 {
+    --blur: 60px;
+    filter: blur(var(--blur));
+    width: calc(var(--ball-size) * 2);
+    height: calc(var(--ball-size) * 2);
+    z-index: 0;
+}
+
+#ball-2 {
+    --blur: 15px;
+    width: calc(var(--ball-size) * 1.0);
+    height: calc(var(--ball-size) * 1.0);
+    /* transform: scale(1.5); */
+    /* filter: hue-rotate(90deg); */
+    filter: blur(var(--blur));
+    z-index: 0;
+    border: solid 10px #274bee;
+}
+
+#ball-3 {
+    --background-color: #8d4bf0;
+    width: calc(var(--ball-size) * 0.3);
+    height: calc(var(--ball-size) * 0.3);
+    /* filter: hue-rotate(90deg); */
+    filter: blur(10px);
+    /* z-index: 100; */
+    background-color: white;
+    border: solid 10px var(--background-color);
+}
+
+.ui {
+    position: absolute;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 1rem;
+    color: white;
+    background-color: #0000004a;
+    padding: 0.5rem;
+    z-index: 100;
+}
+
+#mouse-follow {
+    bottom: 1rem;
+    right: 1rem;
+}
+
+@keyframes glowing {
+    0% {
+        box-shadow: 0 0 0 var(--background-color);
+    }
+
+    50% {
+        box-shadow: 0 0 50px var(--background-color);
+    }
+
+    100% {
+        box-shadow: 0 0 0 var(--background-color);
+    }
+}
+
+.hidden {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* Too many things relied on the first hidden, so a second hidden may solve the problem */
+.hidden-2 {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+.hidden-3 {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+.sign {
+    color: var(--primary-color);
+}
+
+#first-sign {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 180px;
+    text-align: center;
+    transform: translate(-50%, -50%);
+}
+
+#end-sign {
+    position: absolute;
+    top: 0px;
+    left: 320px;
+    width: 180px;
+    text-align: center;
+}
+
+#congrats {
+    position: absolute;
+    width: 1000px;
+    text-align: center;
+    left: calc((100vw - var(--section-body-width))/2);
+    top: 2300px;
+}
+
+#congrats-text {
+    z-index: 2;
+    position: relative;
+    top: 25px;
+    font-size: 10rem;
+}
+
+.glow-orb {
+    filter: blur(20px);
+    border-radius: 50%;
+    position: absolute;
+    z-index: 0;
+    background-attachment: local !important;
+}
+
+#go-1 {
+    --orb-size: 150px;
+    width: var(--orb-size);
+    height: var(--orb-size);
+    top: 50%;
+    left: 450px;
+    scale: 1.5;
+    filter: blur(40px) hue-rotate(90deg);
+}
+
+#go-2 {
+    --orb-size: 200px;
+    width: var(--orb-size);
+    height: var(--orb-size);
+    top: 180px;
+    left: 180px;
+    scale: 1.5;
+    filter: blur(50px) hue-rotate(32deg);
+}
+
+#go-3 {
+    --orb-size: 150px;
+    width: var(--orb-size);
+    height: var(--orb-size);
+    top: 290px;
+    left: 705px;
+    scale: 1.5;
+    filter: blur(40px) hue-rotate(-90deg);
+}
+
+#go-4 {
+    --orb-size: 150px;
+    width: var(--orb-size);
+    height: var(--orb-size);
+    top: 130px;
+    left: 570px;
+    scale: 1.5;
+    filter: blur(40px) hue-rotate(60deg);
+}
+
+.section-body {
+    position: relative;
+    left: calc(((100vw - var(--section-body-width)) - 10px)/2);
+    width: var(--section-body-width);
+    height: 3000px;
+    /* outline: 2px solid purple; */
+    outline-offset: -1px;
+}
+
+.wall {
+    --base-height: 0px;
+    position: absolute;
+    background-color: var(--primary-color);
+    z-index: 5;
+    /* background-color: white; */
+    /* outline: 2px solid rgb(0, 208, 255); */
+    outline-offset: -1px;
+    color: var(--primary-color);
+    user-select: none;
+    top: 0;
+}
+
+.maze-wall {
+    --base-height: 150px;
+    top: var(--base-height);
+}
+
+.section-edge {
+    width: calc(((100vw - var(--section-body-width)) - 10px)/2);
+    height: calc(100% - var(--base-height));
+    position: absolute;
+}
+
+.se-right {
+    left: calc((((100vw - var(--section-body-width)) - 10px)/2) + var(--section-body-width));
+}
+
+
+#wall-1 {
+    width: 425px;
+    height: 100px;
+    left: 0px;
+}
+
+#wall-2 {
+    --width: 425px;
+    width: var(--width);
+    height: 180px;
+    right: 0;
+}
+
+#wall-3 {
+    width: 315px;
+    height: 180px;
+    top: calc(var(--base-height) + 100px);
+    left: 110px;
+}
+
+#wall-4 {
+    --width: 175px;
+    width: var(--width);
+    height: 210px;
+    right: 0;
+    top: calc(var(--base-height) + 290px);
+}
+
+#wall-5 {
+    --width: 590px;
+    width: var(--width);
+    height: 100px;
+    left: 110px;
+    top: calc(var(--base-height) + 400px);
+}
+
+#wall-6 {
+    --width: 125px;
+    width: var(--width);
+    height: 100px;
+    left: 575px;
+    top: calc(var(--base-height) + 180px);
+}
+
+#wall-7 {
+    --width: 125px;
+    width: var(--width);
+    height: 100px;
+    left: 110px;
+    top: calc(var(--base-height) + 500px);
+}
+
+#wall-8 {
+    --width: 350px;
+    width: var(--width);
+    height: 100px;
+    left: 0;
+    top: calc(var(--base-height) + 720px);
+}
+
+#wall-9 {
+    --width: 100px;
+    width: var(--width);
+    height: 320px;
+    left: 350px;
+    top: calc(var(--base-height) + 500px);
+}
+
+#wall-10 {
+    --width: 440px;
+    width: var(--width);
+    height: 100px;
+    right: 0;
+    top: calc(var(--base-height) + 600px);
+}
+
+#wall-11 {
+    --width: 110px;
+    width: var(--width);
+    height: 320px;
+    left: 560px;
+    top: calc(var(--base-height) + 700px);
+}
+
+#wall-12 {
+    --width: 340px;
+    width: var(--width);
+    height: 100px;
+    left: 110px;
+    top: calc(var(--base-height) + 920px);
+}
+
+#wall-13 {
+    --width: 110px;
+    width: var(--width);
+    height: 860px;
+    left: 780px;
+    top: calc(var(--base-height) + 810px);
+}
+
+#wall-14 {
+    --width: 220px;
+    width: var(--width);
+    height: 100px;
+    left: 560px;
+    top: calc(var(--base-height) + 1150px);
+}
+
+#wall-15 {
+    --width: 100px;
+    width: var(--width);
+    height: 440px;
+    left: 350px;
+    top: calc(var(--base-height) + 1020px);
+}
+
+#wall-16 {
+    --width: 120px;
+    width: var(--width);
+    height: 320px;
+    left: 110px;
+    top: calc(var(--base-height) + 1140px);
+}
+
+#wall-17 {
+    --width: 120px;
+    width: var(--width);
+    height: 100px;
+    left: 230px;
+    top: calc(var(--base-height) + 1240px);
+}
+
+#wall-18 {
+    --width: 540px;
+    width: var(--width);
+    height: 100px;
+    left: 240px;
+    top: calc(var(--base-height) + 1570px);
+}
+
+#wall-19 {
+    --width: 230px;
+    width: var(--width);
+    height: 100px;
+    left: 450px;
+    top: calc(var(--base-height) + 1360px);
+}
+
+#wall-20 {
+    --width: 120px;
+    width: var(--width);
+    height: 100px;
+    left: 0;
+    top: calc(var(--base-height) + 1570px);
+}
+
+#wall-21 {
+    --width: 240px;
+    width: var(--width);
+    height: 120px;
+    left: 120px;
+    top: calc(var(--base-height) + 1790px);
+}
+
+#wall-22 {
+    --width: 120px;
+    width: var(--width);
+    height: 120px;
+    left: 240px;
+    top: calc(var(--base-height) + 1670px);
+}
+
+#wall-23 {
+    --width: 360px;
+    width: var(--width);
+    height: 120px;
+    left: 0px;
+    top: calc(var(--base-height) + 2030px);
+}
+
+#wall-24 {
+    --width: 120px;
+    width: var(--width);
+    height: 360px;
+    left: 480px;
+    top: calc(var(--base-height) + 1790px);
+}
+
+#wall-25 {
+    --width: 280px;
+    width: var(--width);
+    height: 120px;
+    right: 0px;
+    top: calc(var(--base-height) + 1790px);
+}
+
+#wall-26 {
+    --width: 400px;
+    width: var(--width);
+    height: 120px;
+    right: 0px;
+    top: calc(var(--base-height) + 2030px);
+}
+
+#wall-27 {
+    --height: 50px;
+    position: absolute;
+    top: calc(100vh - var(--height));
+    left: 0;
+    right: 0;
+    height: var(--height);
+}
