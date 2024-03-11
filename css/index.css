@@ -1,3 +1,7 @@
+* {
+    border: solid 1px red;
+}
+
 :root {
     --primary-color: #091629;
     --section-body-width: 1000px;
@@ -67,21 +71,25 @@ h1 {
 }
 
 #ball-1 {
-    --blur: 60px;
-    filter: blur(var(--blur));
     width: calc(var(--ball-size) * 2);
     height: calc(var(--ball-size) * 2);
     z-index: 0;
+}
+
+.glow-orb-1 {
+    --blur: 60px;
+    filter: blur(var(--blur));
 }
 
 #ball-2 {
     --blur: 15px;
     width: calc(var(--ball-size) * 1.0);
     height: calc(var(--ball-size) * 1.0);
-    /* transform: scale(1.5); */
-    /* filter: hue-rotate(90deg); */
+}
+
+.glow-orb-2 {
     filter: blur(var(--blur));
-    z-index: 0;
+    z-index: 1;
     border: solid 10px #274bee;
 }
 
@@ -472,6 +480,11 @@ h1 {
     position: absolute;
     top: calc(100vh - var(--height));
     left: 0;
-    right: 0;
+    right: 20vw;
     height: var(--height);
+}
+
+
+#sky {
+    background-color: #3a7de2;
 }

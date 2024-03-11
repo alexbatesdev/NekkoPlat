@@ -15,6 +15,7 @@ let mouseY = 0;
 
 let firstCLick = false;
 let followMouse = false;
+let doGravity = false;
 
 let keyState = {
     W: false,
@@ -84,9 +85,9 @@ const update = () => {
                     acceleration = 0.15;
                 }
                 if (keyState.W && velocityY > -maxVelocity) velocityY -= acceleration;
-                if (keyState.A && velocityX > -maxVelocity) velocityX -= acceleration;
+                if (keyState.A && velocityX > -maxVelocity * (doGravity ? 2.4 : 1)) velocityX -= acceleration * (doGravity ? 2.4 : 1);
                 if (keyState.S && velocityY < maxVelocity) velocityY += acceleration;
-                if (keyState.D && velocityX < maxVelocity) velocityX += acceleration;
+                if (keyState.D && velocityX < maxVelocity * (doGravity ? 2.4 : 1)) velocityX += acceleration * (doGravity ? 2.4 : 1);
 
                 // Gradually decrease velocity when no keys are pressed
                 if (!keyState.W && velocityY < 0) velocityY += deceleration;
@@ -118,7 +119,7 @@ const update = () => {
 
                 scopedSpeed = speed;
                 velocityX = Math.cos(angle) * speed;
-                velocityY = Math.sin(angle) * speed;
+                velocityY = (Math.sin(angle) * speed);
 
                 // If the ball is going a certain speed, check for collision with a higher precision
 
@@ -129,6 +130,10 @@ const update = () => {
 
             // if (velocityX > -0.15 && velocityX < 0.15) velocityX = 0;
             // if (velocityY > -0.15 && velocityY < 0.15) velocityY = 0;
+
+            if (doGravity) {
+                velocityY += 1;
+            }
 
 
             //if ball will be off screen next frame, stop the ball
@@ -159,6 +164,7 @@ const update = () => {
 
                 let deltaX = velocityX * stepSize;
                 let deltaY = velocityY * stepSize;
+
 
                 let tempBallX = ballRect.x;
                 let tempBallY = ballRect.y;
@@ -204,6 +210,7 @@ const update = () => {
                     tempBallY += deltaY;
                 }
             }
+
             // Update position based on velocity
             positionX += velocityX;
             positionY += velocityY;
@@ -331,6 +338,7 @@ const update = () => {
 const firstSignAction = () => {
     toggleFollowMouse();
     firstCLick = true;
+    doGravity = true;
 
     const unhides = document.getElementById("part-1").querySelectorAll(".hidden-2");
     for (let i = 0; i < unhides.length; i++) {
@@ -384,6 +392,7 @@ document.addEventListener('keydown', function (event) {
     }
     if (key == "E") {
         document.addEventListener('click', (event) => {
+            console.log(event.pageX, event.pageY);
             positionX = event.pageX;
             positionY = event.pageY;
             velocityX = 0;
@@ -392,8 +401,13 @@ document.addEventListener('keydown', function (event) {
     }
 
     if (key == " ") {
-        event.preventDefault();
         toggleFollowMouse();
+    }
+
+    if (key == "W") {
+        if (velocityY < 0.15 && velocityY > -0.15) {
+            velocityY = -24;
+        }
     }
 });
 

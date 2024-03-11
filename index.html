@@ -17,8 +17,8 @@
     <!-- Shift should make the ball brighter! (Just glow) -->
     <!-- Ctrl should slow the ball but make it illuminate more! -->
     <!-- Refactor how '.hidden' works -->
-    <div class="ball hexBackground" id="ball-1"></div>
-    <div class="ball hexBackground" id="ball-2"></div>
+    <div class="ball hexBackground glow-orb-1" id="ball-1"></div>
+    <div class="ball hexBackground glow-orb-2" id="ball-2"></div>
     <div class="ball" id="ball-3"></div>
     <div class="wall" id="wall-27"></div>
     <div class="section" id="part-1">
@@ -107,7 +107,7 @@
         </div>
         <div class="wall section-edge se-right maze-wall"></div>
     </div>
-    <div class="section hidden">
+    <div class="section" id="sky">
         <div class="section-edge wall"></div>
         <div class="section-body"></div>
         <div class="section-edge wall se-right"></div>
