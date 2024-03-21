@@ -377,7 +377,6 @@ h1 {
     width: calc(((100vw - var(--section-body-width)) - 10px)/2);
     height: calc(100% - var(--base-height));
     position: absolute;
-    border: solid 1px red;
 }
 
 .se-right {
