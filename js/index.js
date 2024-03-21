@@ -18,7 +18,7 @@ let followMouse = false;
 let doGravity = false;
 let airJumps = 0;
 let maxAirJumps = 1;
-let airborn = true;
+let airborn = false;
 let recentInputs = [];
 
 let keyState = {
@@ -56,7 +56,7 @@ const update = () => {
     }
     // console.log(keyState)
     const scopedMinSpeed = 5;
-    const scopedStandardSpeed = 15;
+    const scopedStandardSpeed = 25;
     let scopedCurrentMaxSpeed = scopedStandardSpeed;
 
     for (let i = 0; i < cursor_balls.length; i++) {
@@ -82,16 +82,18 @@ const update = () => {
             // Update velocity based on key states
             if (!followMouse) {
                 if (keyState.SHIFT) {
-                    acceleration = 0.3;
+                    acceleration = 0.5;
                     maxVelocity = 6;
                 } else {
                     maxVelocity = 3;
-                    acceleration = 0.15;
+                    acceleration = 0.25;
                 }
                 if (keyState.W && velocityY > -maxVelocity) velocityY -= acceleration;
                 if (keyState.A && velocityX > -maxVelocity * (doGravity ? 2.4 : 1)) velocityX -= acceleration * (doGravity ? 2.4 : 1);
                 if (keyState.S && velocityY < maxVelocity) velocityY += acceleration;
                 if (keyState.D && velocityX < maxVelocity * (doGravity ? 2.4 : 1)) velocityX += acceleration * (doGravity ? 2.4 : 1);
+
+                console.log("Velocity X: " + velocityX + " Velocity Y: " + velocityY)
 
                 // Gradually decrease velocity when no keys are pressed
                 if (!airborn && !keyState.W && velocityY < 0) velocityY += (deceleration * (doGravity ? 2 : 1));
@@ -272,12 +274,12 @@ const update = () => {
 
     // if ball y value greater than window height + scroll, scroll down
     if (positionY > window.innerHeight + window.scrollY - scrollThreshold) {
-        window.scrollBy(0, (doGravity && velocityY > 0) ? velocityY : 10);
+        window.scrollBy(0, (velocityY > 0) ? velocityY : 10);
     }
 
     // if ball y value less than scroll, scroll up
     if (positionY < window.scrollY + scrollThreshold) {
-        window.scrollBy(0, (doGravity && velocityY < 0) ? velocityY : -10);
+        window.scrollBy(0, (velocityY < 0) ? velocityY : -10);
     }
     const ball_2 = document.getElementById("ball-2");
     const ball_2_rect = ball_2.getBoundingClientRect();
