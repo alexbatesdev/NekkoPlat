@@ -1,21 +1,13 @@
-let cursor_balls = document.getElementsByClassName('ball');
-let signs = document.getElementsByClassName('sign');
-let sections = document.getElementsByClassName('section');
+let player = document.getElementById('player');
+
 let walls = document.getElementsByClassName('wall');
 let positionX = window.innerWidth / 2;
-let positionY = window.innerHeight / 2;
+let positionY = 0;
 let velocityX = 0;
 let velocityY = 0;
 let maxVelocity = 3;
 let acceleration = 0.15;
 let deceleration = 0.074;
-
-let mouseX = 0;
-let mouseY = 0;
-
-let firstCLick = false;
-let followMouse = false;
-let doGravity = false;
 let airJumps = 0;
 let maxAirJumps = 1;
 let airborn = false;
@@ -35,21 +27,8 @@ let keyState = {
     CONTROL: false,
 };
 
-const toggleFollowMouse = () => {
-    followMouse = !followMouse;
-    if (followMouse) {
-        for (let i = 0; i < signs.length; i++) {
-            if (signs[i].querySelector(".secondary-text")) signs[i].querySelector(".secondary-text").innerHTML = signs[i].querySelector(".secondary-text").innerHTML.replace("Press Enter!", "Click Me!")
-        }
-    } else {
-        for (let i = 0; i < signs.length; i++) {
-            if (signs[i].querySelector(".secondary-text")) signs[i].querySelector(".secondary-text").innerHTML = signs[i].querySelector(".secondary-text").innerHTML.replace("Click Me!", "Press Enter!")
-        }
-    }
-}
 
-
-//This is pretty much just my gameloop, not just element movement
+// TODO ---------------------- 1. Seperate Ball logic from platformer logic for everything lower than this line
 const update = () => {
     if (!firstCLick) {
         positionX = window.innerWidth / 2;
@@ -459,56 +438,6 @@ const activatePlatformerMode = () => {
     document.title = "Nekko's Journey to the right";
 }
 
-const firstSignAction = () => {
-    toggleFollowMouse();
-    firstCLick = true;
-
-    const unhides = document.getElementById("part-1").querySelectorAll(".hidden-2");
-    for (let i = 0; i < unhides.length; i++) {
-        unhides[i].classList.remove("hidden-2");
-    }
-
-    const first_sign = document.getElementById("first-sign");
-    first_sign.classList.add("hidden-2");
-}
-
-const mazeEndAction = () => {
-    console.log("Congrats! You made it to the end of the maze!")
-    const glow_cluster = document.getElementById("gc-1");
-    glow_cluster.classList.remove("hidden-2");
-    const glow_orbs = glow_cluster.querySelectorAll(".glow-orb");
-    for (let i = 0; i < glow_orbs.length; i++) {
-        glow_orbs[i].classList.remove("hidden-2");
-    }
-    const end_sign = document.getElementById("end-sign");
-    end_sign.classList.add("hidden-2");
-    const congrats_text = document.getElementById("congrats-text");
-    congrats_text.classList.remove("hidden-2");
-    window.scrollBy(0, 300);
-    document.getElementById("start-platformer-sign").classList.remove("hidden-2");
-}
-
-
-
-const startsignAction = () => {
-    console.log("start sign action");
-    document.getElementById("start-sign").innerHTML = "Proceed South"
-    for (let i = 0; i < sections.length; i++) {
-        if (sections[i].id == "part-1") {
-            // sections[i].style.display = "none";
-        } else if (sections[i].id == "part-2") {
-            showElement(sections[i]);
-            showElement(sections[i + 1]);
-            document.getElementById("wall-27").classList.add("hidden");
-            // sections[i].classList.remove("hidden");
-            // sections[i].querySelector(".maze").classList.remove("hidden");
-            // sections[i].querySelectorAll(".wall.hidden").forEach((wall) => {
-            //     wall.classList.remove("hidden");
-            // })
-        }
-    }
-}
-
 document.addEventListener('keydown', function (event) {
     event.preventDefault();
     let key = event.key.toUpperCase();
@@ -608,55 +537,6 @@ document.addEventListener('mousemove', function (event) {
     mouseY = event.clientY;
 });
 
-//add hidden class to every item in a section
-const hideElement = (element) => {
-    let items = element.querySelectorAll("*");
-    element.classList.add("hidden");
-    for (let i = 0; i < items.length; i++) {
-        items[i].classList.add("hidden");
-    }
-}
-
-//remove hidden class to every item in a section
-const showElement = (element) => {
-    let items = element.querySelectorAll("*");
-    element.classList.remove("hidden");
-    for (let i = 0; i < items.length; i++) {
-        items[i].classList.remove("hidden");
-    }
-}
-
-
-let sectionsToHide = document.querySelectorAll(".section.hidden");
-for (let i = 0; i < sectionsToHide.length; i++) {
-    hideElement(sectionsToHide[i]);
-}
-
-requestAnimationFrame(update);
-
-
-function getRandomColor() {
-    let letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-}
-
-const changeColor = () => {
-    // Colors are two shades of blue, and a green. The blues are each in twice to make them more likely to be chosen.
-    let colors = ["#030dd8", "#41acd6", "#63d80c", "#030dd8", "#41acd6"]
-    // let bgColor = getRandomColor();
-    bgColor = colors[Math.floor(Math.random() * colors.length)];
-    for (let i = 0; i < cursor_balls.length; i++) {
-        if (cursor_balls[i].id == "ball-3") continue;
-        cursor_balls[i].style.setProperty('--background-color', bgColor);
-    }
-}
-
-setInterval(changeColor, 4000);
-
 setInterval(() => {
     if (!doGravity) return;
 
@@ -676,8 +556,4 @@ const listsAreEqual = (list1, list2) => {
         if (list1[i] != list2[i]) return false;
     }
     return true;
-}
-
-window.onload = () => {
-    window.scrollTo(0, 0);
 }

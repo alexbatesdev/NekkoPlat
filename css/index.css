@@ -348,6 +348,13 @@ h1 {
     filter: blur(40px) hue-rotate(60deg);
 }
 
+#start-platformer-sign {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
 .section-body {
     position: relative;
     left: calc(((100vw - var(--section-body-width)) - 10px)/2);
@@ -425,11 +432,99 @@ h1 {
     min-width: var(--section-body-width);
     /* outline: 2px solid purple; */
     outline-offset: -1px;
-    height: 800px;
-    background-image: url("../img/bliss.jpg");
+    height: 100vh;
     background-size: cover;
     background-position: center;
 }
+
+#ss-1 {
+    background-image: url("../img/Nekkos\ Journey/1.jpg");
+    background-position: center;
+}
+
+#ss-2 {
+    background-image: url("../img/Nekkos\ Journey/2.jpg");
+    background-position: center;
+}
+
+#ss-3 {
+    background-image: url("../img/Nekkos\ Journey/3.jpg");
+    background-position: center;
+}
+
+#ss-4 {
+    background-image: url("../img/Nekkos\ Journey/4.jpg");
+    background-position: center;
+}
+
+#ss-5 {
+    background-image: url("../img/Nekkos\ Journey/5.jpg");
+    background-position: center;
+}
+
+#ss-6 {
+    background-image: url("../img/Nekkos\ Journey/6.jpg");
+    background-position: center;
+}
+
+#ss-7 {
+    background-image: url("../img/Nekkos\ Journey/7.jpg");
+    background-position: center;
+}
+
+#ss-8 {
+    background-image: url("../img/Nekkos\ Journey/8.jpg");
+    background-position: center;
+}
+
+#ss-9 {
+    background-image: url("../img/Nekkos\ Journey/9.jpg");
+    background-position: center;
+}
+
+#ss-10 {
+    background-image: url("../img/Nekkos\ Journey/10.jpg");
+    background-position: center;
+}
+
+#ss-11 {
+    background-image: url("../img/Nekkos\ Journey/11.jpg");
+    background-position: center;
+}
+
+#ss-12 {
+    background-image: url("../img/Nekkos\ Journey/12.jpg");
+    background-position: center;
+}
+
+#ss-13 {
+    background-image: url("../img/Nekkos\ Journey/13.jpg");
+    background-position: center;
+}
+
+#ss-14 {
+    background-image: url("../img/Nekkos\ Journey/14.jpg");
+    background-position: center;
+}
+
+#ss-15 {
+    background-image: url("../img/Nekkos\ Journey/15.jpg");
+    background-position: center;
+}
+
+.pipe {
+    --size: 100px;
+    width: var(--size);
+    height: var(--size);
+    position: absolute;
+    top: calc(100% - var(--size));
+    right: 40px;
+    background-image: url("../img/pipe.png");
+    background-size: cover;
+    background-position: center;
+    image-rendering: pixelated;
+}
+
 
 .floor {
     --height: 5px;
