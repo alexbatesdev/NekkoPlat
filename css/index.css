@@ -1,11 +1,111 @@
-* {
+/* * {
     border: solid 1px red;
+} */
+
+@keyframes flicker {
+    0% {
+        opacity: 0.37861;
+    }
+
+    5% {
+        opacity: 0.34769;
+    }
+
+    10% {
+        opacity: 0.23604;
+    }
+
+    15% {
+        opacity: 0.80626;
+    }
+
+    20% {
+        opacity: 0.38128;
+    }
+
+    25% {
+        opacity: 0.83891;
+    }
+
+    30% {
+        opacity: 0.65583;
+    }
+
+    35% {
+        opacity: 0.67807;
+    }
+
+    40% {
+        opacity: 0.36559;
+    }
+
+    45% {
+        opacity: 0.84693;
+    }
+
+    50% {
+        opacity: 0.86019;
+    }
+
+    55% {
+        opacity: 0.38594;
+    }
+
+    60% {
+        opacity: 0.30313;
+    }
+
+    65% {
+        opacity: 0.71988;
+    }
+
+    70% {
+        opacity: 0.53455;
+    }
+
+    75% {
+        opacity: 0.37288;
+    }
+
+    80% {
+        opacity: 0.71428;
+    }
+
+    85% {
+        opacity: 0.70419;
+    }
+
+    90% {
+        opacity: 0.7003;
+    }
+
+    95% {
+        opacity: 0.36108;
+    }
+
+    100% {
+        opacity: 0.34387;
+    }
+}
+
+.crt::before {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    z-index: 2;
+    background-size: 100% 5px, 10px 100%;
+    pointer-events: none;
+    animation: flicker 0.05s infinite;
 }
 
 :root {
     --primary-color: #091629;
     --section-body-width: 1000px;
-    --overflow-x: hidden;
 }
 
 body {
@@ -13,9 +113,10 @@ body {
     padding: 0;
     background-color: var(--primary-color);
     /* background-color: black; */
-    overflow-x: var(--overflow-x);
-    overflow-y: auto;
+    overflow-x: hidden;
+    overflow-y: hidden;
     min-height: 100vh;
+    min-width: 100vw;
     cursor: none;
 }
 
@@ -30,9 +131,19 @@ body {
     background-color: #050e1b;
 }
 
+#filter {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 100;
+    pointer-events: none;
+}
+
 .section {
     /* min-height: 100vh; */
-    width: calc(100vw - 20px);
+    min-width: calc(100vw - 20px);
     position: relative;
     /* outline: 1px solid red; */
     outline-offset: -1px;
@@ -45,6 +156,10 @@ body {
     justify-content: space-around;
     padding-bottom: 100px;
     height: calc(100vh - 100px);
+}
+
+#part-2 {
+    min-height: 2300px;
 }
 
 h1 {
@@ -145,9 +260,9 @@ h1 {
 }
 
 .hidden-3 {
-    display: none !important;
     visibility: hidden !important;
 }
+
 
 .sign {
     color: var(--primary-color);
@@ -237,7 +352,7 @@ h1 {
     position: relative;
     left: calc(((100vw - var(--section-body-width)) - 10px)/2);
     width: var(--section-body-width);
-    height: 3000px;
+    height: 1000px;
     /* outline: 2px solid purple; */
     outline-offset: -1px;
 }
@@ -245,31 +360,133 @@ h1 {
 .wall {
     --base-height: 0px;
     position: absolute;
-    background-color: var(--primary-color);
+    top: 0;
     z-index: 5;
-    /* background-color: white; */
-    /* outline: 2px solid rgb(0, 208, 255); */
     outline-offset: -1px;
     color: var(--primary-color);
     user-select: none;
-    top: 0;
 }
 
 .maze-wall {
     --base-height: 150px;
     top: var(--base-height);
+    background-color: var(--primary-color);
 }
 
 .section-edge {
     width: calc(((100vw - var(--section-body-width)) - 10px)/2);
     height: calc(100% - var(--base-height));
     position: absolute;
+    border: solid 1px red;
 }
 
 .se-right {
     left: calc((((100vw - var(--section-body-width)) - 10px)/2) + var(--section-body-width));
 }
 
+#space-1 {
+    background-color: #000003;
+    background-image: url("../img/space-bg-2.gif");
+}
+
+#space-2 {
+    background-color: #020a36;
+    background-image: url("../img/dblue003.jpg");
+}
+
+#space-3 {
+    background-color: #043fad;
+    background-image: url("../img/clouds.png");
+    background-size: cover;
+    background-position: center;
+}
+
+#space-3>.section-body {
+    height: 2000px;
+}
+
+#surface {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    position: relative;
+    left: calc(((100vw - var(--section-body-width)) - 10px)/2);
+}
+
+#fake-padding {
+    min-width: calc((((100vw - var(--section-body-width)) - 10px)/2) + 10px);
+    height: 100%;
+    background-color: var(--primary-color);
+    position: relative;
+}
+
+.surface-section {
+    position: relative;
+    min-width: var(--section-body-width);
+    /* outline: 2px solid purple; */
+    outline-offset: -1px;
+    height: 800px;
+    background-image: url("../img/bliss.jpg");
+    background-size: cover;
+    background-position: center;
+}
+
+.floor {
+    --height: 5px;
+    position: absolute;
+    top: calc(100% - var(--height));
+    left: 50%;
+    transform: translateX(-50%);
+    height: var(--height);
+    width: 97%;
+}
+
+.ceiling {
+    --height: 10px;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: var(--height);
+    width: 100%;
+}
+
+.scroll-edge {
+    width: calc(((100vw - var(--section-body-width)) - 10px)/2);
+    height: 100%;
+    position: fixed;
+    z-index: 100;
+    top: 0;
+    background-color: black;
+}
+
+#scroll-edge-left {
+    left: 0;
+}
+
+#scroll-edge-right {
+    left: calc((((100vw - var(--section-body-width)) - 10px)/2) + var(--section-body-width));
+    width: calc(((100vw - var(--section-body-width)) - 10px)/2 + 10px);
+}
+
+#start-cap {
+    position: absolute;
+    top: 0;
+    left: -5px;
+    bottom: 0;
+    width: 10px;
+}
+
+#end-cap {
+    position: absolute;
+    top: 0;
+    right: -5px;
+    bottom: 0;
+    width: 10px;
+}
+
+/*  Start of walls ------------------------------ */
 
 #wall-1 {
     width: 425px;
@@ -480,11 +697,6 @@ h1 {
     position: absolute;
     top: calc(100vh - var(--height));
     left: 0;
-    right: 20vw;
+    right: 0;
     height: var(--height);
-}
-
-
-#sky {
-    background-color: #3a7de2;
 }

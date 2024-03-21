@@ -2,6 +2,13 @@
 <html lang="en">
 
 <head>
+    <!-- anti caching measures -->
+    <meta http-equiv="cache-control" content="max-age=0">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="-1">
+    <meta http-equiv="expires" content="Tue, 01 Jan 1980 11:00:00 GMT">
+    <meta http-equiv="pragma" content="no-cache">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="./js/hexBackground2.js" defer></script>
@@ -20,6 +27,7 @@
     <div class="ball hexBackground glow-orb-1" id="ball-1"></div>
     <div class="ball hexBackground glow-orb-2" id="ball-2"></div>
     <div class="ball" id="ball-3"></div>
+    <div id="filter" class="crt hidden"></div>
     <div class="wall" id="wall-27"></div>
     <div class="section" id="part-1">
         <h3 class="foreground sign" id="first-sign">
@@ -107,11 +115,39 @@
         </div>
         <div class="wall section-edge se-right maze-wall"></div>
     </div>
-    <div class="section" id="sky">
+    <div class="section hidden-2" id="space-1">
         <div class="section-edge wall"></div>
-        <div class="section-body"></div>
+        <div class="section-body">
+        </div>
         <div class="section-edge wall se-right"></div>
     </div>
+    <div class="section hidden-2" id="space-2">
+        <div class="section-body">
+
+        </div>
+    </div>
+    <div class="section hidden-2" id="space-3">
+        <div class="section-body">
+        </div>
+    </div>
+    <div class="section hidden-2" id="surface">
+        <div class="surface-section">
+            <div class="wall" id="start-cap"></div>
+            <div class="wall floor"></div>
+        </div>
+        <div class="surface-section">
+            <div class="wall floor"></div>
+            <div class="wall ceiling"></div>
+        </div>
+        <div class="surface-section">
+            <div class="wall floor"></div>
+            <div class="wall ceiling"></div>
+            <div class="wall" id="end-cap"></div>
+        </div>
+        <div id="fake-padding" class="wall"></div>
+    </div>
+    <div id="scroll-edge-left" class="scroll-edge hidden-3"></div>
+    <div id="scroll-edge-right" class="scroll-edge hidden-3"></div>
 </body>
 
 </html>

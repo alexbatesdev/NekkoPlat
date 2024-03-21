@@ -16,6 +16,10 @@ let mouseY = 0;
 let firstCLick = false;
 let followMouse = false;
 let doGravity = false;
+let airJumps = 0;
+let maxAirJumps = 1;
+let airborn = true;
+let recentInputs = [];
 
 let keyState = {
     W: false,
@@ -90,10 +94,10 @@ const update = () => {
                 if (keyState.D && velocityX < maxVelocity * (doGravity ? 2.4 : 1)) velocityX += acceleration * (doGravity ? 2.4 : 1);
 
                 // Gradually decrease velocity when no keys are pressed
-                if (!keyState.W && velocityY < 0) velocityY += deceleration;
-                if (!keyState.A && velocityX < 0) velocityX += deceleration;
-                if (!keyState.S && velocityY > 0) velocityY -= deceleration;
-                if (!keyState.D && velocityX > 0) velocityX -= deceleration;
+                if (!airborn && !keyState.W && velocityY < 0) velocityY += (deceleration * (doGravity ? 2 : 1));
+                if (!airborn && !keyState.A && velocityX < 0) velocityX += (deceleration * (doGravity ? 2.3 : 1));
+                if (!airborn && !keyState.S && velocityY > 0) velocityY -= (deceleration * (doGravity ? 2 : 1));
+                if (!airborn && !keyState.D && velocityX > 0) velocityX -= (deceleration * (doGravity ? 2.3 : 1));
             } else {
                 // Ball Following Mouse
                 let ballX = cursor_balls[i].getBoundingClientRect().x;
@@ -121,26 +125,24 @@ const update = () => {
                 velocityX = Math.cos(angle) * speed;
                 velocityY = (Math.sin(angle) * speed);
 
-                // If the ball is going a certain speed, check for collision with a higher precision
+
 
             }
 
             // MOVEMENT CHUNK END --------------------------------------------------------------
 
 
-            // if (velocityX > -0.15 && velocityX < 0.15) velocityX = 0;
-            // if (velocityY > -0.15 && velocityY < 0.15) velocityY = 0;
-
             if (doGravity) {
-                velocityY += 1;
+                if (velocityY < 0 && keyState.W) {
+                    velocityY += 0.7;
+                } else {
+                    velocityY += 1;
+                }
             }
 
 
             //if ball will be off screen next frame, stop the ball
             if (positionX + velocityX < 0) {
-                velocityX = 0;
-            }
-            if (positionX + velocityX > window.innerWidth) {
                 velocityX = 0;
             }
 
@@ -176,7 +178,36 @@ const update = () => {
                         tempBallY + deltaY < wallRect.y + wallRect.height &&
                         tempBallY + ballRect.height + deltaY > wallRect.y
                     ) {
-                        console.log("collision")
+                        let collisionType = null;
+                        if (tempBallX + ballRect.width + deltaX > wallRect.x && tempBallX + deltaX < wallRect.x) collisionType = "right";
+                        if (tempBallX + deltaX < wallRect.x + wallRect.width && tempBallX + ballRect.width + deltaX > wallRect.x + wallRect.width) collisionType = "left";
+                        if (tempBallY + ballRect.height + deltaY > wallRect.y && tempBallY + deltaY < wallRect.y) collisionType = "bottom";
+                        if (tempBallY + deltaY < wallRect.y + wallRect.height && tempBallY + ballRect.height + deltaY > wallRect.y + wallRect.height) collisionType = "top";
+
+                        if (collisionType == "right" || collisionType == "left") {
+                            airborn = false;
+                            if (velocityY > 0) {
+                                velocityY *= 0.5;
+
+                            } else {
+                                if (keyState.W) {
+                                    velocityX += collisionType == "right" ? -12 : 12;
+                                }
+                            }
+                        }
+
+                        if (collisionType == "bottom") {
+                            if (doGravity) {
+                                airJumps = maxAirJumps;
+                                airborn = false;
+                                if (velocityX != 0) {
+                                    let ball_2 = document.getElementById("ball-2");
+                                    ball_2.style.backgroundImage = "url('./img/cat_walk.gif')";
+
+                                }
+                            }
+                        }
+
                         // Check if the ball is already inside the wall
                         if (
                             ballRect.x >= wallRect.x &&
@@ -215,11 +246,16 @@ const update = () => {
             positionX += velocityX;
             positionY += velocityY;
 
-            // Now if you are ball-3 ignore all these calculations and set your position to the mouse position
-
-            const velocityThreshold = 0.15;
+            const velocityThreshold = 0.2;
             if (Math.abs(velocityX) < velocityThreshold) velocityX = 0;
             if (Math.abs(velocityY) < velocityThreshold) velocityY = 0;
+
+            if (velocityX == 0 && velocityY == 0 && doGravity && !keyState.A && !keyState.D) {
+                let ball_2 = document.getElementById("ball-2");
+                if (!listsAreEqual(recentInputs, [null, null, null, null, null,])) {
+                    ball_2.style.backgroundImage = "url('./img/cat_stand.gif')";
+                }
+            }
 
             cursor_balls[i].style.top = positionY - ballRect.height / 2 + 'px';
             cursor_balls[i].style.left = positionX - ballRect.width / 2 + 'px';
@@ -236,12 +272,34 @@ const update = () => {
 
     // if ball y value greater than window height + scroll, scroll down
     if (positionY > window.innerHeight + window.scrollY - scrollThreshold) {
-        window.scrollBy(0, 10);
+        window.scrollBy(0, (doGravity && velocityY > 0) ? velocityY : 10);
     }
 
     // if ball y value less than scroll, scroll up
     if (positionY < window.scrollY + scrollThreshold) {
-        window.scrollBy(0, -10);
+        window.scrollBy(0, (doGravity && velocityY < 0) ? velocityY : -10);
+    }
+    const ball_2 = document.getElementById("ball-2");
+    const ball_2_rect = ball_2.getBoundingClientRect();
+
+    let scrollLeftBoundary = document.getElementById("scroll-edge-left").getBoundingClientRect();
+    let scrollRightBoundary = document.getElementById("scroll-edge-right").getBoundingClientRect();
+
+    // Get root css variable values
+    let sectionBodyWidth = getComputedStyle(document.documentElement).getPropertyValue("--section-body-width").replace("px", "");
+
+    // if ball x value less than scroll, scroll left
+    if (ball_2_rect.x < scrollLeftBoundary.right && doGravity) {
+        window.scrollBy(velocityX < 0 ? -sectionBodyWidth : 0, 0);
+        positionX -= ball_2_rect.width;
+        console.log("scrolling left")
+    }
+
+    // if ball x value greater than scroll, scroll right
+    if (ball_2_rect.x + ball_2_rect.width > scrollRightBoundary.left && doGravity) {
+        window.scrollBy(velocityX > 0 ? sectionBodyWidth : 0, 0);
+        positionX += ball_2_rect.width;
+        console.log("scrolling right")
     }
 
     const maxSize = 300;
@@ -249,7 +307,6 @@ const update = () => {
     const maxBlur = 120;
     const minBlur = 60;
     const ball = document.getElementById("ball-1");
-    const ball_2 = document.getElementById("ball-2");
     const ballRect = ball.getBoundingClientRect();
     const prevBlur = parseInt(getComputedStyle(ball).getPropertyValue("--blur").replace("px", ""))
     const prevBlur_2 = parseInt(getComputedStyle(ball_2).getPropertyValue("--blur").replace("px", ""))
@@ -257,12 +314,12 @@ const update = () => {
         console.log(ballRect.width)
         if (ballRect.width < maxSize) {
             ball.style.setProperty("--ball-size", ballRect.width / 2 + 1 + "px")
-            console.log("Growing")
+
         }
         if (prevBlur < maxBlur) {
             ball.style.setProperty("--blur", (prevBlur + 1) + "px")
             ball_2.style.setProperty("--blur", (prevBlur_2 + 1) + "px")
-            console.log("Blurring")
+
 
         }
         if (scopedCurrentMaxSpeed > scopedMinSpeed) {
@@ -271,23 +328,21 @@ const update = () => {
 
     } else {
         if (ballRect.width > minSize) {
-            ball.style.setProperty("--ball-size", ballRect.width / 2 - 1 + "px")
+            ball.style.setProperty("--ball-size", ballRect.width / 2 - 2 + "px")
             console.log("Shrinking")
             console.log(ballRect.width)
             console.log(ball.style.getPropertyValue("--ball-size"))
+            console.log(ballRect.width / 2 - 1 + "px")
         }
         if (prevBlur > minBlur) {
             ball.style.setProperty("--blur", prevBlur - 1 + "px")
             ball_2.style.setProperty("--blur", prevBlur_2 - 1 + "px")
-            console.log("Unblurring")
         }
         if (scopedCurrentMaxSpeed < scopedStandardSpeed) {
             scopedCurrentMaxSpeed += 1;
         }
     }
-    if (ballRect.width > maxSize) {
-        ball.style.setProperty("--ball-size", maxSize / 2 + "px")
-    }
+
 
     // if element overlapping sign, change sign text and allow click/press enter action
     for (let i = 0; i < signs.length; i++) {
@@ -332,13 +387,43 @@ const update = () => {
         }
 
     }
+
     requestAnimationFrame(update);
+}
+
+const activatePlatformerMode = () => {
+    doGravity = true;
+    deceleration = 0.1;
+    followMouse = false;
+    document.getElementById("filter").classList.remove("hidden");
+
+    let ball_2 = document.getElementById("ball-2");
+
+
+    ball_2.classList.remove("glow-orb-2");
+    ball_2.classList.remove("hexBackground");
+    ball_2.style.animation = "none";
+    // Move to a class
+    ball_2.style.border = "none";
+    ball_2.style.backgroundColor = "transparent";
+    ball_2.style.backgroundImage = "url('./img/cat_stand.gif')";
+    ball_2.style.backgroundSize = "cover";
+    ball_2.style.backgroundPosition = "center";
+    ball_2.style.imageRendering = "pixelated";
+    ball_2.style.borderRadius = "25%";
+    ball_2.style.zIndex = "5";
+
+    document.getElementById("scroll-edge-left").classList.remove("hidden-3");
+    document.getElementById("scroll-edge-right").classList.remove("hidden-3");
+
+    let ball_1 = document.getElementById("ball-1");
+    ball_1.style.display = "none";
 }
 
 const firstSignAction = () => {
     toggleFollowMouse();
+    // activatePlatformerMode();
     firstCLick = true;
-    doGravity = true;
 
     const unhides = document.getElementById("part-1").querySelectorAll(".hidden-2");
     for (let i = 0; i < unhides.length; i++) {
@@ -387,9 +472,41 @@ const startsignAction = () => {
 document.addEventListener('keydown', function (event) {
     event.preventDefault();
     let key = event.key.toUpperCase();
-    if (key in keyState) {
-        keyState[key] = true;
+    let ball_2 = document.getElementById("ball-2");
+
+    if (doGravity) {
+
+        if (key == "A" && !keyState.A) {
+            ball_2.style.transform = "rotate3d(0, 1, 0, 0deg)";
+            ball_2.style.backgroundImage = "url('./img/cat_walk.gif')";
+            console.log("set_cat_walk")
+            if (velocityX > 0) velocityX *= -0.2;
+        }
+
+        if (key == "D" && !keyState.D) {
+            ball_2.style.transform = "rotate3d(0, 1, 0, 180deg)";
+            ball_2.style.backgroundImage = "url('./img/cat_walk.gif')";
+            console.log("set_cat_walk")
+            if (velocityX < 0) velocityX *= -0.2;
+        }
+
+        if (key == "W" && !keyState.W) {
+            console.log("Airborn: " + airborn)
+            if (!airborn) {
+                velocityY = -24;
+                airborn = true;
+                ball_2.style.backgroundImage = "url('./img/cat_jump.gif')";
+            } else if (airJumps > 0) {
+                console.log(airJumps + "th Air Jump Used!")
+                airJumps -= 1;
+                velocityY = -24;
+                ball_2.style.backgroundImage = "url('./img/cat_jump.gif')";
+
+            }
+        }
     }
+
+
     if (key == "E") {
         document.addEventListener('click', (event) => {
             console.log(event.pageX, event.pageY);
@@ -404,10 +521,9 @@ document.addEventListener('keydown', function (event) {
         toggleFollowMouse();
     }
 
-    if (key == "W") {
-        if (velocityY < 0.15 && velocityY > -0.15) {
-            velocityY = -24;
-        }
+    if (key in keyState) {
+        keyState[key] = true;
+        recentInputs.push(key);
     }
 });
 
@@ -500,3 +616,28 @@ const changeColor = () => {
 }
 
 setInterval(changeColor, 4000);
+
+setInterval(() => {
+    if (!doGravity) return;
+
+    recentInputs[recentInputs.length] = null;
+    while (recentInputs.length > 5) recentInputs.shift();
+    if (listsAreEqual(recentInputs, [null, null, null, null, null,])) {
+        console.log("Cat fell asleep!")
+        let ball_2 = document.getElementById("ball-2");
+        ball_2.style.backgroundImage = "url('./img/cat_fall_asleep.gif')";
+    }
+    console.log(recentInputs);
+}, 2000);
+
+const listsAreEqual = (list1, list2) => {
+    if (list1.length != list2.length) return false;
+    for (let i = 0; i < list1.length; i++) {
+        if (list1[i] != list2[i]) return false;
+    }
+    return true;
+}
+
+window.onload = () => {
+    window.scrollTo(0, 0);
+}
