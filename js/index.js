@@ -608,6 +608,10 @@ document.addEventListener('mousemove', function (event) {
     mouseY = event.clientY;
 });
 
+document.addEventListener('contextmenu', function (event) {
+    event.preventDefault();
+});
+
 //add hidden class to every item in a section
 const hideElement = (element) => {
     let items = element.querySelectorAll("*");
