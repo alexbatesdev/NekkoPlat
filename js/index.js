@@ -33,6 +33,7 @@ let keyState = {
     LEFT_CLICK: false,
     RIGHT_CLICK: false,
     CONTROL: false,
+    SPACE: false
 };
 
 const toggleFollowMouse = () => {
@@ -346,7 +347,7 @@ const update = () => {
     const ballRect = ball.getBoundingClientRect();
     const prevBlur = parseInt(getComputedStyle(ball).getPropertyValue("--blur").replace("px", ""))
     const prevBlur_2 = parseInt(getComputedStyle(ball_2).getPropertyValue("--blur").replace("px", ""))
-    if ((keyState.RIGHT_CLICK && followMouse) || (keyState.CONTROL && !followMouse)) {
+    if ((keyState.RIGHT_CLICK && followMouse) || (keyState.SPACE && !followMouse)) {
         console.log(ballRect.width)
         if (ballRect.width < maxSize) {
             ball.style.setProperty("--ball-size", ballRect.width / 2 + 1 + "px")
@@ -421,6 +422,11 @@ const update = () => {
         }
 
     }
+    const is_glow_cluster_hidden = document.getElementById("go-1").classList.contains("hidden-2");
+    console.log(is_glow_cluster_hidden)
+    if (!doGravity && positionY > 3200 && is_glow_cluster_hidden) {
+        mazeEndAction()
+    }
 
     requestAnimationFrame(update);
 }
@@ -484,7 +490,6 @@ const mazeEndAction = () => {
     end_sign.classList.add("hidden-2");
     const congrats_text = document.getElementById("congrats-text");
     congrats_text.classList.remove("hidden-2");
-    window.scrollBy(0, 300);
     document.getElementById("start-platformer-sign").classList.remove("hidden-2");
 }
 
@@ -512,6 +517,7 @@ const startsignAction = () => {
 document.addEventListener('keydown', function (event) {
     event.preventDefault();
     let key = event.key.toUpperCase();
+    if (key == " ") key = "SPACE";
     let ball_2 = document.getElementById("ball-2");
 
     if (doGravity) {
@@ -557,7 +563,7 @@ document.addEventListener('keydown', function (event) {
         });
     }
 
-    if (key == " ") {
+    if (key == "CONTROL") {
         toggleFollowMouse();
     }
 
@@ -569,7 +575,9 @@ document.addEventListener('keydown', function (event) {
 
 document.addEventListener('click', function (event) {
     console.log(event.pageX, event.pageY);
-    console.log(cursor_balls);
+    console.log("position")
+    console.log(positionX, positionY);
+
     for (let i = 0; i < cursor_balls.length; i++) {
         console.log("Ball " + (i + 1))
         console.log("X: " + cursor_balls[i].getBoundingClientRect().x + " Y: " + cursor_balls[i].getBoundingClientRect().y);
@@ -598,6 +606,7 @@ document.addEventListener('mouseup', (event) => {
 
 document.addEventListener('keyup', function (event) {
     let key = event.key.toUpperCase();
+    if (key == " ") key = "SPACE";
     if (key in keyState) {
         keyState[key] = false;
     }
@@ -608,9 +617,9 @@ document.addEventListener('mousemove', function (event) {
     mouseY = event.clientY;
 });
 
-document.addEventListener('contextmenu', function (event) {
-    event.preventDefault();
-});
+// document.addEventListener('contextmenu', function (event) {
+//     event.preventDefault();
+// });
 
 //add hidden class to every item in a section
 const hideElement = (element) => {
