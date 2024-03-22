@@ -278,6 +278,9 @@ body {
     position: absolute;
     top: 0;
     left: 0;
+    background-image: url("../img/underground_BG.gif");
+    background-size: cover;
+    background-position: center;
 }
 
 .wall {
@@ -286,6 +289,7 @@ body {
     z-index: 5;
     outline-offset: -1px;
     user-select: none;
+    image-rendering: pixelated;
 }
 
 .pipe {
@@ -303,13 +307,17 @@ body {
 
 
 .floor {
-    --height: 5px;
+    --height: 50px;
     position: absolute;
     top: calc(100% - var(--height));
     left: 50%;
     transform: translateX(-50%);
     height: var(--height);
     width: 100%;
+    background-image: url("../img/stone-edge-hori.png");
+    background-size: contain;
+    background-position: top left;
+    image-rendering: pixelated;
 }
 
 .ceiling {
@@ -342,9 +350,26 @@ body {
 #start-cap {
     position: absolute;
     top: 0;
-    left: -5px;
+    left: 0px;
     bottom: 0;
-    width: 10px;
+    width: 50px;
+    background-image: url("../img/stone-edge-vert.png");
+    background-size: contain;
+    background-position: top left;
+    image-rendering: pixelated;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+
+.cap {
+    position: absolute;
+    height: 50px;
+    width: 50px;
+    z-index: 3;
+    background-image: url("../img/stone-no-edge.png");
+    background-size: contain;
 }
 
 #end-cap {
@@ -352,7 +377,12 @@ body {
     top: 0;
     right: -5px;
     bottom: 0;
-    width: 10px;
+    width: 50px;
+    background-image: url("../img/stone-edge-vert.png");
+    background-size: contain;
+    background-position: top left;
+    image-rendering: pixelated;
+    transform: rotate(180deg);
 }
 
 #pipe-1 {
@@ -368,4 +398,111 @@ body {
     background-position: center;
     image-rendering: pixelated;
     z-index: 5;
+}
+
+#wall-1 {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 100px;
+    background-image: url("../img/stone-edge-sides.png");
+    background-size: contain;
+    background-position: top left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.wall>.double-cap {
+    height: 100%;
+    width: 50px;
+    background-image: url("../img/stone-double-corners.png");
+    background-size: contain;
+    transform: rotate(180deg);
+    z-index: 3;
+    position: relative;
+    right: -10px;
+}
+
+.wall>.double-cap:first-of-type {
+    transform: rotate(0deg);
+    left: -10px;
+}
+
+.sign {
+    padding: 1rem;
+    background-color: rgb(255, 244, 240);
+    font-size: 20px;
+    line-height: 1.25;
+}
+
+#sign-1 {
+    position: absolute;
+    top: 75%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: Arial, Helvetica, sans-serif;
+    width: 500px;
+}
+
+@keyframes bljitter {
+    0% {
+        right: 30px;
+    }
+
+    100% {
+        right: 50px;
+
+    }
+}
+
+#img-1 {
+    position: absolute;
+    right: 40px;
+    bottom: 50px;
+    animation: bljitter 0.1s infinite;
+}
+
+#img-2 {
+    position: absolute;
+    left: 100px;
+    bottom: 45px;
+}
+
+#img-3 {
+    position: absolute;
+    height: 200px;
+    top: 50px;
+    right: 300px;
+    z-index: 2;
+}
+
+#img-4 {
+    position: absolute;
+    height: 500px;
+    top: 50px;
+    animation: bljitter 0.1s infinite;
+}
+
+#img-5 {
+    position: absolute;
+    /* height: 200px; */
+    top: 50px;
+    right: 300px;
+}
+
+#img-6 {
+    position: absolute;
+    top: 50px;
+    left: 50px;
+    width: 100px;
+}
+
+#img-7 {
+    position: absolute;
+    bottom: 50px;
+    right: 75px;
+    width: 100px;
 }

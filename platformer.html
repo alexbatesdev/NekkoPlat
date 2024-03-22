@@ -14,7 +14,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="./js/hexBackground2.js" defer></script>
 
-
+    <link rel="stylesheet" href="./css/pixel-corners.css">
     <script src="./js/platformer.js" defer></script>
     <link rel="stylesheet" href="./css/platformer.css">
     <title>Nekko's World</title>
@@ -26,11 +26,42 @@
     <div id="scroll-edge-left" class="scroll-edge"></div>
     <div id="scroll-edge-right" class="scroll-edge"></div>
     <div class="screen" id="screen-0">
-        <div class="wall" id="start-cap"></div>
         <div class="wall floor" id="floor-1"></div>
         <div class="pipe" id="pipe-1"></div>
+
+        <div class="wall" id="wall-1">
+            <div class="double-cap"></div>
+            <div class="double-cap"></div>
+        </div>
+
+        <div class="sign pixel-corners" id="sign-1">
+            Wow! Thanks for completing what exists of Nekko's Journey!
+            All those images you saw were taken by me during various travels!
+            I plan to add more to this "platformer" in the future, but think of it less like a game and more like a
+            website that you can jump around!
+            What I want to put on this website? I have no clue!
+            Likely a library, a rocket, a beach side resort, an art gallery, and ways to access all my other pre-eisting
+            pages!
+            For now you can head to the right to see funny gifs.
+        </div>
+
+        <div class="wall" id="start-cap">
+            <div class="cap"></div>
+        </div>
     </div>
     <div class="screen" id="screen-1">
         <div class="wall floor" id="floor-2"></div>
+
+        <img src="./img/blj.gif" alt="Mario Backwards Long Jumping" id="img-1">
+        <img src="./img/amogus.gif" alt="amogus club penguin dencing" id="img-2">
+        <img src="./img/cat-planet.gif" alt="Doom Guy standing there regularly" id="img-3">
+        <img src="./img/jinx-cat-javascript.gif" alt="Jinx the cat develops javascript" id="img-4">
+        <img src="./img/slownet.gif" class="hidden" alt="A wizard" id="img-5">
+        <img src="./img/explode.gif" alt="Explosion" id="img-6">
+        <img src="./img/explode.gif" alt="Explosion" id="img-7">
+
+        <div class="wall" id="end-cap">
+            <div class="cap"></div>
+        </div>
     </div>
 </body>

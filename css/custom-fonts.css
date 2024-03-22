@@ -1,0 +1,8 @@
+@font-face {
+    font-family: 'Pixel';
+    src: url("./fonts/Super-Mario-World.ttf");
+}
+
+.pixel-font {
+    font-family: 'Flipnote';
+}

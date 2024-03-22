@@ -33,9 +33,12 @@ let keyState = {
 
 // TODO ---------------------- 1. Seperate Ball logic from platformer logic for everything lower than this line
 const update = () => {
-    const scopedMinSpeed = 5;
-    const scopedStandardSpeed = 25;
-    let scopedCurrentMaxSpeed = scopedStandardSpeed;
+    if (positionX > window.innerWidth) {
+        console.log("You Win!");
+        document.getElementById("img-5").classList.remove("hidden");
+    }
+
+
     const player_rect = player.getBoundingClientRect();
 
     // MOVEMENT CHUNK --------------------------------------------------------------
@@ -383,15 +386,15 @@ let screenIndex = 0;
 
 // For each screen, set the left position to the screen's index times the window width
 for (let i = 0; i < screens.length; i++) {
-    screens[i].style.left = i * window.innerWidth + "px";
+    screens[i].style.left = (i * window.innerWidth) - 1 + "px";
 }
 
 document.body.style.width = screens.length * window.innerWidth + "px";
 
 window.onload = () => {
-    window.scrollTo(0, 0);
     requestAnimationFrame(update);
     setTimeout(() => {
         document.getElementById("pipe-1").classList.add("wall");
-    }, 1000);
+        window.scrollTo(0, 0);
+    }, 400);
 }
