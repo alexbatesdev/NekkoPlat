@@ -9,6 +9,7 @@
     <meta http-equiv="expires" content="Tue, 01 Jan 1980 11:00:00 GMT">
     <meta http-equiv="pragma" content="no-cache">
 
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="./js/hexBackground2.js" defer></script>
@@ -16,10 +17,20 @@
 
     <script src="./js/platformer.js" defer></script>
     <link rel="stylesheet" href="./css/platformer.css">
-    <title>Fidget Page</title>
+    <title>Nekko's World</title>
 </head>
 
 <body>
     <div class="cat" id="player"></div>
     <div id="filter" class="crt hidden"></div>
+    <div id="scroll-edge-left" class="scroll-edge"></div>
+    <div id="scroll-edge-right" class="scroll-edge"></div>
+    <div class="screen" id="screen-0">
+        <div class="wall" id="start-cap"></div>
+        <div class="wall floor" id="floor-1"></div>
+        <div class="pipe" id="pipe-1"></div>
+    </div>
+    <div class="screen" id="screen-1">
+        <div class="wall floor" id="floor-2"></div>
+    </div>
 </body>
