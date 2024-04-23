@@ -30,11 +30,14 @@ let keyState = {
     R: false,
 };
 
+// TODO:
+// Change Screen Layout system to use css grid
+// Rework camera movement to be based on player position
+
 
 // TODO ---------------------- 1. Seperate Ball logic from platformer logic for everything lower than this line
 const update = () => {
     if (positionX > window.innerWidth) {
-        console.log("You Win!");
         document.getElementById("img-5").classList.remove("hidden");
     }
 
@@ -380,16 +383,30 @@ const listsAreEqual = (list1, list2) => {
 
 
 // requestAnimationFrame(update);
+let prevInnerWidth = window.innerWidth;
+const screenResize = () => {
+    let screens = document.getElementsByClassName("screen");
+    let screenIndex = 0;
 
-let screens = document.getElementsByClassName("screen");
-let screenIndex = 0;
+    // For each screen, set the left position to the screen's index times the window width
+    for (let i = 0; i < screens.length; i++) {
+        screens[i].style.left = (i * window.innerWidth) - 1 + "px";
+    }
 
-// For each screen, set the left position to the screen's index times the window width
-for (let i = 0; i < screens.length; i++) {
-    screens[i].style.left = (i * window.innerWidth) - 1 + "px";
+    document.body.style.width = screens.length * window.innerWidth + "px";
 }
 
-document.body.style.width = screens.length * window.innerWidth + "px";
+screenResize();
+
+window.onresize = (one) => {
+    console.log(one.target.innerWidth - prevInnerWidth);
+    positionX += (positionX / one.target.innerWidth) * (one.target.innerWidth - prevInnerWidth);
+    console.log()
+    // window.scrollBy(one.target.innerWidth - prevInnerWidth, 0);
+    prevInnerWidth = one.target.innerWidth;
+    screenResize();
+}
+
 
 window.onload = () => {
     requestAnimationFrame(update);

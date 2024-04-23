@@ -286,10 +286,14 @@ body {
 .wall {
     position: absolute;
     top: 0;
+    left: 0;
     z-index: 5;
     outline-offset: -1px;
     user-select: none;
     image-rendering: pixelated;
+    background-image: url("../img/stone-no-edge.png");
+    background-size: 50px;
+    background-position: top left;
 }
 
 .pipe {
@@ -318,6 +322,22 @@ body {
     background-size: contain;
     background-position: top left;
     image-rendering: pixelated;
+}
+
+#floor-3 {
+    transform: translateX(0);
+    right: 0;
+    left: initial;
+    width: 30%;
+    outline: 2px solid red;
+}
+
+#floor-4 {
+    transform: translateX(0);
+    left: 0;
+    left: initial;
+    width: 52%;
+    outline: 2px solid red;
 }
 
 .ceiling {
@@ -375,6 +395,7 @@ body {
 #end-cap {
     position: absolute;
     top: 0;
+    left: initial;
     right: -5px;
     bottom: 0;
     width: 50px;
@@ -413,6 +434,29 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+#wall-2 {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, 0%);
+    width: 350px;
+    height: 500px;
+}
+
+#wall-3 {
+    left: 30%;
+    top: 75%;
+    transform: translate(-50%, 0%);
+    width: 300px;
+    height: 200px;
+}
+
+#wall-4 {
+    left: 75%;
+    top: 0%;
+    width: 400px;
+    height: 600px;
 }
 
 .wall>.double-cap {
