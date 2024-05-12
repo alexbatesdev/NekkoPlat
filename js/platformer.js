@@ -14,13 +14,22 @@ class Player {
         this.airJumps = 0;
         this.maxAirJumps = 1;
         this.walls = walls;
+        this.gravity = 0.2;
+        this.jumpProcessed = false;
     }
 
     update(keyState) {
-        // Update position based on current velocities
         this.processInput(keyState); // Handle inputs first
-        this.applyPhysics();         // Then apply physics
-        this.checkCollisions();      // Check for collisions
+
+        // First apply vertical physics to help with jumping/falling through platforms
+        this.velocityY += this.gravity;
+        this.y += this.velocityY;
+        this.checkVerticalCollisions();
+
+        // Then apply horizontal movement
+        this.x += this.velocityX;
+        this.checkHorizontalCollisions();
+
         this.render();               // Finally, render the new state
     }
 
@@ -30,43 +39,79 @@ class Player {
         if (keyState['SHIFT']) {
             acceleration = 0.5;
             maxVelocity = 6;
-            console.log(this.x, this.y)
+            // console.log(this.x, this.y)
+        }
+
+
+        if (keyState['W'] && (this.grounded || this.airJumps <= this.maxAirJumps)) {
+            if (!this.jumpProcessed) {
+                if (!this.grounded) {
+                    this.airJumps += 1;
+                    console.log("Air Jumping");
+                } else {
+                    console.log("Jumping");
+                }
+                this.velocityY = -6;
+                console.log(this.airJumps);
+                this.grounded = false;
+                this.jumpProcessed = true; // Set the flag to true after processing the jump
+            }
+        } else {
+            this.jumpProcessed = false; // Reset the flag when 'W' is not pressed
         }
 
         // Movement calculations here
-        if (keyState['A']) this.velocityX = Math.max(this.velocityX - acceleration * 2.4, -maxVelocity);
-        if (keyState['D']) this.velocityX = Math.min(this.velocityX + acceleration * 2.4, maxVelocity);
-        if (keyState['W']) this.velocityY = Math.max(this.velocityY - acceleration, -maxVelocity);
+        if (keyState['A']) this.velocityX = Math.max(this.velocityX - acceleration, -maxVelocity);
+        if (keyState['D']) this.velocityX = Math.min(this.velocityX + acceleration, maxVelocity);
+        // if (keyState['W']) this.velocityY = Math.max(this.velocityY - acceleration, -maxVelocity);
         if (keyState['S']) this.velocityY = Math.min(this.velocityY + acceleration, maxVelocity);
         // Similar for other directions
 
-
+        if (keyState['Z']) {
+            console.log(this.velocityY)
+        }
         // Update position based on velocity
         this.x += this.velocityX;
         this.y += this.velocityY;
     }
 
-    applyPhysics() {
-        // Apply gravity, friction, etc.
-        //     if (positionX + velocityX < 0) {
-        //         velocityX = 0;
-        //     }
-
-        //     if (positionY + velocityY < 0) {
-        //         velocityY = 0;
-        //     }
-
-
-        // if (this.positionX)
-    }
-
-    checkCollisions() {
+    checkVerticalCollisions() {
         const playerRect = this.element.getBoundingClientRect();
         this.walls.forEach(wall => {
             if (this.intersects(playerRect, wall.rect)) {
-                // Handle collision response here
-                console.log('Collision detected with a wall!');
-                // Reset or adjust velocity, position, etc.
+                const collision = this.getCollisionOverlap(playerRect, wall.rect);
+                if (collision.bottom) {
+                    this.velocityY = 0;
+                    this.y -= collision.bottom; // Adjust the y position by the overlap
+                    if (!this.grounded) { // Reset jumpProcessed if the player was not previously grounded
+                        this.jumpProcessed = false;
+                    }
+                    this.grounded = true;
+                    this.airJumps = this.maxAirJumps;
+                } else {
+                    this.grounded = false;
+                }
+                if (collision.top) {
+                    this.velocityY = 0;
+                    this.y += collision.top; // Adjust the y position by the overlap
+                }
+            }
+        });
+    }
+
+    checkHorizontalCollisions() {
+        const playerRect = this.element.getBoundingClientRect();
+        this.walls.forEach(wall => {
+            if (this.intersects(playerRect, wall.rect)) {
+                const collision = this.getCollisionOverlap(playerRect, wall.rect);
+                if (collision.left) {
+                    this.velocityX = 0;
+                    this.x += collision.left; // Adjust the x position by the overlap
+                }
+                if (collision.right) {
+                    this.velocityX = 0;
+                    this.x -= collision.right; // Adjust the x position by the overlap
+                }
             }
         });
     }
@@ -76,6 +121,63 @@ class Player {
             rect2.right < rect1.left ||
             rect2.top > rect1.bottom ||
             rect2.bottom < rect1.top);
+    }
+
+    getCollisionOverlap(playerRect, wallRect) {
+        const playerLeftSide = playerRect.left;
+        const playerRightSide = playerLeftSide + playerRect.width;
+        const playerTopSide = playerRect.top;
+        const playerBottomSide = playerTopSide + playerRect.height;
+        const wallLeftSide = wallRect.left;
+        const wallRightSide = wallLeftSide + wallRect.width;
+        const wallTopSide = wallRect.top;
+        const wallBottomSide = wallTopSide + wallRect.height;
+        const playerCenterX = playerRect.left + playerRect.width / 2;
+        const playerCenterY = playerRect.top + playerRect.height / 2;
+        const wallCenterX = wallRect.left + wallRect.width / 2;
+        const wallCenterY = wallRect.top + wallRect.height / 2;
+
+        let collisionDirections = {
+            left: false,
+            right: false,
+            top: false,
+            bottom: false,
+        }
+
+        if (playerRightSide > wallLeftSide
+            && playerLeftSide < wallLeftSide
+            && playerCenterY > wallTopSide
+            && playerCenterY < wallBottomSide
+        ) {
+            collisionDirections.right = playerRightSide - wallLeftSide;
+        }
+
+        if (playerLeftSide < wallRightSide
+            && playerRightSide > wallRightSide
+            && playerCenterY > wallTopSide
+            && playerCenterY < wallBottomSide
+        ) {
+            collisionDirections.left = wallRightSide - playerLeftSide;
+        }
+
+        if (playerBottomSide > wallTopSide
+            && playerTopSide < wallTopSide
+            && playerCenterX > wallLeftSide
+            && playerCenterX < wallRightSide
+        ) {
+            collisionDirections.bottom = playerBottomSide - wallTopSide;
+        }
+
+        if (playerTopSide < wallBottomSide
+            && playerBottomSide > wallBottomSide
+            && playerCenterX > wallLeftSide
+            && playerCenterX < wallRightSide
+        ) {
+            collisionDirections.top = wallBottomSide - playerTopSide;
+        }
+
+        return collisionDirections;
+
     }
 
     render() {
@@ -117,7 +219,6 @@ class Game {
 
     update() {
         this.player.update(this.keyState);
-        this.player.applyPhysics();
         // Main Game Loop
 
         requestAnimationFrame(this.update.bind(this));

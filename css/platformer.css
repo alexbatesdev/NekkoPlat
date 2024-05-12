@@ -273,8 +273,8 @@ body {
 }
 
 .screen {
-    width: 400px;
-    height: 300px;
+    width: 100vw;
+    height: 100vh;
     position: absolute;
     top: 0;
     left: 0;
