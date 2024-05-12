@@ -7,79 +7,122 @@ class Player {
         this.y = 0;
         this.velocityX = 0;
         this.velocityY = 0;
-        this.maxVelocity = 3;
-        this.acceleration = 0.15;
+        this.maxVelocity = 5;
+        this.acceleration = 0.2;
         this.deceleration = 0.1;
         this.grounded = false;
         this.airJumps = 0;
         this.maxAirJumps = 1;
         this.walls = walls;
-        this.gravity = 0.2;
+        this.gravity = 0.3;
         this.jumpProcessed = false;
+        this.animations = {
+            idle: "url('./img/cat_stand.gif')",
+            walk: "url('./img/cat_walk.gif')",
+            jump: "url('./img/cat_jump.gif')",
+            fallAsleep: "url('./img/cat_fall_asleep.gif')",
+        }
     }
 
     update(keyState) {
-        this.processInput(keyState); // Handle inputs first
+        this.processInput(keyState);
 
-        // First apply vertical physics to help with jumping/falling through platforms
-        this.velocityY += this.gravity;
+        this.applyPhysics();
+
         this.y += this.velocityY;
-        this.checkVerticalCollisions();
-
-        // Then apply horizontal movement
         this.x += this.velocityX;
+
+        this.checkVerticalCollisions();
         this.checkHorizontalCollisions();
 
-        this.render();               // Finally, render the new state
+        this.element.style.left = `${this.x}px`;
+        this.element.style.top = `${this.y}px`;
     }
 
     processInput(keyState) {
         let acceleration = this.acceleration;
         let maxVelocity = this.maxVelocity;
-        if (keyState['SHIFT']) {
+        if (keyState['SHIFT'] && this.grounded) {
             acceleration = 0.5;
             maxVelocity = 6;
-            // console.log(this.x, this.y)
         }
 
 
-        if (keyState['W'] && (this.grounded || this.airJumps <= this.maxAirJumps)) {
+        if (keyState['W'] && (this.grounded || this.airJumps < this.maxAirJumps)) {
             if (!this.jumpProcessed) {
+                this.jumpProcessed = true; // Set the flag to true after processing the jump
                 if (!this.grounded) {
                     this.airJumps += 1;
                     console.log("Air Jumping");
                 } else {
                     console.log("Jumping");
+                    this.grounded = false;
                 }
                 this.velocityY = -6;
-                console.log(this.airJumps);
-                this.grounded = false;
-                this.jumpProcessed = true; // Set the flag to true after processing the jump
             }
         } else {
             this.jumpProcessed = false; // Reset the flag when 'W' is not pressed
         }
 
         // Movement calculations here
-        if (keyState['A']) this.velocityX = Math.max(this.velocityX - acceleration, -maxVelocity);
-        if (keyState['D']) this.velocityX = Math.min(this.velocityX + acceleration, maxVelocity);
-        // if (keyState['W']) this.velocityY = Math.max(this.velocityY - acceleration, -maxVelocity);
-        if (keyState['S']) this.velocityY = Math.min(this.velocityY + acceleration, maxVelocity);
+        if (keyState['A']) {
+            this.changeAnimation('walk');
+            this.lookLeft();
+            if (this.velocityX > 0) {
+                this.velocityX *= -0.25;
+            }
+            this.velocityX = this.velocityX - acceleration;
+        }
+        if (keyState['D']) {
+            this.changeAnimation('walk');
+            this.lookRight();
+            if (this.velocityX < 0) {
+                this.velocityX *= -0.25;
+            }
+            this.velocityX = this.velocityX + acceleration;
+        }
+        if (keyState['W']) {
+            if (this.velocityY < 0) this.velocityY -= 0.15;
+        }
+        if (keyState['S']) this.velocityY = this.velocityY + acceleration;
         // Similar for other directions
 
         if (keyState['Z']) {
-            console.log(this.velocityY)
+            console.log(this.velocityX)
+        }
+
+        if (this.grounded) {
+            // Apply max velocity
+            if (this.velocityX > maxVelocity) {
+                this.velocityX = maxVelocity;
+            } else if (this.velocityX < -maxVelocity) {
+                this.velocityX = -maxVelocity;
+            }
         }
         // Update position based on velocity
         this.x += this.velocityX;
         this.y += this.velocityY;
     }
 
+    applyPhysics() {
+        this.velocityY += this.gravity;
+        if (this.grounded && Math.abs(this.velocityX) > 0.1) {
+            this.velocityX *= 0.94;
+        } else if (!this.grounded && Math.abs(this.velocityX) > 0.1) {
+            this.velocityX *= 0.97;
+        } else {
+            this.velocityX = 0;
+            this.changeAnimation('idle');
+        }
+    }
+
     checkVerticalCollisions() {
         const playerRect = this.element.getBoundingClientRect();
+        let collisionCount = 0;
         this.walls.forEach(wall => {
             if (this.intersects(playerRect, wall.rect)) {
                 const collision = this.getCollisionOverlap(playerRect, wall.rect);
+                collisionCount++;
                 if (collision.bottom) {
                     this.velocityY = 0;
                     this.y -= collision.bottom; // Adjust the y position by the overlap
@@ -87,7 +130,7 @@ class Player {
                         this.jumpProcessed = false;
                     }
                     this.grounded = true;
-                    this.airJumps = this.maxAirJumps;
+                    this.airJumps = 0;
                 } else {
                     this.grounded = false;
                 }
@@ -97,13 +140,16 @@ class Player {
                 }
             }
         });
+        return collisionCount;
     }
 
     checkHorizontalCollisions() {
         const playerRect = this.element.getBoundingClientRect();
+        let collisionCount = 0;
         this.walls.forEach(wall => {
             if (this.intersects(playerRect, wall.rect)) {
                 const collision = this.getCollisionOverlap(playerRect, wall.rect);
+                collisionCount++;
                 if (collision.left) {
                     this.velocityX = 0;
                     this.x += collision.left; // Adjust the x position by the overlap
@@ -114,6 +160,7 @@ class Player {
                 }
             }
         });
+        return collisionCount;
     }
 
     intersects(rect1, rect2) {
@@ -180,12 +227,20 @@ class Player {
 
     }
 
-    render() {
-        // Update DOM element style to reflect new position
-        this.element.style.left = `${this.x}px`;
-        this.element.style.top = `${this.y}px`;
+    changeAnimation(animationName) {
+        const animationUrl = this.animations[animationName];
+        if (animationUrl) {
+            this.element.style.backgroundImage = animationUrl;
+        }
     }
 
+    lookRight() {
+        this.element.style.transform = 'rotateY(180deg)';
+    }
+
+    lookLeft() {
+        this.element.style.transform = 'rotateY(0deg)';
+    }
 }
 
 class Game {
