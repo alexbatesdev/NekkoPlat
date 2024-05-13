@@ -14,13 +14,13 @@ class Player {
         this.airJumps = 0;
         this.maxAirJumps = 1;
         this.walls = walls;
-        this.gravity = 0.6;
+        this.gravity = 0.9;
         this.jumpProcessed = false;
         this.animations = {
             idle: "url('./img/cat_stand.gif')",
             walk: "url('./img/cat_walk.gif')",
             jump: "url('./img/cat_jump.gif')",
-            fallAsleep: "url('./img/cat_fall_asleep.gif')",
+            waiting: "url('./img/cat_fall_asleep.gif')",
         }
         this.currentAnimation = 'idle';
         this.collisionState = {
@@ -51,7 +51,6 @@ class Player {
 
         if (vert_collision_count == 0 && hori_collision_count == 0) {
             this.changeAnimation('jump');
-            console.log("Falling")
             this.collisionState = {
                 left: 0,
                 right: 0,
@@ -92,11 +91,9 @@ class Player {
         if (keyState['W'] && (this.grounded || this.airJumps < this.maxAirJumps)) {
             if (!this.jumpProcessed) {
                 this.jumpProcessed = true; // Set the flag to true after processing the jump
-                if (!this.grounded) {
+                if (this.collisionState.bottom == 0) {
                     this.airJumps += 1;
-                    console.log("Air Jumping");
                 } else {
-                    console.log("Jumping");
                     this.grounded = false;
                 }
                 if (this.collisionState.left > 0) {
@@ -104,14 +101,10 @@ class Player {
                 } else if (this.collisionState.right > 0) {
                     this.velocityX -= 12;
                 }
-                this.velocityY += -17;
+                this.velocityY = -20;
             }
         } else {
             this.jumpProcessed = false; // Reset the flag when 'W' is not pressed
-        }
-
-        if (keyState['Z']) {
-            console.log(this.velocityX)
         }
 
         if (this.collisionState.bottom > 0) {
@@ -154,7 +147,6 @@ class Player {
         this.walls.forEach(wall => {
             if (this.intersects(playerRectNext, wall.rect)) {
                 this.velocityY = 0;
-                console.log("Collision detected");
             }
             if (this.intersects(playerRect, wall.rect)) {
                 const collision = this.getCollisionOverlap(playerRect, wall.rect);
@@ -299,7 +291,15 @@ class Player {
 class Game {
     constructor(player) {
         this.player = player;
-        this.keyState = {};
+        this.keyState = {
+            W: false,
+            A: false,
+            S: false,
+            D: false,
+            SHIFT: false,
+            SPACE: false,
+            CONTROL: false,
+        };
         this.walls = [];
         this.initKeyStateListeners();
         this.initWalls();
@@ -307,6 +307,10 @@ class Game {
 
     initKeyStateListeners() {
         document.addEventListener('keydown', (event) => {
+            if (this.keyState['SHIFT'] && this.keyState['CONTROL']) {
+                return;
+            }
+            event.preventDefault();
             this.keyState[event.key.toUpperCase()] = true;
         });
 
@@ -319,6 +323,12 @@ class Game {
         const wallElements = document.querySelectorAll('.wall');
         this.walls = Array.from(wallElements).map(wall => new Wall(wall));
         this.player.walls = this.walls; // Pass walls to player
+
+        window.addEventListener('resize', () => {
+            this.walls.forEach(wall => {
+                wall.updateRect();
+            });
+        });
     }
 
     start() {
