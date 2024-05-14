@@ -238,6 +238,8 @@ table {
 
 :root {
     --section-body-width: 80vw;
+    --screen-width: 400px;
+    --screen-height: 300px;
 }
 
 body {

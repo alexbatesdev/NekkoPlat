@@ -1,7 +1,48 @@
-// Code written by AI assistant
+
+class Game {
+    constructor(player, level) {
+        this.player = player;
+        this.keyState = {
+            W: false,
+            A: false,
+            S: false,
+            D: false,
+            SHIFT: false,
+            SPACE: false,
+            CONTROL: false,
+        };
+        this.initKeyStateListeners();
+        this.level = level;
+    }
+
+    initKeyStateListeners() {
+        document.addEventListener('keydown', (event) => {
+            if (this.keyState['SHIFT'] && this.keyState['CONTROL']) {
+                return;
+            }
+            event.preventDefault();
+            this.keyState[event.key.toUpperCase()] = true;
+        });
+
+        document.addEventListener('keyup', (event) => {
+            this.keyState[event.key.toUpperCase()] = false;
+        });
+    }
+
+    start() {
+        requestAnimationFrame(this.update.bind(this));
+    }
+
+    update() {
+        this.player.update(this.keyState);
+        // Main Game Loop
+
+        requestAnimationFrame(this.update.bind(this));
+    }
+}
 
 class Player {
-    constructor(element, walls = []) {
+    constructor(element) {
         this.element = element;
         this.x = window.innerWidth / 2;
         this.y = 0;
@@ -13,7 +54,7 @@ class Player {
         this.grounded = false;
         this.airJumps = 0;
         this.maxAirJumps = 1;
-        this.walls = walls;
+        this.walls = [];
         this.gravity = 0.9;
         this.jumpProcessed = false;
         this.animations = {
@@ -286,37 +327,33 @@ class Player {
     lookLeft() {
         this.element.style.transform = 'rotateY(0deg)';
     }
+
+    setWalls(walls) {
+        this.walls = walls;
+    }
 }
 
-class Game {
-    constructor(player) {
-        this.player = player;
-        this.keyState = {
-            W: false,
-            A: false,
-            S: false,
-            D: false,
-            SHIFT: false,
-            SPACE: false,
-            CONTROL: false,
-        };
-        this.walls = [];
-        this.initKeyStateListeners();
-        this.initWalls();
+class Level {
+    constructor(screens, element) {
+        this.screens = screens;
+        this.element = element;
     }
 
-    initKeyStateListeners() {
-        document.addEventListener('keydown', (event) => {
-            if (this.keyState['SHIFT'] && this.keyState['CONTROL']) {
-                return;
-            }
-            event.preventDefault();
-            this.keyState[event.key.toUpperCase()] = true;
-        });
+    update() {
+        // Update the current screen
+    }
 
-        document.addEventListener('keyup', (event) => {
-            this.keyState[event.key.toUpperCase()] = false;
-        });
+    initScreens() {
+        // Grab all of the screen elements
+    }
+}
+
+class Screen {
+    constructor(element) {
+        this.element = element;
+        this.rect = this.element.getBoundingClientRect();
+        this.walls = [];
+        this.initWalls();
     }
 
     initWalls() {
@@ -331,15 +368,14 @@ class Game {
         });
     }
 
-    start() {
-        requestAnimationFrame(this.update.bind(this));
+    updateRect() {
+        this.rect = this.element.getBoundingClientRect();
     }
 
     update() {
-        this.player.update(this.keyState);
-        // Main Game Loop
-
-        requestAnimationFrame(this.update.bind(this));
+        // Maybe this is a good place to check if the player is in this screen
+        // If so, set the player's walls to this screen's walls
+        // Maybe moving platforms can be handled here
     }
 }
 
@@ -353,6 +389,24 @@ class Wall {
         this.rect = this.element.getBoundingClientRect();
     }
 }
+
+
+class Camera {
+    constructor(player) {
+        this.player = player;
+    }
+
+    update() {
+
+    }
+}
+
+// Game
+// Game has a player
+// Game has a level
+// Level has screens
+// Screens have walls
+// Collision detection checks for player and the walls in the screen the player is in
 
 
 // Usage
