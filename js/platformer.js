@@ -1,6 +1,6 @@
 
 class Game {
-    constructor(player, level) {
+    constructor(player) {
         this.player = player;
         this.keyState = {
             W: false,
@@ -12,7 +12,7 @@ class Game {
             CONTROL: false,
         };
         this.initKeyStateListeners();
-        this.level = level;
+        this.level = null;
     }
 
     initKeyStateListeners() {
@@ -39,10 +39,19 @@ class Game {
 
         requestAnimationFrame(this.update.bind(this));
     }
+
+    setLevel(level) {
+        this.level = level;
+    }
 }
 
 class Player {
-    constructor(element) {
+    constructor(element, animation_urls = {
+        idle: "url('./img/cat_stand.gif')",
+        walk: "url('./img/cat_walk.gif')",
+        jump: "url('./img/cat_jump.gif')",
+        wait: "url('./img/cat_fall_asleep.gif')",
+    }) {
         this.element = element;
         this.x = window.innerWidth / 2;
         this.y = 0;
@@ -57,12 +66,7 @@ class Player {
         this.walls = [];
         this.gravity = 0.9;
         this.jumpProcessed = false;
-        this.animations = {
-            idle: "url('./img/cat_stand.gif')",
-            walk: "url('./img/cat_walk.gif')",
-            jump: "url('./img/cat_jump.gif')",
-            waiting: "url('./img/cat_fall_asleep.gif')",
-        }
+        this.animations = animation_urls;
         this.currentAnimation = 'idle';
         this.collisionState = {
             left: 0,
@@ -186,11 +190,11 @@ class Player {
         }
         let collisionCount = 0;
         this.walls.forEach(wall => {
-            if (this.intersects(playerRectNext, wall.rect)) {
+            if (HelperMethods.intersects(playerRectNext, wall.rect)) {
                 this.velocityY = 0;
             }
-            if (this.intersects(playerRect, wall.rect)) {
-                const collision = this.getCollisionOverlap(playerRect, wall.rect);
+            if (HelperMethods.intersects(playerRect, wall.rect)) {
+                const collision = HelperMethods.getCollisionOverlap(playerRect, wall.rect);
                 if (collision.bottom) {
                     collisionCount++;
                     this.y -= collision.bottom; // Adjust the y position by the overlap
@@ -225,11 +229,11 @@ class Player {
         }
         let collisionCount = 0;
         this.walls.forEach(wall => {
-            if (this.intersects(playerRectNext, wall.rect)) {
+            if (HelperMethods.intersects(playerRectNext, wall.rect)) {
                 this.velocityX = 0;
             }
-            if (this.intersects(playerRect, wall.rect)) {
-                const collision = this.getCollisionOverlap(playerRect, wall.rect);
+            if (HelperMethods.intersects(playerRect, wall.rect)) {
+                const collision = HelperMethods.getCollisionOverlap(playerRect, wall.rect);
                 if (collision.left) {
                     this.x += collision.left; // Adjust the x position by the overlap
                     collisionCount++;
@@ -241,74 +245,6 @@ class Player {
             }
         });
         return collisionCount;
-    }
-
-    intersects(rect1, rect2) {
-        return !(rect2.left > rect1.right ||
-            rect2.right < rect1.left ||
-            rect2.top > rect1.bottom ||
-            rect2.bottom < rect1.top);
-    }
-
-    getCollisionOverlap(playerRect, wallRect) {
-        const playerLeftSide = playerRect.left;
-        const playerRightSide = playerLeftSide + playerRect.width;
-        const playerTopSide = playerRect.top;
-        const playerBottomSide = playerTopSide + playerRect.height;
-        const wallLeftSide = wallRect.left;
-        const wallRightSide = wallLeftSide + wallRect.width;
-        const wallTopSide = wallRect.top;
-        const wallBottomSide = wallTopSide + wallRect.height;
-        const playerCenterX = playerRect.left + playerRect.width / 2;
-        const playerCenterY = playerRect.top + playerRect.height / 2;
-        const wallCenterX = wallRect.left + wallRect.width / 2;
-        const wallCenterY = wallRect.top + wallRect.height / 2;
-
-        let collisionDirections = {
-            left: false,
-            right: false,
-            top: false,
-            bottom: false,
-        }
-
-        if (playerRightSide > wallLeftSide
-            && playerLeftSide < wallLeftSide
-            && playerCenterY > wallTopSide
-            && playerCenterY < wallBottomSide
-        ) {
-            collisionDirections.right = playerRightSide - wallLeftSide;
-            this.collisionState.right = collisionDirections.right;
-        }
-
-        if (playerLeftSide < wallRightSide
-            && playerRightSide > wallRightSide
-            && playerCenterY > wallTopSide
-            && playerCenterY < wallBottomSide
-        ) {
-            collisionDirections.left = wallRightSide - playerLeftSide;
-            this.collisionState.left = collisionDirections.left;
-        }
-
-        if (playerBottomSide > wallTopSide
-            && playerTopSide < wallTopSide
-            && playerCenterX > wallLeftSide
-            && playerCenterX < wallRightSide
-        ) {
-            collisionDirections.bottom = playerBottomSide - wallTopSide;
-            this.collisionState.bottom = collisionDirections.bottom;
-        }
-
-        if (playerTopSide < wallBottomSide
-            && playerBottomSide > wallBottomSide
-            && playerCenterX > wallLeftSide
-            && playerCenterX < wallRightSide
-        ) {
-            collisionDirections.top = wallBottomSide - playerTopSide;
-            this.collisionState.top = collisionDirections.top;
-        }
-
-        return collisionDirections;
-
     }
 
     changeAnimation(animationName) {
@@ -337,14 +273,13 @@ class Level {
     constructor(screens, element) {
         this.screens = screens;
         this.element = element;
-    }
-
-    update() {
-        // Update the current screen
+        this.initScreens();
     }
 
     initScreens() {
         // Grab all of the screen elements
+        const screenElements = document.querySelectorAll('.screen');
+        this.screens = Array.from(screenElements).map(screen => new Screen(screen));
     }
 }
 
@@ -354,12 +289,14 @@ class Screen {
         this.rect = this.element.getBoundingClientRect();
         this.walls = [];
         this.initWalls();
+        document.documentElement.style.setProperty('--screen-width', window.innerWidth + 'px');
+        document.documentElement.style.setProperty('--screen-height', window.innerHeight + 'px');
     }
 
     initWalls() {
         const wallElements = document.querySelectorAll('.wall');
         this.walls = Array.from(wallElements).map(wall => new Wall(wall));
-        this.player.walls = this.walls; // Pass walls to player
+        // game.player.setWalls(this.walls);
 
         window.addEventListener('resize', () => {
             this.walls.forEach(wall => {
@@ -372,10 +309,15 @@ class Screen {
         this.rect = this.element.getBoundingClientRect();
     }
 
+    checkIfPlayerInScreen(player) {
+        if (HelperMethods.intersects(player.element.getBoundingClientRect(), this.rect)) {
+            player.setWalls(this.walls);
+        }
+
+    }
+
     update() {
-        // Maybe this is a good place to check if the player is in this screen
-        // If so, set the player's walls to this screen's walls
-        // Maybe moving platforms can be handled here
+        this.checkIfPlayerInScreen(game.player);
     }
 }
 
@@ -401,6 +343,71 @@ class Camera {
     }
 }
 
+class HelperMethods {
+    static intersects(rect1, rect2) {
+        return !(rect2.left > rect1.right ||
+            rect2.right < rect1.left ||
+            rect2.top > rect1.bottom ||
+            rect2.bottom < rect1.top);
+    }
+
+    static getCollisionOverlap(rect1, rect2) {
+        const playerLeftSide = rect1.left;
+        const playerRightSide = playerLeftSide + rect1.width;
+        const playerTopSide = rect1.top;
+        const playerBottomSide = playerTopSide + rect1.height;
+        const wallLeftSide = rect2.left;
+        const wallRightSide = wallLeftSide + rect2.width;
+        const wallTopSide = rect2.top;
+        const wallBottomSide = wallTopSide + rect2.height;
+        const playerCenterX = rect1.left + rect1.width / 2;
+        const playerCenterY = rect1.top + rect1.height / 2;
+        const wallCenterX = rect2.left + rect2.width / 2;
+        const wallCenterY = rect2.top + rect2.height / 2;
+
+        let collisionDirections = {
+            left: false,
+            right: false,
+            top: false,
+            bottom: false,
+        }
+
+        if (playerRightSide > wallLeftSide
+            && playerLeftSide < wallLeftSide
+            && playerCenterY > wallTopSide
+            && playerCenterY < wallBottomSide
+        ) {
+            collisionDirections.right = playerRightSide - wallLeftSide;
+        }
+
+        if (playerLeftSide < wallRightSide
+            && playerRightSide > wallRightSide
+            && playerCenterY > wallTopSide
+            && playerCenterY < wallBottomSide
+        ) {
+            collisionDirections.left = wallRightSide - playerLeftSide;
+        }
+
+        if (playerBottomSide > wallTopSide
+            && playerTopSide < wallTopSide
+            && playerCenterX > wallLeftSide
+            && playerCenterX < wallRightSide
+        ) {
+            collisionDirections.bottom = playerBottomSide - wallTopSide;
+        }
+
+        if (playerTopSide < wallBottomSide
+            && playerBottomSide > wallBottomSide
+            && playerCenterX > wallLeftSide
+            && playerCenterX < wallRightSide
+        ) {
+            collisionDirections.top = wallBottomSide - playerTopSide;
+        }
+
+        return collisionDirections;
+    }
+}
+
 // Game
 // Game has a player
 // Game has a level
@@ -413,6 +420,7 @@ class Camera {
 const playerElement = document.getElementById('player');
 const player = new Player(playerElement);
 const game = new Game(player);
+game.setLevel(new Level());
 game.start();
 
 // End of code

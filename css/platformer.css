@@ -276,14 +276,12 @@ body {
 }
 
 .screen {
-    width: 100vw;
-    height: 100vh;
-    position: absolute;
-    top: 0;
-    left: 0;
+    width: var(--screen-width);
+    height: var(--screen-height);
     background-image: url("../img/underground_BG.gif");
     background-size: cover;
     background-position: center;
+    position: relative;
 }
 
 .wall {
