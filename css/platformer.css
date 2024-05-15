@@ -261,7 +261,7 @@ body {
     --player-size: 50px;
     position: absolute;
     left: 50%;
-    top: 0%;
+    top: 50%;
     border: none;
     background-color: transparent;
     background-image: url('../img/cat_stand.gif');
@@ -272,7 +272,7 @@ body {
     z-index: 2;
     width: var(--player-size);
     height: var(--player-size);
-    transform: rotateY('0');
+    transform: rotateY(0deg);
 }
 
 .screen {

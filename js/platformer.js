@@ -2,31 +2,7 @@
 class Game {
     constructor(player) {
         this.player = player;
-        this.keyState = {
-            W: false,
-            A: false,
-            S: false,
-            D: false,
-            SHIFT: false,
-            SPACE: false,
-            CONTROL: false,
-        };
-        this.initKeyStateListeners();
         this.level = null;
-    }
-
-    initKeyStateListeners() {
-        document.addEventListener('keydown', (event) => {
-            if (this.keyState['SHIFT'] && this.keyState['CONTROL']) {
-                return;
-            }
-            event.preventDefault();
-            this.keyState[event.key.toUpperCase()] = true;
-        });
-
-        document.addEventListener('keyup', (event) => {
-            this.keyState[event.key.toUpperCase()] = false;
-        });
     }
 
     start() {
@@ -74,10 +50,34 @@ class Player {
             top: 0,
             bottom: 0,
         }
+        this.keyState = {
+            W: false,
+            A: false,
+            S: false,
+            D: false,
+            SHIFT: false,
+            SPACE: false,
+            CONTROL: false,
+        };
+        this.initKeyStateListeners();
     }
 
-    update(keyState) {
-        this.processInput(keyState);
+    initKeyStateListeners() {
+        document.addEventListener('keydown', (event) => {
+            if (this.keyState['SHIFT'] && this.keyState['CONTROL']) {
+                return;
+            }
+            event.preventDefault();
+            this.keyState[event.key.toUpperCase()] = true;
+        });
+
+        document.addEventListener('keyup', (event) => {
+            this.keyState[event.key.toUpperCase()] = false;
+        });
+    }
+
+    update() {
+        this.processInput();
         this.applyPhysics();
         this.x += this.velocityX;
         this.y += this.velocityY;
@@ -91,11 +91,11 @@ class Player {
         }
 
         if (vert_collision_count > 0) {
-            this.velocityY = 0;
         }
 
         if (vert_collision_count == 0 && hori_collision_count == 0) {
             this.changeAnimation('jump');
+            console.log("Jumping")
             this.collisionState = {
                 left: 0,
                 right: 0,
@@ -108,32 +108,35 @@ class Player {
         this.element.style.top = `${this.y}px`;
     }
 
-    processInput(keyState) {
+    processInput() {
         let acceleration = this.acceleration;
-        let maxVelocity = this.maxVelocity;
-        if (keyState['SHIFT'] && this.grounded) {
-            acceleration = 2;
-            maxVelocity = 18;
+        if (this.keyState['SHIFT'] && this.grounded) {
+            this.acceleration = 2;
+            this.maxVelocity = 18;
+        } else {
+            this.acceleration = 0.7;
+            this.maxVelocity = 10;
         }
 
         // Movement calculations here
-        if (keyState['A']) {
+        if (this.keyState['A']) {
             this.changeAnimation('walk');
             this.lookLeft();
             this.velocityX -= acceleration;
         }
-        if (keyState['D']) {
+        if (this.keyState['D']) {
             this.changeAnimation('walk');
             this.lookRight();
             this.velocityX += acceleration;
         }
-        if (keyState['W']) {
+        if (this.keyState['W']) {
             if (this.velocityY < 0) this.velocityY -= 0.25;
         }
-        if (keyState['S']) this.velocityY += acceleration;
+        if (this.keyState['S']) this.velocityY += acceleration;
         // Similar for other directions
 
-        if (keyState['W'] && (this.grounded || this.airJumps < this.maxAirJumps)) {
+        console.log(this.collisionState)
+        if (this.keyState['W'] && (this.grounded || this.airJumps < this.maxAirJumps)) {
             if (!this.jumpProcessed) {
                 this.jumpProcessed = true; // Set the flag to true after processing the jump
                 if (this.collisionState.bottom == 0) {
@@ -151,28 +154,26 @@ class Player {
         } else {
             this.jumpProcessed = false; // Reset the flag when 'W' is not pressed
         }
-
-        if (this.collisionState.bottom > 0) {
-            // Apply max velocity
-            if (this.velocityX > maxVelocity) {
-                this.velocityX = maxVelocity;
-            } else if (this.velocityX < -maxVelocity) {
-                this.velocityX = -maxVelocity;
-            }
-        }
     }
 
     applyPhysics() {
+
         this.velocityY += this.gravity;
-        if (this.grounded && Math.abs(this.velocityX) > 0.1) {
-            this.velocityX *= 0.94;
-        } else if (!this.grounded && Math.abs(this.velocityX) > 0.1) {
-            this.velocityX *= 0.97;
-        } else if (this.grounded) {
+        if (this.grounded && this.velocityX < 0.2 && this.velocityX > -0.2) {
             this.velocityX = 0;
             this.changeAnimation('idle');
-        } else {
-            this.velocityX = 0;
+        } else if (this.grounded && !(this.keyState['A'] || this.keyState['D'])) {
+            this.velocityX *= 0.88;
+        } else if (!this.grounded) {
+            this.velocityX *= 0.97;
+        }
+        // Apply max velocity while grounded
+        if (this.collisionState.bottom > 0) {
+            if (this.velocityX > this.maxVelocity) {
+                this.velocityX = this.maxVelocity;
+            } else if (this.velocityX < -this.maxVelocity) {
+                this.velocityX = -this.maxVelocity;
+            }
         }
     }
 
@@ -195,9 +196,10 @@ class Player {
             }
             if (HelperMethods.intersects(playerRect, wall.rect)) {
                 const collision = HelperMethods.getCollisionOverlap(playerRect, wall.rect);
-                if (collision.bottom) {
+                if (collision.bottom > 0) {
                     collisionCount++;
-                    this.y -= collision.bottom; // Adjust the y position by the overlap
+                    this.collisionState.bottom = collision.bottom;
+                    this.y -= collision.bottom - 0.1; // Adjust the y position by the overlap
                     if (!this.grounded) { // Reset jumpProcessed if the player was not previously grounded
                         this.jumpProcessed = false;
                     }
@@ -206,7 +208,8 @@ class Player {
                 } else {
                     this.grounded = false;
                 }
-                if (collision.top) {
+                if (collision.top > 0) {
+                    this.collisionState.top = collision.top;
                     this.y += collision.top; // Adjust the y position by the overlap
                     collisionCount++;
                 }
@@ -234,11 +237,13 @@ class Player {
             }
             if (HelperMethods.intersects(playerRect, wall.rect)) {
                 const collision = HelperMethods.getCollisionOverlap(playerRect, wall.rect);
-                if (collision.left) {
+                if (collision.left > 0) {
+                    this.collisionState.left = collision.left;
                     this.x += collision.left; // Adjust the x position by the overlap
                     collisionCount++;
                 }
-                if (collision.right) {
+                if (collision.right > 0) {
+                    this.collisionState.right = collision.right;
                     this.x -= collision.right; // Adjust the x position by the overlap
                     collisionCount++;
                 }
@@ -270,9 +275,19 @@ class Player {
 }
 
 class Level {
-    constructor(screens, element) {
-        this.screens = screens;
-        this.element = element;
+    constructor(element_id) {
+        if (element_id) {
+            this.element = document.getElementById(element_id);
+        } else {
+            let temp_element = document.getElementsByClassName('level')[0]
+            if (temp_element) {
+                this.element = temp_element;
+            } else {
+                console.error("No level element found in the document");
+                return;
+            }
+        }
+        this.screens = [];
         this.initScreens();
     }
 
@@ -289,6 +304,7 @@ class Level {
     }
 }
 
+//TODO: Split into Parent:Screen and Child:DynamicScreen(Same size as window) and Child:StaticScreen(Fixed size)
 class Screen {
     constructor(element) {
         this.element = element;
@@ -434,7 +450,7 @@ class HelperMethods {
 const playerElement = document.getElementById('player');
 const player = new Player(playerElement);
 const game = new Game(player);
-game.setLevel(new Level());
+game.setLevel(new Level("level-one"));
 game.start();
 
 // End of code
