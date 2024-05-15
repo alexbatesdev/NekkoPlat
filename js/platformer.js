@@ -135,7 +135,6 @@ class Player {
         if (this.keyState['S']) this.velocityY += acceleration;
         // Similar for other directions
 
-        console.log(this.collisionState)
         if (this.keyState['W'] && (this.grounded || this.airJumps < this.maxAirJumps)) {
             if (!this.jumpProcessed) {
                 this.jumpProcessed = true; // Set the flag to true after processing the jump
@@ -362,6 +361,7 @@ class Wall {
 }
 
 
+// Solution to topleft problem: Simply start with a huge offset?
 class Camera {
     constructor(player) {
         this.player = player;
@@ -437,14 +437,6 @@ class HelperMethods {
         return collisionDirections;
     }
 }
-
-// Game
-// Game has a player
-// Game has a level
-// Level has screens
-// Screens have walls
-// Collision detection checks for player and the walls in the screen the player is in
-
 
 // Usage
 const playerElement = document.getElementById('player');
