@@ -35,7 +35,7 @@ class Game {
 
     update() {
         this.player.update(this.keyState);
-        // Main Game Loop
+        this.level.update();
 
         requestAnimationFrame(this.update.bind(this));
     }
@@ -281,6 +281,12 @@ class Level {
         const screenElements = document.querySelectorAll('.screen');
         this.screens = Array.from(screenElements).map(screen => new Screen(screen));
     }
+
+    update() {
+        this.screens.forEach(screen => {
+            screen.update();
+        });
+    }
 }
 
 class Screen {
@@ -309,15 +315,18 @@ class Screen {
         this.rect = this.element.getBoundingClientRect();
     }
 
-    checkIfPlayerInScreen(player) {
+    checkIfPlayerInScreen() {
         if (HelperMethods.intersects(player.element.getBoundingClientRect(), this.rect)) {
-            player.setWalls(this.walls);
+            if (player.walls !== this.walls) player.setWalls(this.walls);
         }
-
     }
 
     update() {
-        this.checkIfPlayerInScreen(game.player);
+        this.updateRect();
+        this.checkIfPlayerInScreen();
+        this.walls.forEach(wall => {
+            wall.update();
+        });
     }
 }
 
@@ -329,6 +338,10 @@ class Wall {
 
     updateRect() {
         this.rect = this.element.getBoundingClientRect();
+    }
+
+    update() {
+        this.updateRect();
     }
 }
 
@@ -345,10 +358,11 @@ class Camera {
 
 class HelperMethods {
     static intersects(rect1, rect2) {
-        return !(rect2.left > rect1.right ||
+        let isIntersecting = !(rect2.left > rect1.right ||
             rect2.right < rect1.left ||
             rect2.top > rect1.bottom ||
             rect2.bottom < rect1.top);
+        return isIntersecting;
     }
 
     static getCollisionOverlap(rect1, rect2) {
