@@ -260,8 +260,8 @@ body {
 #player {
     --player-size: 50px;
     position: absolute;
-    left: 50%;
-    top: 50%;
+    left: 1500px;
+    top: 100px;
     border: none;
     background-color: transparent;
     background-image: url('../img/cat_stand.gif');
@@ -275,16 +275,22 @@ body {
     transform: rotateY(0deg);
 }
 
-.viewport {
+.config {
+    display: none;
+}
+
+#viewport {
     width: 100vw;
     height: 100vh;
-    position: relative;
-    overflow: hidden;
+    position: absolute;
     background-color: black;
-    overflow: auto;
+    overflow: hidden;
+    outline: 2px red solid;
+    outline-offset: -2px;
 }
 
 .level {
+    position: relative;
     display: grid;
     /* https://developer.mozilla.org/en-US/docs/Web/CSS/grid */
 }

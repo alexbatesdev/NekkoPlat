@@ -3,6 +3,7 @@ class Game {
     constructor(player) {
         this.player = player;
         this.level = null;
+        this.camera = new Camera();
     }
 
     start() {
@@ -12,6 +13,7 @@ class Game {
     update() {
         this.player.update(this.keyState);
         this.level.update();
+        this.camera.update();
 
         requestAnimationFrame(this.update.bind(this));
     }
@@ -49,12 +51,12 @@ class Player {
             CONTROL: false,
         };
 
-        const configElement = document.getElementById('player-config');
+        const configElement = element.querySelector(".config");
         this.maxVelocity = 10;
         this.acceleration = 0.7;
         this.deceleration = 0.2;
         this.maxAirJumps = 1;
-        this.gravity = 0.0; //0.9
+        this.gravity = 0.9; //0.9
         this.animations = {
             idle: "url('./img/cat_stand.gif')",
             walk: "url('./img/cat_walk.gif')",
@@ -62,11 +64,11 @@ class Player {
             wait: "url('./img/cat_fall_asleep.gif')",
         };
         if (configElement) {
-            this.maxVelocity = configElement.querySelector(".maxVelocity").innerHTML;
-            this.acceleration = configElement.querySelector(".acceleration").innerHTML;
-            this.deceleration = configElement.querySelector(".deceleration").innerHTML;
-            this.maxAirJumps = configElement.querySelector(".maxAirJumps").innerHTML;
-            this.gravity = configElement.querySelector(".gravity").innerHTML;
+            this.maxVelocity = Number(configElement.querySelector(".maxVelocity").innerHTML);
+            this.acceleration = Number(configElement.querySelector(".acceleration").innerHTML);
+            this.deceleration = Number(configElement.querySelector(".deceleration").innerHTML);
+            this.maxAirJumps = Number(configElement.querySelector(".maxAirJumps").innerHTML);
+            this.gravity = Number(configElement.querySelector(".gravity").innerHTML);
             const animationElement = configElement.querySelector(".animations");
             this.animations = {
                 idle: animationElement.querySelector(".idle").innerHTML,
@@ -177,7 +179,7 @@ class Player {
     applyPhysics() {
 
         this.velocityY += this.gravity;
-        if (this.grounded && this.velocityX < 0.2 && this.velocityX > -0.2) {
+        if (this.grounded && Math.abs(this.velocityX) < 0.2) {
             this.velocityX = 0;
             this.changeAnimation('idle');
         } else if (this.grounded && !(this.keyState['A'] || this.keyState['D'])) {
@@ -201,7 +203,7 @@ class Player {
             left: playerRect.left + 20,
             right: playerRect.right - 20,
             top: playerRect.top,
-            bottom: playerRect.bottom + ((this.velocityY - this.gravity) * 2) - 1,
+            bottom: playerRect.bottom + ((this.velocityY - this.gravity) * 2) + 4,
             x: playerRect.x,
             y: playerRect.y,
             width: playerRect.width,
@@ -214,10 +216,11 @@ class Player {
             }
             if (HelperMethods.intersects(playerRect, wall.rect)) {
                 const collision = HelperMethods.getCollisionOverlap(playerRect, wall.rect);
+                console.log("Collision bottom: ", collision.bottom)
                 if (collision.bottom > 0) {
                     collisionCount++;
                     this.collisionState.bottom = collision.bottom;
-                    this.y -= collision.bottom - 0.1; // Adjust the y position by the overlap
+                    this.y -= collision.bottom; // Adjust the y position by the overlap
                     if (!this.grounded) { // Reset jumpProcessed if the player was not previously grounded
                         this.jumpProcessed = false;
                     }
@@ -396,12 +399,24 @@ class Wall {
 
 // Solution to topleft problem: Simply start with a huge offset?
 class Camera {
-    constructor(player) {
-        this.player = player;
+    constructor() {
+        this.element = document.getElementById('viewport');
+        this.targetX = 0;
+        this.targetY = 0;
+        this.smoothing = 0.1;
     }
 
     update() {
-
+        let currentX = this.element.scrollLeft;
+        let currentY = this.element.scrollTop;
+        
+        this.targetX = player.x - window.innerWidth / 2;
+        this.targetY = player.y - window.innerHeight / 2;
+        
+        this.element.scrollTo(
+            currentX + (this.targetX - currentX) * this.smoothing,
+            currentY + (this.targetY - currentY) * this.smoothing
+        );
     }
 }
 
