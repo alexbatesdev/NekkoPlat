@@ -257,7 +257,7 @@ body {
     display: none !important;
 }
 
-.cat {
+#player {
     --player-size: 50px;
     position: absolute;
     left: 50%;

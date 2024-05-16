@@ -22,27 +22,16 @@ class Game {
 }
 
 class Player {
-    constructor(element, animation_urls = {
-        idle: "url('./img/cat_stand.gif')",
-        walk: "url('./img/cat_walk.gif')",
-        jump: "url('./img/cat_jump.gif')",
-        wait: "url('./img/cat_fall_asleep.gif')",
-    }) {
+    constructor(element) {
         this.element = element;
         this.x = element.getBoundingClientRect().x;
         this.y = element.getBoundingClientRect().y;
         this.velocityX = 0;
         this.velocityY = 0;
-        this.maxVelocity = 10;
-        this.acceleration = 0.7;
-        this.deceleration = 0.2;
         this.grounded = false;
-        this.airJumps = 0;
-        this.maxAirJumps = 1;
-        this.walls = [];
-        this.gravity = 0.0;
         this.jumpProcessed = false;
-        this.animations = animation_urls;
+        this.airJumps = 0;
+        this.walls = [];
         this.currentAnimation = 'idle';
         this.collisionState = {
             left: 0,
@@ -59,6 +48,36 @@ class Player {
             SPACE: false,
             CONTROL: false,
         };
+
+        const configElement = document.getElementById('player-config');
+        this.maxVelocity = 10;
+        this.acceleration = 0.7;
+        this.deceleration = 0.2;
+        this.maxAirJumps = 1;
+        this.gravity = 0.0; //0.9
+        this.animations = {
+            idle: "url('./img/cat_stand.gif')",
+            walk: "url('./img/cat_walk.gif')",
+            jump: "url('./img/cat_jump.gif')",
+            wait: "url('./img/cat_fall_asleep.gif')",
+        };
+        if (configElement) {
+            this.maxVelocity = configElement.querySelector(".maxVelocity").innerHTML;
+            this.acceleration = configElement.querySelector(".acceleration").innerHTML;
+            this.deceleration = configElement.querySelector(".deceleration").innerHTML;
+            this.maxAirJumps = configElement.querySelector(".maxAirJumps").innerHTML;
+            this.gravity = configElement.querySelector(".gravity").innerHTML;
+            const animationElement = configElement.querySelector(".animations");
+            this.animations = {
+                idle: animationElement.querySelector(".idle").innerHTML,
+                walk: animationElement.querySelector(".walk").innerHTML,
+                jump: animationElement.querySelector(".jump").innerHTML,
+                wait: animationElement.querySelector(".wait").innerHTML,
+            };
+        } else {
+            console.error("No player config element found in the document, using default values");
+        }
+
         this.initKeyStateListeners();
     }
 
