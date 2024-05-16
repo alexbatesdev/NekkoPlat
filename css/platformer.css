@@ -275,6 +275,20 @@ body {
     transform: rotateY(0deg);
 }
 
+.viewport {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background-color: black;
+    overflow: auto;
+}
+
+.level {
+    display: grid;
+    /* https://developer.mozilla.org/en-US/docs/Web/CSS/grid */
+}
+
 .screen {
     width: var(--screen-width);
     height: var(--screen-height);
@@ -282,12 +296,10 @@ body {
     background-size: cover;
     background-position: center;
     position: relative;
+    outline: yellow 2px solid;
+    background-color: cadetblue;
 }
 
-.level {
-    display: grid;
-    /* https://developer.mozilla.org/en-US/docs/Web/CSS/grid */
-}
 
 .wall {
     position: absolute;

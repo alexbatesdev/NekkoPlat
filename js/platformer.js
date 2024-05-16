@@ -29,8 +29,8 @@ class Player {
         wait: "url('./img/cat_fall_asleep.gif')",
     }) {
         this.element = element;
-        this.x = window.innerWidth / 2;
-        this.y = 0;
+        this.x = element.getBoundingClientRect().x;
+        this.y = element.getBoundingClientRect().y;
         this.velocityX = 0;
         this.velocityY = 0;
         this.maxVelocity = 10;
@@ -40,7 +40,7 @@ class Player {
         this.airJumps = 0;
         this.maxAirJumps = 1;
         this.walls = [];
-        this.gravity = 0.9;
+        this.gravity = 0.0;
         this.jumpProcessed = false;
         this.animations = animation_urls;
         this.currentAnimation = 'idle';
@@ -288,6 +288,20 @@ class Level {
         }
         this.screens = [];
         this.initScreens();
+        this.initScreenGrid();
+    }
+
+    initScreenGrid() {
+        const classes = this.element.classList;
+        for (let i = 0; i < classes.length; i++) {
+            if (classes[i].includes('x')) {
+                const gridValues = classes[i].split('x');
+                const columns = gridValues[0];
+                const rows = gridValues[1];
+                this.element.style.gridTemplateColumns = `repeat(${columns}, var(--screen-width))`;
+                this.element.style.gridTemplateRows = `repeat(${rows}, var(--screen-height))`;
+            }
+        }
     }
 
     initScreens() {
