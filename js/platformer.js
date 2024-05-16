@@ -70,12 +70,6 @@ class Player {
             this.maxAirJumps = Number(configElement.querySelector(".maxAirJumps").innerHTML);
             this.gravity = Number(configElement.querySelector(".gravity").innerHTML);
             const animationElement = configElement.querySelector(".animations");
-            this.animations = {
-                idle: animationElement.querySelector(".idle").innerHTML,
-                walk: animationElement.querySelector(".walk").innerHTML,
-                jump: animationElement.querySelector(".jump").innerHTML,
-                wait: animationElement.querySelector(".wait").innerHTML,
-            };
         } else {
             console.error("No player config element found in the document, using default values");
         }
@@ -109,14 +103,27 @@ class Player {
         if (hori_collision_count > 0) {
             if (this.velocityY > 0) this.velocityY *= 0.5;
             // this.velocityX = 0;
+        } else {
+            this.collisionState = {
+                left: 0,
+                right: 0,
+                top: this.collisionState.top,
+                bottom: this.collisionState.bottom,
+            }
         }
 
         if (vert_collision_count > 0) {
+        } else {
+            this.collisionState = {
+                left: this.collisionState.left,
+                right: this.collisionState.right,
+                top: 0,
+                bottom: 0,
+            }
         }
 
         if (vert_collision_count == 0 && hori_collision_count == 0) {
             this.changeAnimation('jump');
-            console.log("Jumping")
             this.collisionState = {
                 left: 0,
                 right: 0,
@@ -155,11 +162,10 @@ class Player {
         }
         if (this.keyState['S']) this.velocityY += acceleration;
         // Similar for other directions
-
-        if (this.keyState['W'] && (this.grounded || this.airJumps < this.maxAirJumps)) {
+        if (this.keyState['W'] && (this.grounded || this.airJumps < this.maxAirJumps || this.collisionState.left > 0 || this.collisionState.right > 0)) {
             if (!this.jumpProcessed) {
                 this.jumpProcessed = true; // Set the flag to true after processing the jump
-                if (this.collisionState.bottom == 0) {
+                if (!this.grounded && !(this.collisionState.left > 0 || this.collisionState.right > 0)) {
                     this.airJumps += 1;
                 } else {
                     this.grounded = false;
@@ -199,24 +205,25 @@ class Player {
 
     checkVerticalCollisions() {
         const playerRect = this.element.getBoundingClientRect();
-        let playerRectNext = {
-            left: playerRect.left + 20,
-            right: playerRect.right - 20,
-            top: playerRect.top,
-            bottom: playerRect.bottom + ((this.velocityY - this.gravity) * 2) + 4,
-            x: playerRect.x,
-            y: playerRect.y,
-            width: playerRect.width,
-            height: playerRect.height,
-        }
         let collisionCount = 0;
         this.walls.forEach(wall => {
-            if (HelperMethods.intersects(playerRectNext, wall.rect)) {
-                this.velocityY = 0;
+            for (let i = 0.25; i < 1; i += 0.25) {
+                let playerRectNext = {
+                    left: playerRect.left + 20,
+                    right: playerRect.right - 20,
+                    top: playerRect.top + (this.velocityY * i),
+                    bottom: playerRect.bottom + ((this.velocityY - this.gravity) * i),
+                    x: playerRect.x,
+                    y: playerRect.y,
+                    width: playerRect.width,
+                    height: playerRect.height,
+                }
+                if (HelperMethods.intersects(playerRectNext, wall.rect)) {
+                    this.velocityY = 0;
+                }
             }
             if (HelperMethods.intersects(playerRect, wall.rect)) {
                 const collision = HelperMethods.getCollisionOverlap(playerRect, wall.rect);
-                console.log("Collision bottom: ", collision.bottom)
                 if (collision.bottom > 0) {
                     collisionCount++;
                     this.collisionState.bottom = collision.bottom;
@@ -241,20 +248,22 @@ class Player {
 
     checkHorizontalCollisions() {
         const playerRect = this.element.getBoundingClientRect();
-        let playerRectNext = {
-            left: playerRect.left + this.velocityX + 1,
-            right: playerRect.right + this.velocityX - 1,
-            top: playerRect.top,
-            bottom: playerRect.bottom - 25,
-            x: playerRect.x,
-            y: playerRect.y,
-            width: playerRect.width,
-            height: playerRect.height,
-        }
         let collisionCount = 0;
         this.walls.forEach(wall => {
-            if (HelperMethods.intersects(playerRectNext, wall.rect)) {
-                this.velocityX = 0;
+            for (let i = 0.25; i < 1; i += 0.25) {
+                let playerRectNext = {
+                    left: playerRect.left + (this.velocityX * i),
+                    right: playerRect.right + (this.velocityX * i),
+                    top: playerRect.top,
+                    bottom: playerRect.bottom - 25,
+                    x: playerRect.x,
+                    y: playerRect.y,
+                    width: playerRect.width,
+                    height: playerRect.height,
+                }
+                if (HelperMethods.intersects(playerRectNext, wall.rect)) {
+                    this.velocityX = 0;
+                }
             }
             if (HelperMethods.intersects(playerRect, wall.rect)) {
                 const collision = HelperMethods.getCollisionOverlap(playerRect, wall.rect);
@@ -276,9 +285,17 @@ class Player {
     changeAnimation(animationName) {
         if (this.currentAnimation === animationName) return;
         this.currentAnimation = animationName;
-        const animationUrl = this.animations[this.currentAnimation];
-        if (animationUrl) {
-            this.element.style.backgroundImage = animationUrl;
+        const animationElement = this.element.querySelector(".animation-container");
+        if (animationElement) {
+            // Iterate over animationElement children
+            for (let i = 0; i < animationElement.children.length; i++) {
+                const child = animationElement.children[i];
+                if (child.classList.contains(animationName)) {
+                    child.style.display = 'block';
+                } else {
+                    child.style.display = 'none';
+                }
+            }
         }
     }
 
@@ -346,8 +363,26 @@ class Screen {
         this.rect = this.element.getBoundingClientRect();
         this.walls = [];
         this.initWalls();
+        if (this.element.classList.contains('initial')) {
+            this.initScreensInitialWindowSize();
+        } else if (this.element.classList.contains('dynamic')) {
+            this.initScreensDynamicWindowSize();
+        } else {
+            console.log("Screens using width and height based on CSS variables")
+        }
+    }
+
+    initScreensInitialWindowSize() {
         document.documentElement.style.setProperty('--screen-width', window.innerWidth + 'px');
         document.documentElement.style.setProperty('--screen-height', window.innerHeight + 'px');
+    }
+
+    initScreensDynamicWindowSize() {
+        this.initScreensInitialWindowSize();
+        window.addEventListener('resize', () => {
+            document.documentElement.style.setProperty('--screen-width', window.innerWidth + 'px');
+            document.documentElement.style.setProperty('--screen-height', window.innerHeight + 'px');
+        });
     }
 
     initWalls() {
@@ -409,10 +444,10 @@ class Camera {
     update() {
         let currentX = this.element.scrollLeft;
         let currentY = this.element.scrollTop;
-        
+
         this.targetX = player.x - window.innerWidth / 2;
         this.targetY = player.y - window.innerHeight / 2;
-        
+
         this.element.scrollTo(
             currentX + (this.targetX - currentX) * this.smoothing,
             currentY + (this.targetY - currentY) * this.smoothing
