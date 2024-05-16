@@ -71,7 +71,7 @@ class Player {
             this.gravity = Number(configElement.querySelector(".gravity").innerHTML);
             const animationElement = configElement.querySelector(".animations");
         } else {
-            console.error("No player config element found in the document, using default values");
+            console.warn("No player config element found in the document, using default values");
         }
 
         this.initKeyStateListeners();
@@ -332,14 +332,26 @@ class Level {
 
     initScreenGrid() {
         const classes = this.element.classList;
+        let doDefault = true;
         for (let i = 0; i < classes.length; i++) {
             if (classes[i].includes('x')) {
+                doDefault = false;
                 const gridValues = classes[i].split('x');
                 const columns = gridValues[0];
                 const rows = gridValues[1];
                 this.element.style.gridTemplateColumns = `repeat(${columns}, var(--screen-width))`;
                 this.element.style.gridTemplateRows = `repeat(${rows}, var(--screen-height))`;
+                if (this.screens.length > columns * rows) {
+                    console.error("Screen count exceeds grid dimensions");
+                } else if (this.screens.length < columns * rows) {
+                    console.warn("Screen count is less than grid dimensions, some grid cells will be empty");
+                }
             }
+        }
+        if (doDefault) {
+            console.warn("No grid dimensions specified, using linear grid layout");
+            this.element.style.gridTemplateColumns = `repeat(${this.screens.length}, var(--screen-width))`;
+            this.element.style.gridTemplateRows = `var(--screen-height)`;
         }
     }
 
@@ -367,9 +379,7 @@ class Screen {
             this.initScreensInitialWindowSize();
         } else if (this.element.classList.contains('dynamic')) {
             this.initScreensDynamicWindowSize();
-        } else {
-            console.log("Screens using width and height based on CSS variables")
-        }
+        }// else uses the --screen-width and --screen-height variables from the css
     }
 
     initScreensInitialWindowSize() {
@@ -388,7 +398,6 @@ class Screen {
     initWalls() {
         const wallElements = document.querySelectorAll('.wall');
         this.walls = Array.from(wallElements).map(wall => new Wall(wall));
-        // game.player.setWalls(this.walls);
 
         window.addEventListener('resize', () => {
             this.walls.forEach(wall => {
