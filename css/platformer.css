@@ -284,6 +284,11 @@ body {
     position: relative;
 }
 
+.level {
+    display: grid;
+    /* https://developer.mozilla.org/en-US/docs/Web/CSS/grid */
+}
+
 .wall {
     position: absolute;
     top: 0;
