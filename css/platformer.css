@@ -224,22 +224,24 @@ table {
 .crt::before {
     content: " ";
     display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
     background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-    z-index: 2;
+    z-index: 5;
     background-size: 100% 5px, 10px 100%;
     pointer-events: none;
     animation: flicker 0.05s infinite;
+    width: var(--screen-width);
+    height: var(--screen-height);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 :root {
     --section-body-width: 80vw;
-    --screen-width: 100vw;
-    --screen-height: 100vh;
+    --screen-size: 0.7;
+    --screen-width: calc(1600px*var(--screen-size));
+    --screen-height: calc(900px*var(--screen-size));
 }
 
 body {
@@ -299,16 +301,16 @@ body {
 }
 
 #viewport {
-    width: 80vw;
-    height: 80vh;
+    width: var(--screen-width);
+    height: var(--screen-height);
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: black;
     overflow: hidden;
-    outline: 2px red solid;
-    outline-offset: -2px;
+    border: 40px solid black;
+    border-radius: 3px;
 }
 
 .level {
@@ -333,13 +335,14 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 5;
+    z-index: 3;
     outline-offset: -1px;
     user-select: none;
     image-rendering: pixelated;
     background-image: url("../img/stone-no-edge.png");
     background-size: 50px;
     background-position: top left;
+    background-color: rebeccapurple;
 }
 
 .pipe {
@@ -595,4 +598,33 @@ body {
     bottom: 50px;
     right: 75px;
     width: 100px;
+}
+
+.criss {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    background-color: red;
+    height: 1px;
+    z-index: 100;
+}
+
+.cross {
+    position: absolute;
+    left: 50%;
+    height: 100%;
+    background-color: red;
+    width: 1px;
+    z-index: 100;
+}
+
+.tv-stump {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    width: 300px;
+    height: 450px;
+    background-color: black;
+    z-index: -1;
 }
