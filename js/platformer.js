@@ -57,8 +57,19 @@ class Player {
         this.element = element;
         this.x = element.getBoundingClientRect().x;
         this.y = element.getBoundingClientRect().y;
+
+        this.maxVelocity = this.setConfigItem('maxVelocity', 10);
+        this.acceleration = this.setConfigItem('acceleration', 0.7);
+        this.deceleration = this.setConfigItem('deceleration', 0.2);
+        this.maxAirJumps = this.setConfigItem('maxAirJumps', 1);
+        this.gravity = this.setConfigItem('gravity', 0.9);
+        this.fallingGravity = this.setConfigItem('fallingGravity', 1.5);
+        this.preJumpAllowance = this.setConfigItem('preJumpAllowance', 80);
+        this.jumpForce = this.setConfigItem('jumpForce', 25);
+        
         this.velocityX = 0;
         this.velocityY = 0;
+        this.liveGravity = this.gravity;
         this.grounded = false;
         this.jumpProcessed = false;
         this.airJumps = 0;
@@ -71,20 +82,6 @@ class Player {
             bottom: 0,
         }
 
-        this.maxVelocity = 10;
-        this.acceleration = 0.7;
-        this.deceleration = 0.2;
-        this.maxAirJumps = 1;
-        this.gravity = 0.9;
-        this.preJumpAllowance = 80;
-        this.jumpForce = 25;
-        this.setConfigItem('maxVelocity', this.maxVelocity);
-        this.setConfigItem('acceleration', this.acceleration);
-        this.setConfigItem('deceleration', this.deceleration);
-        this.setConfigItem('maxAirJumps', this.maxAirJumps);
-        this.setConfigItem('gravity', this.gravity);
-        this.setConfigItem('preJumpAllowance', this.preJumpAllowance);
-        this.setConfigItem('jumpForce', this.jumpForce);
     }
 
     setConfigItem(configItem, default_value) {
@@ -175,6 +172,11 @@ class Player {
             console.log("holding jump")
         } else {
             this.jumpProcessed = false; // Reset the flag when 'W' is not pressed
+            if (!this.grounded && this.velocityY < 0) {
+                this.liveGravity = this.fallingGravity;
+            } else {
+                this.liveGravity = this.gravity;
+            }
         }
     }
 
@@ -200,6 +202,7 @@ class Player {
             } else if (this.collisionState.right > 0) {
                 this.velocityX -= 12;
             }
+
             this.velocityY = -this.jumpForce;
         } else if (this.airJumps >= this.maxAirJumps && !this.grounded && !this.jumpProcessed) {
             this.jumpProcessed = true;
@@ -213,7 +216,7 @@ class Player {
 
     applyPhysics() {
 
-        this.velocityY += this.gravity;
+        this.velocityY += this.liveGravity;
         if (this.grounded && Math.abs(this.velocityX) < 0.2) {
             this.velocityX = 0;
             this.changeAnimation('idle');
@@ -243,7 +246,7 @@ class Player {
                     left: playerRect.left + 20,
                     right: playerRect.right - 20,
                     top: playerRect.top + (this.velocityY * i),
-                    bottom: playerRect.bottom + ((this.velocityY - this.gravity) * i),
+                    bottom: playerRect.bottom + ((this.velocityY - this.liveGravity) * i),
                     x: playerRect.x,
                     y: playerRect.y,
                     width: playerRect.width,
