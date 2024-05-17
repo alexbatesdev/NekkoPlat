@@ -22,7 +22,6 @@ class Game {
 
     initKeyStateListeners() {
         document.addEventListener('keydown', (event) => {
-            console.log(this.keyState)
             if (this.keyState['SHIFT'] && this.keyState['CONTROL']) {
                 return;
             }
@@ -95,8 +94,6 @@ class Player {
             console.warn("No player config element found in the document, using default values");
         }
     }
-
-
 
     update() {
         this.processInput();
@@ -318,6 +315,10 @@ class Player {
         this.element.style.transform = 'rotateY(0deg)';
     }
 
+    facingRight() {
+        return this.element.style.transform === 'rotateY(180deg)';
+    }
+
     setWalls(walls) {
         this.walls = walls;
     }
@@ -460,6 +461,7 @@ class Camera {
         this.offsetY = 0.5;
         this.maxOffset = 0.8;
         this.minOffset = 0.2;
+        this.lookahead = 0.1;
     }
 
     update() {
@@ -508,8 +510,8 @@ class Camera {
     }
 
     applyCenterDrift() {
-        if (this.offsetX != this.restingOffsetX) {
-            if (this.offsetX > this.restingOffsetX) {
+        if (this.offsetX != (this.restingOffsetX + (player.facingRight() ? -this.lookahead : this.lookahead))) {
+            if (this.offsetX > (this.restingOffsetX + (player.facingRight() ? -this.lookahead : this.lookahead ))) {
                 this.offsetX -= 0.01;
             } else {
                 this.offsetX += 0.01;
