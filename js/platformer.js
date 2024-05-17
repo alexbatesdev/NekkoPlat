@@ -76,7 +76,8 @@ class Player {
         this.acceleration = 0.7;
         this.deceleration = 0.2;
         this.maxAirJumps = 1;
-        this.gravity = 0.9; //0.9
+        this.gravity = 0.9;
+        this.preJumpAllowance = 80;
         this.animations = {
             idle: "url('./img/cat_stand.gif')",
             walk: "url('./img/cat_walk.gif')",
@@ -89,7 +90,7 @@ class Player {
             this.deceleration = Number(configElement.querySelector(".deceleration").innerHTML);
             this.maxAirJumps = Number(configElement.querySelector(".maxAirJumps").innerHTML);
             this.gravity = Number(configElement.querySelector(".gravity").innerHTML);
-            const animationElement = configElement.querySelector(".animations");
+            this.preJumpAllowance = Number(configElement.querySelector(".preJumpAllowance").innerHTML);
         } else {
             console.warn("No player config element found in the document, using default values");
         }
@@ -166,23 +167,34 @@ class Player {
         }
         if (game.keyState['S']) this.velocityY += acceleration;
         // Similar for other directions
-        if (game.keyState['W'] && (this.grounded || this.airJumps < this.maxAirJumps || this.collisionState.left > 0 || this.collisionState.right > 0)) {
-            if (!this.jumpProcessed) {
-                this.jumpProcessed = true; // Set the flag to true after processing the jump
-                if (!this.grounded && !(this.collisionState.left > 0 || this.collisionState.right > 0)) {
-                    this.airJumps += 1;
-                } else {
-                    this.grounded = false;
-                }
-                if (this.collisionState.left > 0) {
-                    this.velocityX += 12;
-                } else if (this.collisionState.right > 0) {
-                    this.velocityX -= 12;
-                }
-                this.velocityY = -20;
-            }
+        if (game.keyState['W']) {
+            this.jump();
         } else {
             this.jumpProcessed = false; // Reset the flag when 'W' is not pressed
+        }
+    }
+
+    jump() {
+        if (!this.jumpProcessed && (this.grounded || this.airJumps < this.maxAirJumps || this.collisionState.left > 0 || this.collisionState.right > 0)) {
+            this.jumpProcessed = true; // Set the flag to true after processing the jump
+            if (!this.grounded && !(this.collisionState.left > 0 || this.collisionState.right > 0)) {
+                this.airJumps += 1;
+            } else {
+                this.grounded = false;
+            }
+            if (this.collisionState.left > 0) {
+                this.velocityX += 12;
+            } else if (this.collisionState.right > 0) {
+                this.velocityX -= 12;
+            }
+            this.velocityY = -20;
+        } else if (this.airJumps >= this.maxAirJumps && !this.grounded && !this.jumpProcessed) {
+            this.jumpProcessed = true;
+            setTimeout(() => {
+                if (this.grounded) {
+                    this.jump();
+                }
+            }, this.preJumpAllowance);
         }
     }
 
