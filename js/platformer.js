@@ -71,28 +71,35 @@ class Player {
             bottom: 0,
         }
 
-        const configElement = element.querySelector(".config");
         this.maxVelocity = 10;
         this.acceleration = 0.7;
         this.deceleration = 0.2;
         this.maxAirJumps = 1;
         this.gravity = 0.9;
         this.preJumpAllowance = 80;
-        this.animations = {
-            idle: "url('./img/cat_stand.gif')",
-            walk: "url('./img/cat_walk.gif')",
-            jump: "url('./img/cat_jump.gif')",
-            wait: "url('./img/cat_fall_asleep.gif')",
-        };
+        this.jumpForce = 25;
+        this.setConfigItem('maxVelocity', this.maxVelocity);
+        this.setConfigItem('acceleration', this.acceleration);
+        this.setConfigItem('deceleration', this.deceleration);
+        this.setConfigItem('maxAirJumps', this.maxAirJumps);
+        this.setConfigItem('gravity', this.gravity);
+        this.setConfigItem('preJumpAllowance', this.preJumpAllowance);
+        this.setConfigItem('jumpForce', this.jumpForce);
+    }
+
+    setConfigItem(configItem, default_value) {
+        const configElement = this.element.querySelector(".config");
         if (configElement) {
-            this.maxVelocity = Number(configElement.querySelector(".maxVelocity").innerHTML);
-            this.acceleration = Number(configElement.querySelector(".acceleration").innerHTML);
-            this.deceleration = Number(configElement.querySelector(".deceleration").innerHTML);
-            this.maxAirJumps = Number(configElement.querySelector(".maxAirJumps").innerHTML);
-            this.gravity = Number(configElement.querySelector(".gravity").innerHTML);
-            this.preJumpAllowance = Number(configElement.querySelector(".preJumpAllowance").innerHTML);
+            const configItemElement = configElement.querySelector(`.${configItem}`);
+            if (configItemElement) {
+                return Number(configItemElement.innerHTML);
+            } else {
+                console.warn("No config element found for " + configItem + ", using default value: " + default_value);
+                return default_value;
+            }
         } else {
-            console.warn("No player config element found in the document, using default values");
+            console.warn("No player config element found in the document, using default value for " + configItem + ": " + default_value);
+            return default_value;
         }
     }
 
@@ -153,30 +160,36 @@ class Player {
 
         // Movement calculations here
         if (game.keyState['A']) {
-            this.changeAnimation('walk');
-            this.lookLeft();
-            this.velocityX -= acceleration;
+            this.move(-acceleration, 0);
         }
         if (game.keyState['D']) {
-            this.changeAnimation('walk');
-            this.lookRight();
-            this.velocityX += acceleration;
+            this.move(acceleration, 0);
         }
-        if (game.keyState['W']) {
-            if (this.velocityY < 0) this.velocityY -= 0.25;
-        }
+        // if (game.keyState['W']) {
+        //     if (this.velocityY < -3) this.velocityY -= 0.6;
+        // }
         if (game.keyState['S']) this.velocityY += acceleration;
         // Similar for other directions
         if (game.keyState['W']) {
             this.jump();
+            console.log("holding jump")
         } else {
             this.jumpProcessed = false; // Reset the flag when 'W' is not pressed
         }
     }
 
+    move(xVel, yVel) {
+        if (Math.abs(xVel) > 0) this.changeAnimation('walk');
+        if (xVel > 0) this.lookRight();
+        if (xVel < 0) this.lookLeft();
+
+        this.velocityX += xVel;
+        this.velocityY += yVel;
+    }
+
     jump() {
         if (!this.jumpProcessed && (this.grounded || this.airJumps < this.maxAirJumps || this.collisionState.left > 0 || this.collisionState.right > 0)) {
-            this.jumpProcessed = true; // Set the flag to true after processing the jump
+            this.jumpProcessed = true;
             if (!this.grounded && !(this.collisionState.left > 0 || this.collisionState.right > 0)) {
                 this.airJumps += 1;
             } else {
@@ -187,7 +200,7 @@ class Player {
             } else if (this.collisionState.right > 0) {
                 this.velocityX -= 12;
             }
-            this.velocityY = -20;
+            this.velocityY = -this.jumpForce;
         } else if (this.airJumps >= this.maxAirJumps && !this.grounded && !this.jumpProcessed) {
             this.jumpProcessed = true;
             setTimeout(() => {
@@ -207,14 +220,12 @@ class Player {
         } else if (this.grounded && !(game.keyState['A'] || game.keyState['D'])) {
             this.velocityX *= 0.88;
         } else if (!this.grounded) {
-            this.velocityX *= 0.97;
+            this.velocityX *= 0.95;
         }
         // Apply max velocity while grounded
         if (this.collisionState.bottom > 0) {
-            if (this.velocityX > this.maxVelocity) {
-                this.velocityX = this.maxVelocity;
-            } else if (this.velocityX < -this.maxVelocity) {
-                this.velocityX = -this.maxVelocity;
+            if (Math.abs(this.velocityX) > this.maxVelocity) {
+                this.velocityX *= 0.9;
             }
         } else {
             if (this.velocityY > 30) {
@@ -392,13 +403,17 @@ class Level {
     }
 }
 
-//TODO: Split into Parent:Screen and Child:DynamicScreen(Same size as window) and Child:StaticScreen(Fixed size)
 class Screen {
     constructor(element) {
         this.element = element;
         this.rect = this.element.getBoundingClientRect();
         this.walls = [];
         this.initWalls();
+        if (this.element.classList.contains('dynamic')) {
+            this.initScreensDynamicWindowSize();
+        } else if (this.element.classList.contains('static')) {
+            this.initScreensInitialWindowSize();
+        }
     }
 
     initScreensInitialWindowSize() {
