@@ -200,6 +200,10 @@ class Player {
             } else if (this.velocityX < -this.maxVelocity) {
                 this.velocityX = -this.maxVelocity;
             }
+        } else {
+            if (this.velocityY > 30) {
+                this.velocityY = 30;
+            }
         }
     }
 
@@ -375,11 +379,6 @@ class Screen {
         this.rect = this.element.getBoundingClientRect();
         this.walls = [];
         this.initWalls();
-        if (this.element.classList.contains('initial')) {
-            this.initScreensInitialWindowSize();
-        } else if (this.element.classList.contains('dynamic')) {
-            this.initScreensDynamicWindowSize();
-        }// else uses the --screen-width and --screen-height variables from the css
     }
 
     initScreensInitialWindowSize() {
