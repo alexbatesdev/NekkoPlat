@@ -1,4 +1,5 @@
-
+// https://chatgpt.com/c/28b14350-009c-47a1-9b81-91d1849af58a
+// TODO: Fork this repo into one dedicated to it instead of the darkness maze
 class Game {
     constructor(player) {
         this.player = player;
@@ -503,8 +504,6 @@ class Wall {
     }
 }
 
-
-// Solution to topleft problem: Simply start with a huge offset?
 class Camera {
     constructor() {
         this.element = document.getElementById('viewport');
