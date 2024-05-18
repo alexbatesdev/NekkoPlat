@@ -54,34 +54,44 @@ class Game {
 
 class Player {
     constructor(element) {
+        // HTML element
         this.element = element;
-        this.x = element.getBoundingClientRect().x;
-        this.y = element.getBoundingClientRect().y;
-
+        // HTML config - comes from a .config element in the #player element
+        //   Physics and jump variables in order from most physics to least physics
         this.maxVelocity = this.setConfigItem('maxVelocity', 10);
         this.acceleration = this.setConfigItem('acceleration', 0.7);
         this.deceleration = this.setConfigItem('deceleration', 0.2);
-        this.maxAirJumps = this.setConfigItem('maxAirJumps', 1);
         this.gravity = this.setConfigItem('gravity', 0.9);
         this.fallingGravity = this.setConfigItem('fallingGravity', 1.5);
-        this.preJumpAllowance = this.setConfigItem('preJumpAllowance', 80);
         this.jumpForce = this.setConfigItem('jumpForce', 25);
-        
+        this.coyoteTime = this.setConfigItem('coyoteTime', 100);
+        this.preJumpAllowance = this.setConfigItem('preJumpAllowance', 10);
+        this.maxAirJumps = this.setConfigItem('maxAirJumps', 1);
+        // Character state variables
+        //   Position
+        this.x = element.getBoundingClientRect().x;
+        this.y = element.getBoundingClientRect().y;
+        //   Physics
         this.velocityX = 0;
         this.velocityY = 0;
         this.liveGravity = this.gravity;
-        this.grounded = false;
-        this.jumpProcessed = false;
-        this.airJumps = 0;
+        //   Collision
         this.walls = [];
-        this.currentAnimation = 'idle';
         this.collisionState = {
             left: 0,
             right: 0,
             top: 0,
             bottom: 0,
         }
-
+        this.grounded = false;
+        //   Jumping
+        this.airJumps = 0;
+        this.jumpProcessed = false;
+        this.jumpInProgress = false;
+        this.coyoteTimer = 0;
+        this.coyoteTimeActive = false;
+        //   Animation
+        this.currentAnimation = 'idle';
     }
 
     setConfigItem(configItem, default_value) {
@@ -103,44 +113,8 @@ class Player {
     update() {
         this.processInput();
         this.applyPhysics();
-        this.x += this.velocityX;
-        this.y += this.velocityY;
-
-        let vert_collision_count = this.checkVerticalCollisions();
-        let hori_collision_count = this.checkHorizontalCollisions();
-
-        if (hori_collision_count > 0) {
-            if (this.velocityY > 0) this.velocityY *= 0.5;
-            // this.velocityX = 0;
-        } else {
-            this.collisionState = {
-                left: 0,
-                right: 0,
-                top: this.collisionState.top,
-                bottom: this.collisionState.bottom,
-            }
-        }
-
-        if (vert_collision_count > 0) {
-        } else {
-            this.collisionState = {
-                left: this.collisionState.left,
-                right: this.collisionState.right,
-                top: 0,
-                bottom: 0,
-            }
-        }
-
-        if (vert_collision_count == 0 && hori_collision_count == 0) {
-            this.changeAnimation('jump');
-            this.collisionState = {
-                left: 0,
-                right: 0,
-                top: 0,
-                bottom: 0,
-            }
-        }
-
+        this.applyCollisions();
+        // Set the position of the player's HTML element
         this.element.style.left = `${this.x}px`;
         this.element.style.top = `${this.y}px`;
     }
@@ -169,7 +143,6 @@ class Player {
         // Similar for other directions
         if (game.keyState['W']) {
             this.jump();
-            console.log("holding jump")
         } else {
             this.jumpProcessed = false; // Reset the flag when 'W' is not pressed
             if (!this.grounded && this.velocityY < 0) {
@@ -190,22 +163,30 @@ class Player {
     }
 
     jump() {
-        if (!this.jumpProcessed && (this.grounded || this.airJumps < this.maxAirJumps || this.collisionState.left > 0 || this.collisionState.right > 0)) {
+        if (!this.jumpProcessed && HelperMethods.anyTrue(
+            [
+                this.grounded,
+                this.airJumps < this.maxAirJumps,
+                this.collisionState.left > 0,
+                this.collisionState.right > 0,
+                this.coyoteTimeActive,
+            ]
+        )
+        ) {
             this.jumpProcessed = true;
-            if (!this.grounded && !(this.collisionState.left > 0 || this.collisionState.right > 0)) {
+            this.jumpInProgress = true;
+            if (!this.grounded && !(this.collisionState.left > 0 || this.collisionState.right > 0 || this.coyoteTimeActive)) {
                 this.airJumps += 1;
-            } else {
-                this.grounded = false;
+                console.log("Air Jumped")
             }
             if (this.collisionState.left > 0) {
                 this.velocityX += 12;
             } else if (this.collisionState.right > 0) {
                 this.velocityX -= 12;
             }
-
+            console.log("Bababooey")
             this.velocityY = -this.jumpForce;
-        } else if (this.airJumps >= this.maxAirJumps && !this.grounded && !this.jumpProcessed) {
-            this.jumpProcessed = true;
+        } else if (this.airJumps >= this.maxAirJumps && !this.grounded) {
             setTimeout(() => {
                 if (this.grounded) {
                     this.jump();
@@ -235,6 +216,58 @@ class Player {
                 this.velocityY = 30;
             }
         }
+
+        this.x += this.velocityX;
+        this.y += this.velocityY;
+    }
+
+    applyCollisions() {
+        let horizontal_collision_count = this.checkHorizontalCollisions();
+        let vertical_collision_count = this.checkVerticalCollisions();
+
+        if (horizontal_collision_count > 0) {
+            if (this.velocityY > 0) this.velocityY *= 0.5;
+        } else {
+            this.collisionState = {
+                left: 0,
+                right: 0,
+                top: this.collisionState.top,
+                bottom: this.collisionState.bottom,
+            }
+        }
+
+        if (vertical_collision_count > 0) {
+            if (this.collisionState.bottom > 0 && !this.grounded) {
+                    this.jumpInProgress = false;
+                    this.airJumps = 0;
+                    this.grounded = true;
+            }
+        } else {
+            this.collisionState = {
+                left: this.collisionState.left,
+                right: this.collisionState.right,
+                top: 0,
+                bottom: 0,
+            }
+            this.grounded = false;
+            if (this.velocityY > 0 && !this.jumpInProgress) {
+                this.coyoteTimeActive = true;
+                setTimeout(() => {
+                    this.coyoteTimeActive = false;
+                }, this.coyoteTime);
+            }
+        }
+
+        if (vertical_collision_count == 0 && horizontal_collision_count == 0) {
+            this.changeAnimation('jump');
+            this.collisionState = {
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 0,
+            }
+
+        }
     }
 
     checkVerticalCollisions() {
@@ -262,13 +295,6 @@ class Player {
                     collisionCount++;
                     this.collisionState.bottom = collision.bottom;
                     this.y -= collision.bottom; // Adjust the y position by the overlap
-                    if (!this.grounded) { // Reset jumpProcessed if the player was not previously grounded
-                        this.jumpProcessed = false;
-                    }
-                    this.grounded = true;
-                    this.airJumps = 0;
-                } else {
-                    this.grounded = false;
                 }
                 if (collision.top > 0) {
                     this.collisionState.top = collision.top;
@@ -541,7 +567,7 @@ class Camera {
 
     applyCenterDrift() {
         if (this.offsetX != (this.restingOffsetX + (player.facingRight() ? -this.lookahead : this.lookahead))) {
-            if (this.offsetX > (this.restingOffsetX + (player.facingRight() ? -this.lookahead : this.lookahead ))) {
+            if (this.offsetX > (this.restingOffsetX + (player.facingRight() ? -this.lookahead : this.lookahead))) {
                 this.offsetX -= 0.01;
             } else {
                 this.offsetX += 0.01;
@@ -621,6 +647,13 @@ class HelperMethods {
         }
 
         return collisionDirections;
+    }
+
+    static anyTrue(comparison_list) {
+        for (let i = 0; i < comparison_list.length; i++) {
+            if (comparison_list[i]) return true;
+        }
+        return false;
     }
 }
 
