@@ -54,13 +54,26 @@ export default class Player {
         let element_style = document.getElementById("boxo"); //I should be writing this in typescript shouldn't I... :<<<
         element.style.position = "absolute";
         element.style.zIndex = 2;
-
+        
         this.animationElement.style.position = "absolute";
         this.animationElement.style.top = 0;
         this.animationElement.style.left = 0;
         this.animationElement.style.width = "100%";
         this.animationElement.style.height = "100%";
         this.animationElement.style.zIndex = 1;
+
+        let animations = this.animationElement.children;
+        Array.from(animations).forEach(animation => {
+            animation.style.display = 'none';
+            animation.style.position = "absolute";
+            animation.style.top = 0;
+            animation.style.left = 0;
+            animation.style.width = "100%";
+            animation.style.height = "100%";
+            animation.style.zIndex = 1;
+        });
+
+        this.element.querySelector(".config").style.display = "none";
     }
 
     setConfigItem(configItem, default_value) {

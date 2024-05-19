@@ -15,6 +15,12 @@ export default class Camera {
         this.lookahead = 0.1;
     }
 
+    initStyles() {
+        
+        this.element.style.position = 'absolute';
+
+    }
+
     update() {
         this.trackPlayer();
         this.processInput();
