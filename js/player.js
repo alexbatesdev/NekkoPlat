@@ -5,6 +5,12 @@ export default class Player {
     constructor(element) {
         // HTML element
         this.element = element;
+        this.animationElement = this.element.querySelector(".animation-container");
+        if (!this.animationElement) {
+            //😎
+            console.warn("You should have an animationElement, I have yet to test what goes wrong when you don't have one")
+        }
+        this.initStyles();
         // HTML config - comes from a .config element in the #player element
         //   Physics and jump variables in order from most physics to least physics
         this.maxVelocity = this.setConfigItem('maxVelocity', 10);
@@ -41,6 +47,20 @@ export default class Player {
         this.coyoteTimeActive = false;
         //   Animation
         this.currentAnimation = 'idle';
+    }
+
+    initStyles() {
+        let element = this.element;
+        let element_style = document.getElementById("boxo"); //I should be writing this in typescript shouldn't I... :<<<
+        element.style.position = "absolute";
+        element.style.zIndex = 2;
+
+        this.animationElement.style.position = "absolute";
+        this.animationElement.style.top = 0;
+        this.animationElement.style.left = 0;
+        this.animationElement.style.width = "100%";
+        this.animationElement.style.height = "100%";
+        this.animationElement.style.zIndex = 1;
     }
 
     setConfigItem(configItem, default_value) {
@@ -185,9 +205,9 @@ export default class Player {
 
         if (vertical_collision_count > 0) {
             if (this.collisionState.bottom > 0 && !this.grounded) {
-                    this.jumpInProgress = false;
-                    this.airJumps = 0;
-                    this.grounded = true;
+                this.jumpInProgress = false;
+                this.airJumps = 0;
+                this.grounded = true;
             }
         } else {
             this.collisionState = {
@@ -295,19 +315,31 @@ export default class Player {
     changeAnimation(animationName) {
         if (this.currentAnimation === animationName) return;
         this.currentAnimation = animationName;
-        const animationElement = this.element.querySelector(".animation-container");
-        if (animationElement) {
-            // Iterate over animationElement children
-            for (let i = 0; i < animationElement.children.length; i++) {
-                const child = animationElement.children[i];
-                if (child.classList.contains(animationName)) {
-                    child.style.display = 'block';
-                } else {
-                    child.style.display = 'none';
-                }
+        // if animation has the gif class
+        if (!this.animationElement) {
+            console.error("Animation Element not found, please add an element with the class of `animation-container` to your player element")
+            return
+        } else if (this.animationElement.classList.contains("gif")) {
+            this.setGifAnimation(animationName)
+        } else if (this.animationElement.classList.contains("sprite-sheet")) {
+            console.warn("Not Implemented Yet")
+        } else {
+            console.warn("No Animation Element type found (gif/spritesheet), defaulting to gif because that's the easier one :>")
+        }
+    }
+
+    setGifAnimation(animationName) {
+        // Iterate over this.animationElement children
+        for (let i = 0; i < this.animationElement.children.length; i++) {
+            const child = this.animationElement.children[i];
+            if (child.classList.contains(animationName)) {
+                child.style.display = 'block';
+            } else {
+                child.style.display = 'none';
             }
         }
     }
+
 
     lookRight() {
         this.element.style.transform = 'rotateY(180deg)';
