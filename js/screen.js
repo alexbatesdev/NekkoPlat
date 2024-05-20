@@ -5,17 +5,19 @@ import gameInstance from "./game.js";
 export default class Screen {
     constructor(element) {
         this.element = element;
-        this.initStyles();
         this.rect = this.element.getBoundingClientRect();
         this.walls = [];
         this.initWalls();
-
+        this.initStyles();
     }
 
     initStyles() {
         this.element.style.position = 'relative';
         if (gameInstance.debug) this.element.style.outline = '1px solid yellow';
         else this.element.style.outline = 'none';
+        for (let i = 0; i < this.walls.length; i++) {
+            this.walls[i].reinitStyles();
+        }
     }
 
     initWalls() {

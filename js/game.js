@@ -102,7 +102,7 @@ class Game {
         } else {
             document.documentElement.style.setProperty('--debug', 'hidden');
         }
-        this.level.reinitScreenStyles();
+        this.level.reinitStyles();
     }
 
     debugLog(message) {

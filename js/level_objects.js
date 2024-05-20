@@ -1,3 +1,5 @@
+import gameInstance from './game.js';
+
 export class Wall {
     constructor(element) {
         this.element = element;
@@ -10,6 +12,15 @@ export class Wall {
 
     update() {
         this.updateRect();
+    }
+
+    reinitStyles() {
+        if (gameInstance.debug) {
+            this.element.style.outline = '3px solid red';
+            this.element.style.outlineOffset = '-3px';
+        } else {
+            this.element.style.outline = 'none';
+        }
     }
 }
 

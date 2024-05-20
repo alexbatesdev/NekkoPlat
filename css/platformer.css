@@ -387,7 +387,6 @@ left
     right: 0;
     left: initial;
     width: 30%;
-    outline: 2px solid red;
 }
 
 #floor-4 {
@@ -395,7 +394,6 @@ left
     left: 0;
     left: initial;
     width: 52%;
-    outline: 2px solid red;
 }
 
 .ceiling {
