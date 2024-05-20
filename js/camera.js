@@ -3,7 +3,8 @@ import gameInstance from "./game.js";
 export default class Camera {
     constructor() {
         this.element = document.getElementById('viewport');
-        this.filterElement = document.getElementById('filter');
+        this.filterElement = document.createElement('div');
+        this.element.appendChild(this.filterElement);
         this.targetX = 0;
         this.targetY = 0;
         this.smoothing = 0.1;
@@ -20,6 +21,14 @@ export default class Camera {
 
     initStyles() {
         this.element.style.overflow = 'hidden';
+
+        this.filterElement.style.zIndex = '5';
+        this.filterElement.style.width = 'var(--screen-width)';
+        this.filterElement.style.height = 'var(--screen-height)';
+        this.filterElement.style.position = 'absolute';
+        this.filterElement.style.top = '0';
+        this.filterElement.style.left = '0';
+        this.filterElement.style.pointerEvents = 'none';
     }
 
     update() {

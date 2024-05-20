@@ -43,3 +43,19 @@ export class Wall {
 //   - Teleport to coordinates
 //   - Teleport to checkpoint? (optional)
 // - Display a message on collision (optional)
+
+
+// Box - an object that can be pushed by the player
+// https://chatgpt.com/c/81b5a9bb-778d-4388-8d13-b3ebd16a8895
+// ChatGPT answer is probably wrong but on the right track
+// Features:
+// - Can rotate based on physics calculations
+// - Can be pushed by player
+// - Stops on collision with wall
+// - Pushes other boxes
+// - Pushes player
+// - Pushes other objects
+// - Falls off ledges
+// - Can be pulled by player (maybe)
+// - Can be picked up by player (maybe)
+// - Can be thrown by player (maybe)
