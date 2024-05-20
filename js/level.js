@@ -2,6 +2,7 @@ import Screen from './screen.js';
 
 export default class Level {
     constructor(element_id) {
+        this.element = null;
         if (element_id) {
             this.element = document.getElementById(element_id);
         } else {
@@ -17,7 +18,7 @@ export default class Level {
         this.initScreens();
         this.initScreenGrid();
     }
-
+    
     initScreenGrid() {
         const classes = this.element.classList;
         let doDefault = true;
@@ -27,6 +28,8 @@ export default class Level {
                 const gridValues = classes[i].split('x');
                 const columns = gridValues[0];
                 const rows = gridValues[1];
+                this.element.style.display = 'grid';
+                this.element.style.position = 'relative';
                 this.element.style.gridTemplateColumns = `repeat(${columns}, var(--screen-width))`;
                 this.element.style.gridTemplateRows = `repeat(${rows}, var(--screen-height))`;
                 if (this.screens.length > columns * rows) {

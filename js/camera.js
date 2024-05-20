@@ -13,12 +13,11 @@ export default class Camera {
         this.maxOffset = 0.8;
         this.minOffset = 0.2;
         this.lookahead = 0.1;
+        this.initStyles();
     }
 
     initStyles() {
-        
-        this.element.style.position = 'absolute';
-
+        this.element.style.overflow = 'hidden';
     }
 
     update() {
