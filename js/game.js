@@ -5,6 +5,8 @@ class Game {
         this.player = null;
         this.level = null;
         this.camera = new Camera();
+        this.paused = false;
+        this.processedPause = false;
         this.keyState = {
             W: false,
             A: false,
@@ -17,6 +19,7 @@ class Game {
             ARROWDOWN: false,
             ARROWLEFT: false,
             ARROWRIGHT: false,
+            ESCAPE: false
         };
         this.start();
     }
@@ -57,11 +60,34 @@ class Game {
     }
 
     update() {
-        this.player.update(this.keyState);
-        this.level.update();
-        this.camera.update();
+        this.processInput();
+        if (!this.paused) {
+            this.player.update(this.keyState);
+            this.level.update();
+            this.camera.update();
+        }
+        
 
         requestAnimationFrame(this.update.bind(this));
+    }
+
+    processInput() {
+        if (this.keyState['ESCAPE'] && !this.processedPause) {
+            this.processedPause = true;
+            this.togglePause();
+        } else if (!this.keyState['ESCAPE']) {
+            this.processedPause = false;
+        }
+    }
+
+    togglePause() {
+        this.paused = !this.paused;
+        if (this.paused) {
+            this.camera.addFilter('blur');
+            this.camera.addFilter('dark');
+        } else {
+            this.camera.setFilter(null);
+        }
     }
 
 }

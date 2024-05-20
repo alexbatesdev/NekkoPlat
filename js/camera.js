@@ -3,6 +3,7 @@ import gameInstance from "./game.js";
 export default class Camera {
     constructor() {
         this.element = document.getElementById('viewport');
+        this.filterElement = document.getElementById('filter');
         this.targetX = 0;
         this.targetY = 0;
         this.smoothing = 0.1;
@@ -10,7 +11,7 @@ export default class Camera {
         this.restingOffsetY = 0.9;
         this.offsetX = 0.5;
         this.offsetY = 0.5;
-        this.offsetBounds = 0.1;
+        this.offsetBounds = 0;
         this.maxOffset = 1 - this.offsetBounds;
         this.minOffset = this.offsetBounds;
         this.lookahead = 0.1;
@@ -38,6 +39,23 @@ export default class Camera {
             currentX + (this.targetX - currentX) * this.smoothing,
             currentY + (this.targetY - currentY) * this.smoothing
         );
+        this.filterElement.style.left = this.element.scrollLeft + 'px';
+        this.filterElement.style.top = this.element.scrollTop + 'px';
+    }
+
+    setFilter(filter) {
+        if (!filter) {
+            this.filterElement.classList = '';
+            return;
+        }
+        this.filterElement.classList = '';
+        this.filterElement.classList.add(filter);
+        this.activeFilter = filter;
+    }
+
+    addFilter(filter) {
+        if (!filter) return;
+        this.filterElement.classList.add(filter);
     }
 
     processInput() {
