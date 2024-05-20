@@ -5,27 +5,15 @@ import gameInstance from "./game.js";
 export default class Screen {
     constructor(element) {
         this.element = element;
+        this.initStyles();
         this.rect = this.element.getBoundingClientRect();
         this.walls = [];
         this.initWalls();
-        if (this.element.classList.contains('dynamic')) {
-            this.initScreensDynamicWindowSize();
-        } else if (this.element.classList.contains('static')) {
-            this.initScreensInitialWindowSize();
-        }
+
     }
 
-    initScreensInitialWindowSize() {
-        document.documentElement.style.setProperty('--screen-width', window.innerWidth + 'px');
-        document.documentElement.style.setProperty('--screen-height', window.innerHeight + 'px');
-    }
-
-    initScreensDynamicWindowSize() {
-        this.initScreensInitialWindowSize();
-        window.addEventListener('resize', () => {
-            document.documentElement.style.setProperty('--screen-width', window.innerWidth + 'px');
-            document.documentElement.style.setProperty('--screen-height', window.innerHeight + 'px');
-        });
+    initStyles() {
+        this.element.style.position = 'relative';
     }
 
     initWalls() {

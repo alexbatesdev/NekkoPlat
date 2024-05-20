@@ -17,6 +17,24 @@ export default class Level {
         this.screens = [];
         this.initScreens();
         this.initScreenGrid();
+        if (this.element.classList.contains('dynamic')) {
+            this.initScreensDynamicWindowSize();
+        } else if (this.element.classList.contains('initial')) {
+            this.initScreensInitialWindowSize();
+        }
+    }
+
+    initScreensInitialWindowSize() {
+        document.documentElement.style.setProperty('--screen-width', window.innerWidth + 'px');
+        document.documentElement.style.setProperty('--screen-height', window.innerHeight + 'px');
+    }
+
+    initScreensDynamicWindowSize() {
+        this.initScreensInitialWindowSize();
+        window.addEventListener('resize', () => {
+            document.documentElement.style.setProperty('--screen-width', window.innerWidth + 'px');
+            document.documentElement.style.setProperty('--screen-height', window.innerHeight + 'px');
+        });
     }
     
     initScreenGrid() {

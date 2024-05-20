@@ -324,13 +324,10 @@ position: relative or absolute
 
 
 .screen {
-    width: var(--screen-width);
-    height: var(--screen-height);
     background-image: url("../img/underground_BG.gif");
     background-size: cover;
     background-position: center;
-    position: relative;
-    /* outline: yellow 2px solid; */
+    outline: yellow 2px solid;
     background-color: cadetblue;
 }
 
@@ -531,24 +528,24 @@ left
     left: 50%;
     transform: translate(-50%, -50%);
     font-family: Arial, Helvetica, sans-serif;
-    width: 500px;
+    width: 700px;
 }
 
 @keyframes bljitter {
     0% {
-        right: 30px;
+        margin-left: 0px;
     }
 
     100% {
-        right: 50px;
+        margin-left: 30px;
 
     }
 }
 
 #img-1 {
     position: absolute;
-    right: 40px;
-    bottom: 50px;
+    left: 320px;
+    bottom: 160px;
     animation: bljitter 0.1s infinite;
 }
 
@@ -570,7 +567,6 @@ left
     position: absolute;
     height: 500px;
     top: 50px;
-    animation: bljitter 0.1s infinite;
 }
 
 #img-5 {
