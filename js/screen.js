@@ -14,6 +14,8 @@ export default class Screen {
 
     initStyles() {
         this.element.style.position = 'relative';
+        if (gameInstance.debug) this.element.style.outline = '1px solid yellow';
+        else this.element.style.outline = 'none';
     }
 
     initWalls() {

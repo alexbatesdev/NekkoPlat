@@ -6,7 +6,8 @@ class Game {
         this.level = null;
         this.camera = new Camera();
         this.paused = false;
-        this.processedPause = false;
+        this.processedInput = false;
+        this.debug = false;
         this.keyState = {
             W: false,
             A: false,
@@ -31,11 +32,11 @@ class Game {
     setPlayer(player) {
         this.player = player;
     }
-    
+
     getPlayer() {
         return this.player;
     }
-    
+
     setLevel(level) {
         this.level = level;
     }
@@ -46,6 +47,7 @@ class Game {
                 return;
             }
             event.preventDefault();
+            this.debugLog(event.key.toUpperCase());
             this.keyState[event.key.toUpperCase()] = true;
         });
 
@@ -66,17 +68,20 @@ class Game {
             this.level.update();
             this.camera.update();
         }
-        
+
 
         requestAnimationFrame(this.update.bind(this));
     }
 
     processInput() {
-        if (this.keyState['ESCAPE'] && !this.processedPause) {
-            this.processedPause = true;
+        if (this.keyState['3'] && !this.processedInput) {
+            this.processedInput = true;
+            this.toggleDebug();
+        } else if (this.keyState['ESCAPE'] && !this.processedInput) {
+            this.processedInput = true;
             this.togglePause();
-        } else if (!this.keyState['ESCAPE']) {
-            this.processedPause = false;
+        } else if (!this.keyState['ESCAPE'] && !this.keyState['3']){
+            this.processedInput = false;
         }
     }
 
@@ -87,6 +92,22 @@ class Game {
             this.camera.addFilter('dark');
         } else {
             this.camera.setFilter(null);
+        }
+    }
+
+    toggleDebug() {
+        this.debug = !this.debug;
+        if (this.debug) {
+            document.documentElement.style.setProperty('--debug', 'visible');
+        } else {
+            document.documentElement.style.setProperty('--debug', 'hidden');
+        }
+        this.level.reinitScreenStyles();
+    }
+
+    debugLog(message) {
+        if (this.debug) {
+            console.log(message);
         }
     }
 

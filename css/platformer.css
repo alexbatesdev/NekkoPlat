@@ -240,6 +240,11 @@ table {
     --screen-size: 0.7;
     --screen-width: calc(1600px*var(--screen-size));
     --screen-height: calc(900px*var(--screen-size));
+    --debug: hidden;
+}
+
+.debug {
+    visibility: var(--debug);
 }
 
 body {
@@ -325,8 +330,6 @@ position: relative or absolute
     background-image: url("../img/underground_BG.gif");
     background-size: cover;
     background-position: center;
-    outline: yellow 2px solid;
-    background-color: cadetblue;
 }
 
 /*

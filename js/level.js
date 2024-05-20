@@ -70,6 +70,12 @@ export default class Level {
         this.screens = Array.from(screenElements).map(screen => new Screen(screen));
     }
 
+    reinitScreenStyles() {
+        this.screens.forEach(screen => {
+            screen.initStyles();
+        });
+    }
+
     update() {
         this.screens.forEach(screen => {
             screen.update();
