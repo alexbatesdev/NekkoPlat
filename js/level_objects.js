@@ -24,6 +24,12 @@ export class Wall {
     }
 }
 
+// One Way Wall - a wall that can be passed through in one direction
+// Features:
+// - Can be passed through in one direction
+// - Can't be passed through in the other direction
+// - Vertical or horizontal orientation
+
 
 // Moving platform - a type of wall that moves
 // Easy example of extending a class
@@ -70,3 +76,4 @@ export class Wall {
 // - Can be pulled by player (maybe)
 // - Can be picked up by player (maybe)
 // - Can be thrown by player (maybe)
+

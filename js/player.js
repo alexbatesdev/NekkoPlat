@@ -1,5 +1,5 @@
 import gameInstance from "./game.js";
-import { intersects, getCollisionOverlap, anyTrue } from "./tools.js";
+import { intersects, getCollisionOverlap, anyTrue, debugLog } from "./tools.js";
 
 export default class Player {
     constructor(element) {
@@ -99,6 +99,7 @@ export default class Player {
         // Set the position of the player's HTML element
         this.element.style.left = `${this.x}px`;
         this.element.style.top = `${this.y}px`;
+        debugLog(this.walls.length);
     }
 
     processInput() {

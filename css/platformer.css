@@ -639,3 +639,9 @@ a {
     text-decoration: none;
     font-size: 10rem;
 }
+
+#blahaj-pet {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}

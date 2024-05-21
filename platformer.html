@@ -17,13 +17,14 @@
     <script type="module" src="./js/platformer.js" defer></script>
     <link rel="stylesheet" href="./css/platformer.css">
     <title>Nekko's World</title>
+
 </head>
 
 <body>
     <!-- I should make a developer "F3 Menu" console -->
     <span class="criss debug"></span>
     <span class="cross debug"></span>
-    
+
     <div class="tv" id="viewport">
         <div class="level 3x2" id="level-one">
             <div class="cat" id="player">
@@ -45,7 +46,7 @@
                     <img class="wait" src="./img/cat_fall_asleep.gif" alt="A cat falling asleep">
                 </div>
             </div>
-            <div class="screen dynamic">
+            <div class="screen">
                 <div class="wall floor" id="floor-1"></div>
                 <!-- <div class="pipe" id="pipe-1"></div> -->
 
@@ -95,9 +96,15 @@
                     <div class="cap"></div>
                 </div>
             </div>
-            <div class="screen"></div>
-            <div class="screen"></div>
-            <div class="screen"></div>
+            <div class="screen">
+                <div class="wall floor"></div>
+            </div>
+            <div class="screen">
+                <div class="wall floor"></div>
+            </div>
+            <div class="screen">
+                <div class="wall floor"></div>
+            </div>
             <!-- <div class="screen"></div>
             <div class="screen"></div>
             <div class="screen"></div> -->
@@ -132,7 +139,8 @@
     </div>
     <!-- Need to make these elements (overlay) optional in the javascript to avoid errors! -->
     <div id="overlay">
-        <span class="filter crt"></span>  
+        <span class="filter crt"></span> 
+        <img id="blahaj-pet" src="./img/blahaj-blahaj-pet.gif" alt="A Swedish shark stuffed animal being given a good pet"> 
     </div>
     <div class="tv-stump">
         <div class="tv-base"></div>

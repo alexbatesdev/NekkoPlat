@@ -14,9 +14,11 @@ export default class Level {
                 return;
             }
         }
+        this.rows = 1;
+        this.columns = 1;
         this.screens = [];
-        this.initScreens();
         this.initScreenGrid();
+        this.initScreens();
         if (this.element.classList.contains('dynamic')) {
             this.initScreensDynamicWindowSize();
         } else if (this.element.classList.contains('initial')) {
@@ -36,7 +38,7 @@ export default class Level {
             document.documentElement.style.setProperty('--screen-height', window.innerHeight + 'px');
         });
     }
-    
+
     initScreenGrid() {
         const classes = this.element.classList;
         let doDefault = true;
@@ -44,15 +46,15 @@ export default class Level {
             if (classes[i].includes('x')) {
                 doDefault = false;
                 const gridValues = classes[i].split('x');
-                const columns = gridValues[0];
-                const rows = gridValues[1];
+                this.columns = gridValues[0];
+                this.rows = gridValues[1];
                 this.element.style.display = 'grid';
                 this.element.style.position = 'relative';
-                this.element.style.gridTemplateColumns = `repeat(${columns}, var(--screen-width))`;
-                this.element.style.gridTemplateRows = `repeat(${rows}, var(--screen-height))`;
-                if (this.screens.length > columns * rows) {
+                this.element.style.gridTemplateColumns = `repeat(${this.columns}, var(--screen-width))`;
+                this.element.style.gridTemplateRows = `repeat(${this.rows}, var(--screen-height))`;
+                if (this.screens.length > this.columns * this.rows) {
                     console.error("Screen count exceeds grid dimensions");
-                } else if (this.screens.length < columns * rows) {
+                } else if (this.screens.length < this.columns * this.rows) {
                     console.warn("Screen count is less than grid dimensions, some grid cells will be empty");
                 }
             }
@@ -67,7 +69,13 @@ export default class Level {
     initScreens() {
         // Grab all of the screen elements
         const screenElements = document.querySelectorAll('.screen');
-        this.screens = Array.from(screenElements).map(screen => new Screen(screen));
+        let index = 0;
+        this.screens = Array.from(screenElements).map(screen => {
+            let column = index % this.columns;
+            let row = Math.floor(index / this.columns);
+            index++;
+            return new Screen(this, screen, column, row)
+        });
     }
 
     reinitStyles() {
@@ -80,5 +88,9 @@ export default class Level {
         this.screens.forEach(screen => {
             screen.update();
         });
+    }
+
+    getScreen(x, y) {
+        return this.screens.find(screen => screen.x === x && screen.y === y);
     }
 }

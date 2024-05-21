@@ -1,3 +1,4 @@
+import gameInstance from "./game.js";
 
 export const intersects = (rect1, rect2) => {
     let isIntersecting = !(rect2.left > rect1.right ||
@@ -68,4 +69,14 @@ export const anyTrue = (comparison_list) => {
         if (comparison_list[i]) return true;
     }
     return false;
+}
+
+export const debugLog = (message) => {
+    if (gameInstance.debug) {
+        console.log(message);
+    }
+}
+
+export const isSubset = (subset, set) => {
+    return subset.every(element => set.includes(element));
 }

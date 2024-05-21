@@ -1,4 +1,5 @@
 import Camera, { Filter } from './camera.js';
+import { debugLog } from './tools.js';
 
 class Game {
     constructor() {
@@ -70,7 +71,7 @@ class Game {
                 return;
             }
             event.preventDefault();
-            this.debugLog(event.key.toUpperCase());
+            debugLog(event.key.toUpperCase());
             this.keyState[event.key.toUpperCase()] = true;
         });
 
@@ -128,13 +129,6 @@ class Game {
         }
         this.level.reinitStyles();
     }
-
-    debugLog(message) {
-        if (this.debug) {
-            console.log(message);
-        }
-    }
-
 }
 
 const gameInstance = new Game();
