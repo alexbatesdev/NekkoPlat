@@ -29,7 +29,6 @@ class Game {
             ARROWRIGHT: false,
             ESCAPE: false
         };
-        this.start();
     }
 
     initPauseElement() {
@@ -83,6 +82,7 @@ class Game {
     start() {
         requestAnimationFrame(this.update.bind(this));
         this.initKeyStateListeners();
+        this.player.spawn();
     }
 
     update() {

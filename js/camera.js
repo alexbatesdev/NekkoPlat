@@ -55,7 +55,6 @@ export default class Camera {
     trackPlayer() {
         let currentX = this.element.scrollLeft;
         let currentY = this.element.scrollTop;
-
         this.targetX = (gameInstance.player.x + (gameInstance.player.element.getBoundingClientRect().width / 2)) - (this.element.getBoundingClientRect().width - 80) * this.offsetX;
         this.targetY = (gameInstance.player.y + (gameInstance.player.element.getBoundingClientRect().height / 2)) - (this.element.getBoundingClientRect().height - 80) * this.offsetY;
 

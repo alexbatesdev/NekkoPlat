@@ -24,8 +24,8 @@ export default class Player {
         this.maxAirJumps = this.setConfigItem('maxAirJumps', 1);
         // Character state variables
         //   Position
-        this.x = element.getBoundingClientRect().x;
-        this.y = element.getBoundingClientRect().y;
+        this.x = 0;
+        this.y = 0;
         //   Physics
         this.velocityX = 0;
         this.velocityY = 0;
@@ -51,7 +51,6 @@ export default class Player {
 
     initStyles() {
         let element = this.element;
-        let element_style = document.getElementById("boxo"); //I should be writing this in typescript shouldn't I... :<<<
         element.style.position = "absolute";
         element.style.zIndex = 2;
         
@@ -92,6 +91,30 @@ export default class Player {
         }
     }
 
+    spawn() {
+        const playerSpawnXRelativeToScreen = getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-x')
+        const playerSpawnYRelativeToScreen = getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-y')
+        const screenXposition = this.element.parentNode.getBoundingClientRect().x;
+        const screenYposition = this.element.parentNode.getBoundingClientRect().y;
+        this.element.style.left = playerSpawnXRelativeToScreen;
+        this.element.style.top = playerSpawnYRelativeToScreen;
+        this.x = (this.element.getBoundingClientRect().x - screenXposition) - (this.element.getBoundingClientRect().width / 2);
+        this.y = (this.element.getBoundingClientRect().y - screenYposition) - (this.element.getBoundingClientRect().height / 2);
+    }
+
+    respawn(playerSpawnXRelativeToScreen, playerSpawnYRelativeToScreen, screen) {
+        let screensToTheLeft = 0;
+        let screensToTheTop = 0;
+        screen.classList.forEach(className => {
+            if (className.includes("screen-")) {
+                screensToTheLeft = Number(className.split("-")[1]);
+                screensToTheTop = Number(className.split("-")[2]);
+            }
+        });
+        this.x = (playerSpawnXRelativeToScreen) + (screensToTheLeft * screen.getBoundingClientRect().width) - (this.element.getBoundingClientRect().width / 2);
+        this.y = (playerSpawnYRelativeToScreen) + (screensToTheTop * screen.getBoundingClientRect().height) - (this.element.getBoundingClientRect().height / 2);
+    }
+
     update() {
         this.processInput();
         this.applyPhysics();
@@ -99,7 +122,15 @@ export default class Player {
         // Set the position of the player's HTML element
         this.element.style.left = `${this.x}px`;
         this.element.style.top = `${this.y}px`;
-        debugLog(this.walls.length);
+        debugLog({
+            x: this.x,
+            y: this.y,
+            // velocityX: this.velocityX,
+            // velocityY: this.velocityY,
+            // gravity: this.liveGravity,
+            // grounded: this.grounded,
+            // collisionState: this.collisionState,
+        });
     }
 
     processInput() {

@@ -19,6 +19,7 @@ export default class Level {
         this.screens = [];
         this.initScreenGrid();
         this.initScreens();
+        this.checkScreenCount();
         if (this.element.classList.contains('dynamic')) {
             this.initScreensDynamicWindowSize();
         } else if (this.element.classList.contains('initial')) {
@@ -39,6 +40,14 @@ export default class Level {
         });
     }
 
+    checkScreenCount() {
+        if (this.screens.length > this.columns * this.rows) {
+            console.error("Screen count exceeds grid dimensions");
+        } else if (this.screens.length < this.columns * this.rows) {
+            console.warn("Screen count is less than grid dimensions, some grid cells will be empty");
+        }
+    }
+
     initScreenGrid() {
         const classes = this.element.classList;
         let doDefault = true;
@@ -52,11 +61,6 @@ export default class Level {
                 this.element.style.position = 'relative';
                 this.element.style.gridTemplateColumns = `repeat(${this.columns}, var(--screen-width))`;
                 this.element.style.gridTemplateRows = `repeat(${this.rows}, var(--screen-height))`;
-                if (this.screens.length > this.columns * this.rows) {
-                    console.error("Screen count exceeds grid dimensions");
-                } else if (this.screens.length < this.columns * this.rows) {
-                    console.warn("Screen count is less than grid dimensions, some grid cells will be empty");
-                }
             }
         }
         if (doDefault) {
