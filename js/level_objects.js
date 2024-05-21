@@ -24,6 +24,13 @@ export class Wall {
     }
 }
 
+// USE THIS AS A BASE FOR OTHER INTERACTABLE OBJECTS
+// Effect Area - an object that does something when the player enters it
+// Features:
+// - Run javascript code on player overlap
+// - Run javascript code on player interaction
+
+
 // One Way Wall - a wall that can be passed through in one direction
 // Features:
 // - Can be passed through in one direction
@@ -76,4 +83,3 @@ export class Wall {
 // - Can be pulled by player (maybe)
 // - Can be picked up by player (maybe)
 // - Can be thrown by player (maybe)
-
