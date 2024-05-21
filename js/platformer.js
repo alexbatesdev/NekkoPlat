@@ -9,5 +9,3 @@ import Level from "./level.js";
 const playerElement = document.getElementById('player');
 gameInstance.setPlayer(new Player(playerElement));
 gameInstance.setLevel(new Level("level-one"));
-// I'm not sure if this solves the problem I had with the camera if the player doesn't spawn in the top left
-gameInstance.camera.snapToPlayer();

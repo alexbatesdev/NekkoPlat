@@ -1,13 +1,17 @@
-import Camera from './camera.js';
+import Camera, { Filter } from './camera.js';
 
 class Game {
     constructor() {
         this.player = null;
         this.level = null;
         this.camera = new Camera();
+        this.pauseElement = document.getElementById('pause');
+        this.camera.overlayElement.appendChild(this.pauseElement);
+        this.initPauseElement();
+
+        this.debug = false;
         this.paused = false;
         this.processedInput = false;
-        this.debug = false;
         this.keyState = {
             W: false,
             A: false,
@@ -23,6 +27,23 @@ class Game {
             ESCAPE: false
         };
         this.start();
+    }
+
+    initPauseElement() {
+        this.pauseElement.style.position = 'absolute';
+        this.pauseElement.style.top = 0;
+        this.pauseElement.style.left = 0;
+        this.pauseElement.style.width = '100%';
+        this.pauseElement.style.height = '100%';
+        this.pauseElement.style.zIndex = 5;
+        this.pauseElement.style.visibility = 'hidden';
+        this.pauseElement.style.pointerEvents = 'none';
+
+        const filters = document.querySelectorAll('.filter');
+        filters.forEach(filter => {
+            new Filter(filter);
+            this.pauseElement.appendChild(filter);
+        });
     }
 
     getKeyState(key) {
@@ -89,9 +110,12 @@ class Game {
         this.paused = !this.paused;
         if (this.paused) {
             this.camera.addFilter('blur');
-            this.camera.addFilter('dark');
+           this.pauseElement.style.visibility = 'visible';
+            this.pauseElement.style.pointerEvents = 'all';
         } else {
             this.camera.setFilter(null);
+            this.pauseElement.style.visibility = 'hidden';
+            this.pauseElement.style.pointerEvents = 'none';
         }
     }
 

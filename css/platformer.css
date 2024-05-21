@@ -606,3 +606,26 @@ left
     width: 1px;
     z-index: 100;
 }
+
+.pause-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: white;
+    font-family: 'Times New Roman', Times, serif;
+    gap: 1rem;
+}
+
+.pause-text>h1 {
+    font-size: 5rem;
+}
+
+.pause-text>p {
+    font-size: 2rem;
+}

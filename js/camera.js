@@ -3,8 +3,8 @@ import gameInstance from "./game.js";
 export default class Camera {
     constructor() {
         this.element = document.getElementById('viewport');
-        this.filterElement = document.createElement('div');
-        this.element.appendChild(this.filterElement);
+        this.overlayElement = document.createElement('div');
+        this.element.appendChild(this.overlayElement);
         this.targetX = 0;
         this.targetY = 0;
         this.smoothing = 0.1;
@@ -22,13 +22,13 @@ export default class Camera {
     initStyles() {
         this.element.style.overflow = 'hidden';
 
-        this.filterElement.style.zIndex = '5';
-        this.filterElement.style.width = 'var(--screen-width)';
-        this.filterElement.style.height = 'var(--screen-height)';
-        this.filterElement.style.position = 'absolute';
-        this.filterElement.style.top = '0';
-        this.filterElement.style.left = '0';
-        this.filterElement.style.pointerEvents = 'none';
+        this.overlayElement.style.zIndex = '5';
+        this.overlayElement.style.width = 'var(--screen-width)';
+        this.overlayElement.style.height = 'var(--screen-height)';
+        this.overlayElement.style.position = 'absolute';
+        this.overlayElement.style.top = '0';
+        this.overlayElement.style.left = '0';
+        this.overlayElement.style.pointerEvents = 'none';
     }
 
     update() {
@@ -48,8 +48,8 @@ export default class Camera {
             currentX + (this.targetX - currentX) * this.smoothing,
             currentY + (this.targetY - currentY) * this.smoothing
         );
-        this.filterElement.style.left = this.element.scrollLeft + 'px';
-        this.filterElement.style.top = this.element.scrollTop + 'px';
+        this.overlayElement.style.left = this.element.scrollLeft + 'px';
+        this.overlayElement.style.top = this.element.scrollTop + 'px';
     }
 
     snapToPlayer() {
@@ -61,17 +61,17 @@ export default class Camera {
 
     setFilter(filter) {
         if (!filter) {
-            this.filterElement.classList = '';
+            this.overlayElement.classList = '';
             return;
         }
-        this.filterElement.classList = '';
-        this.filterElement.classList.add(filter);
+        this.overlayElement.classList = '';
+        this.overlayElement.classList.add(filter);
         this.activeFilter = filter;
     }
 
     addFilter(filter) {
         if (!filter) return;
-        this.filterElement.classList.add(filter);
+        this.overlayElement.classList.add(filter);
     }
 
     processInput() {
@@ -116,5 +116,22 @@ export default class Camera {
                 this.offsetY += 0.01;
             }
         }
+    }
+}
+
+export class Filter {
+    constructor(element) {
+        this.element = element;
+        this.initStyles();
+    }
+
+    initStyles() {
+        this.element.style.position = 'absolute';
+        this.element.style.top = '0';
+        this.element.style.left = '0';
+        this.element.style.width = '100%';
+        this.element.style.height = '100%';
+        this.element.style.pointerEvents = 'none';
+        this.element.style.zIndex = -1;
     }
 }
