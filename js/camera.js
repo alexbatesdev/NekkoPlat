@@ -12,8 +12,8 @@ export default class Camera {
         this.smoothing = 0.1;
         this.restingOffsetX = 0.5;
         this.restingOffsetY = 0.9;
-        this.offsetX = 0.5;
-        this.offsetY = 0.5;
+        this.offsetX = this.restingOffsetX;
+        this.offsetY = this.restingOffsetY;
         this.offsetBounds = 0;
         this.maxOffset = 1 - this.offsetBounds;
         this.minOffset = this.offsetBounds;
