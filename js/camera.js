@@ -3,8 +3,10 @@ import gameInstance from "./game.js";
 export default class Camera {
     constructor() {
         this.element = document.getElementById('viewport');
-        this.overlayElement = document.createElement('div');
+        this.overlayElement = document.getElementById('overlay');
         this.element.appendChild(this.overlayElement);
+        this.filters = [];
+        this.initFilters();
         this.targetX = 0;
         this.targetY = 0;
         this.smoothing = 0.1;
@@ -19,6 +21,11 @@ export default class Camera {
         this.initStyles();
     }
 
+    positionOverlay() {
+        this.overlayElement.style.left = this.element.scrollLeft + 'px';
+        this.overlayElement.style.top = this.element.scrollTop + 'px';
+    }
+
     initStyles() {
         this.element.style.overflow = 'hidden';
 
@@ -31,10 +38,18 @@ export default class Camera {
         this.overlayElement.style.pointerEvents = 'none';
     }
 
+    initFilters() {
+        this.overlayElement.querySelectorAll('.filter').forEach(filter => {
+            this.filters.push(new Filter(filter));
+        });
+
+    }
+
     update() {
         this.trackPlayer();
         this.processInput();
         this.applyMaxOffset();
+        this.positionOverlay();
     }
 
     trackPlayer() {
@@ -48,8 +63,6 @@ export default class Camera {
             currentX + (this.targetX - currentX) * this.smoothing,
             currentY + (this.targetY - currentY) * this.smoothing
         );
-        this.overlayElement.style.left = this.element.scrollLeft + 'px';
-        this.overlayElement.style.top = this.element.scrollTop + 'px';
     }
 
     snapToPlayer() {
@@ -57,21 +70,6 @@ export default class Camera {
             (gameInstance.player.x + (gameInstance.player.element.getBoundingClientRect().width / 2)) - (this.element.getBoundingClientRect().width - 80) * this.offsetX,
             (gameInstance.player.y + (gameInstance.player.element.getBoundingClientRect().height / 2)) - (this.element.getBoundingClientRect().height - 80) * this.offsetY
         );
-    }
-
-    setFilter(filter) {
-        if (!filter) {
-            this.overlayElement.classList = '';
-            return;
-        }
-        this.overlayElement.classList = '';
-        this.overlayElement.classList.add(filter);
-        this.activeFilter = filter;
-    }
-
-    addFilter(filter) {
-        if (!filter) return;
-        this.overlayElement.classList.add(filter);
     }
 
     processInput() {

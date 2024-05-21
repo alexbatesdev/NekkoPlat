@@ -629,3 +629,13 @@ left
 .pause-text>p {
     font-size: 2rem;
 }
+
+a {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: blue;
+    text-decoration: none;
+    font-size: 10rem;
+}

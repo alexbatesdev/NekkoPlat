@@ -6,8 +6,10 @@ class Game {
         this.level = null;
         this.camera = new Camera();
         this.pauseElement = document.getElementById('pause');
-        this.camera.overlayElement.appendChild(this.pauseElement);
-        this.initPauseElement();
+        if (this.pauseElement) {
+            this.camera.overlayElement.appendChild(this.pauseElement);
+            this.initPauseElement();
+        }
 
         this.debug = false;
         this.paused = false;
@@ -39,7 +41,7 @@ class Game {
         this.pauseElement.style.visibility = 'hidden';
         this.pauseElement.style.pointerEvents = 'none';
 
-        const filters = document.querySelectorAll('.filter');
+        const filters = this.pauseElement.querySelectorAll('.filter');
         filters.forEach(filter => {
             new Filter(filter);
             this.pauseElement.appendChild(filter);
@@ -100,7 +102,7 @@ class Game {
             this.toggleDebug();
         } else if (this.keyState['ESCAPE'] && !this.processedInput) {
             this.processedInput = true;
-            this.togglePause();
+            if (this.pauseElement) this.togglePause();
         } else if (!this.keyState['ESCAPE'] && !this.keyState['3']){
             this.processedInput = false;
         }
@@ -109,11 +111,9 @@ class Game {
     togglePause() {
         this.paused = !this.paused;
         if (this.paused) {
-            this.camera.addFilter('blur');
-           this.pauseElement.style.visibility = 'visible';
+            this.pauseElement.style.visibility = 'visible';
             this.pauseElement.style.pointerEvents = 'all';
         } else {
-            this.camera.setFilter(null);
             this.pauseElement.style.visibility = 'hidden';
             this.pauseElement.style.pointerEvents = 'none';
         }
