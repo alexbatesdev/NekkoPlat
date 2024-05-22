@@ -83,3 +83,15 @@ export class SoldObject {
 // - Can be pulled by player (maybe)
 // - Can be picked up by player (maybe)
 // - Can be thrown by player (maybe)
+
+
+// Interactable Toggle - an object that toggles between two states on interaction
+// Features:
+// - Toggle between two states on interaction
+// - Trigger other objects on toggle
+
+
+// Classic Mario Block - an object that changes state on collision
+// Features:
+// - Change state on collision
+// - Choose direction impact is needed for state change
