@@ -56,7 +56,7 @@ export default class Player {
         let element = this.element;
         element.style.position = "absolute";
         element.style.zIndex = 2;
-        
+
         this.animationElement.style.position = "absolute";
         this.animationElement.style.top = 0;
         this.animationElement.style.left = 0;
@@ -120,7 +120,7 @@ export default class Player {
                 screensToTheTop = Number(className.split("-")[2]);
                 console.log(screensToTheLeft, screensToTheTop);
             }
-        }); 
+        });
         console.log(playerSpawnXRelativeToScreen, playerSpawnYRelativeToScreen);
         console.log((playerSpawnXRelativeToScreen) + (screensToTheLeft * screen.getBoundingClientRect().width) - (this.element.getBoundingClientRect().width / 2))
         console.log((playerSpawnYRelativeToScreen) + (screensToTheTop * screen.getBoundingClientRect().height) - (this.element.getBoundingClientRect().height / 2))
@@ -391,27 +391,43 @@ export default class Player {
         const outOfBoundEffect = gameInstance.level.outOfBoundEffect;
         if (playerRect.left < levelRect.left) {
             console.log("Out of bounds left");
-            if (outOfBoundEffect == "contain") {
+            if (outOfBoundEffect.left == "contain") {
                 this.x -= playerRect.left - levelRect.left;
+                console.log(this.x);
+            } else if (outOfBoundEffect.left == "respawn") {
+                this.respawnAtCheckpoint();
+            } else if (outOfBoundEffect.left == "wrap") {
+                this.x = levelRect.right - playerRect.width;
             }
-        }
-        if (playerRect.right > levelRect.right) {
+        } else if (playerRect.right > levelRect.right) {
             console.log("Out of bounds right");
-            if (outOfBoundEffect == "contain") {
+            if (outOfBoundEffect.right == "contain") {
                 this.x -= playerRect.right - levelRect.right;
+            } else if (outOfBoundEffect.right == "respawn") {
+                this.respawnAtCheckpoint();
+            } else if (outOfBoundEffect.right == "wrap") {
+                this.x = 0;
             }
         }
         if (playerRect.top < levelRect.top) {
             console.log("Out of bounds top");
-            if (outOfBoundEffect == "contain") {
+            if (outOfBoundEffect.top == "contain") {
                 this.y -= playerRect.top - levelRect.top;
+            } else if (outOfBoundEffect.top == "respawn") {
+                this.respawnAtCheckpoint();
+            } else if (outOfBoundEffect.top == "wrap") {
+                this.y = levelRect.height - playerRect.height;
             }
-        }
-        if (playerRect.bottom > levelRect.bottom) {
+        } else if (playerRect.bottom > levelRect.bottom) {
             console.log("Out of bounds bottom");
-            if (outOfBoundEffect == "contain") {
+            if (outOfBoundEffect.bottom == "contain") {
                 this.y -= playerRect.bottom - levelRect.bottom;
+            } else if (outOfBoundEffect.bottom == "respawn") {
+                this.respawnAtCheckpoint();
+            } else if (outOfBoundEffect.bottom == "wrap") {
+                this.y = 0;
             }
+
         }
     }
 

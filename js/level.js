@@ -25,18 +25,37 @@ export default class Level {
         } else if (this.element.classList.contains('initial')) {
             this.initScreensInitialWindowSize();
         }
-        this.outOfBoundEffect = null;
-        if (this.element.classList.contains("contain")) {
-            this.outOfBoundEffect = "contain";
-            // init method
-        } else if (this.element.classList.contains("kill")) {
-            this.outOfBoundEffect = "kill";
-            // init method
-        } else if (this.element.classList.contains("wrap")) {
-            this.outOfBoundEffect = "wrap";
-            // init method
-        }
+        this.outOfBoundEffect = {
+            top: null,
+            right: null,
+            bottom: null,
+            left: null
+        };
+        this.initOutOfBoundEffects();
+    }
 
+    initOutOfBoundEffects() {
+        const validEffects = ['contain', 'respawn', 'wrap'];
+        this.element.classList.forEach(className => {
+            validEffects.forEach(effect => {
+                if (className.includes(effect)) {
+                    console.log(className)
+                    if (className.includes("-")) {
+                        console.log(className.split("-"))
+                        if (className.split("-")[1] == "vert") {
+                            this.outOfBoundEffect.top = effect;
+                            this.outOfBoundEffect.bottom = effect;
+                        } else if (className.split("-")[1] == "hori") {
+                            this.outOfBoundEffect.left = effect;
+                            this.outOfBoundEffect.right = effect;
+                        } else {
+                            this.outOfBoundEffect[className.split("-")[1]] = effect;
+                        }
+                    }
+                }
+            });
+        });
+        console.log(this.outOfBoundEffect)
     }
 
     initScreensInitialWindowSize() {

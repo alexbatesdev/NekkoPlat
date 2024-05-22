@@ -242,7 +242,7 @@ table {
     --screen-height: calc(900px*var(--screen-size));
     --debug: hidden;
     --player-spawn-x: 50%;
-    --player-spawn-y: 10px;
+    --player-spawn-y: 25px;
 }
 
 .debug {

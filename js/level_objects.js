@@ -29,7 +29,14 @@ export class SoldObject {
 // Features:
 // - Run javascript code on player overlap
 // - Run javascript code on player interaction
+// Interactable Toggle - an object that toggles between two states on interaction
+// Features:
+// - Toggle between two states on interaction
+// - Trigger other objects on toggle
 
+// Floor - a solid object that the player can stand on
+// Features:
+// - Automatically places itself at the bottom of the screen
 
 // One Way SoldObject - a soldObject that can be passed through in one direction
 // Features:
@@ -83,12 +90,6 @@ export class SoldObject {
 // - Can be pulled by player (maybe)
 // - Can be picked up by player (maybe)
 // - Can be thrown by player (maybe)
-
-
-// Interactable Toggle - an object that toggles between two states on interaction
-// Features:
-// - Toggle between two states on interaction
-// - Trigger other objects on toggle
 
 
 // Classic Mario Block - an object that changes state on collision
