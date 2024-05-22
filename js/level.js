@@ -25,10 +25,18 @@ export default class Level {
         } else if (this.element.classList.contains('initial')) {
             this.initScreensInitialWindowSize();
         }
-        this.stopUserLeaveLevel = false;
+        this.outOfBoundEffect = null;
         if (this.element.classList.contains("contain")) {
-            this.stopUserLeaveLevel = true;
+            this.outOfBoundEffect = "contain";
+            // init method
+        } else if (this.element.classList.contains("kill")) {
+            this.outOfBoundEffect = "kill";
+            // init method
+        } else if (this.element.classList.contains("wrap")) {
+            this.outOfBoundEffect = "wrap";
+            // init method
         }
+
     }
 
     initScreensInitialWindowSize() {
@@ -65,6 +73,7 @@ export default class Level {
                 this.element.style.position = 'relative';
                 this.element.style.gridTemplateColumns = `repeat(${this.columns}, var(--screen-width))`;
                 this.element.style.gridTemplateRows = `repeat(${this.rows}, var(--screen-height))`;
+                this.element.style.width = "max-content";
             }
         }
         if (doDefault) {

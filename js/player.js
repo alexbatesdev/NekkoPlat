@@ -234,6 +234,7 @@ export default class Player {
     }
 
     applyCollisions() {
+        this.checkOutOfBounds();
         let horizontal_collision_count = this.checkHorizontalCollisions();
         let vertical_collision_count = this.checkVerticalCollisions();
 
@@ -352,6 +353,36 @@ export default class Player {
             }
         });
         return collisionCount;
+    }
+
+    checkOutOfBounds() {
+        const playerRect = this.element.getBoundingClientRect();
+        const levelRect = gameInstance.level.element.getBoundingClientRect();
+        const outOfBoundEffect = gameInstance.level.outOfBoundEffect;
+        if (playerRect.left < levelRect.left) {
+            console.log("Out of bounds left");
+            if (outOfBoundEffect == "contain") {
+                this.x -= playerRect.left - levelRect.left;
+            }
+        }
+        if (playerRect.right > levelRect.right) {
+            console.log("Out of bounds right");
+            if (outOfBoundEffect == "contain") {
+                this.x -= playerRect.right - levelRect.right;
+            }
+        }
+        if (playerRect.top < levelRect.top) {
+            console.log("Out of bounds top");
+            if (outOfBoundEffect == "contain") {
+                this.y -= playerRect.top - levelRect.top;
+            }
+        }
+        if (playerRect.bottom > levelRect.bottom) {
+            console.log("Out of bounds bottom");
+            if (outOfBoundEffect == "contain") {
+                this.y -= playerRect.bottom - levelRect.bottom;
+            }
+        }
     }
 
     // https://chatgpt.com/c/d6c3427f-edfa-4d17-bb39-a9a15b01fda5
