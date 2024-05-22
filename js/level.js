@@ -25,6 +25,10 @@ export default class Level {
         } else if (this.element.classList.contains('initial')) {
             this.initScreensInitialWindowSize();
         }
+        this.stopUserLeaveLevel = false;
+        if (this.element.classList.contains("contain")) {
+            this.stopUserLeaveLevel = true;
+        }
     }
 
     initScreensInitialWindowSize() {
