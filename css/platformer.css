@@ -237,7 +237,7 @@ table {
 
 /* Necessary variables */
 :root {
-    --screen-size: 0.7;
+    --screen-size: 1;
     --screen-width: calc(1600px*var(--screen-size));
     --screen-height: calc(900px*var(--screen-size));
     --debug: hidden;
@@ -305,9 +305,9 @@ position: relative or absolute
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, 0);
+    transform: translate(-50%, calc(0.5*var(--screen-height)));
     width: 300px;
-    height: 450px;
+    height: 100px;
     background-color: black;
     z-index: -1;
 }
@@ -543,8 +543,8 @@ left
 
 #img-1 {
     position: absolute;
-    left: 320px;
-    bottom: 160px;
+    left: 35%;
+    bottom: 25%;
     animation: bljitter 0.1s infinite;
 }
 

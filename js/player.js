@@ -23,9 +23,12 @@ export default class Player {
         this.preJumpAllowance = this.setConfigItem('preJumpAllowance', 10);
         this.maxAirJumps = this.setConfigItem('maxAirJumps', 1);
         // Character state variables
-        //   Position
+        //   Position/Respawn
         this.x = 0;
         this.y = 0;
+        this.respawnX = 0;
+        this.respawnY = 0;
+        this.respawnScreen = null;
         //   Physics
         this.velocityX = 0;
         this.velocityY = 0;
@@ -91,28 +94,53 @@ export default class Player {
         }
     }
 
+    start() {
+        this.respawnScreen = this.element.parentNode;
+        this.spawn();
+    }
+
     spawn() {
         const playerSpawnXRelativeToScreen = getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-x')
         const playerSpawnYRelativeToScreen = getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-y')
-        const screenXposition = this.element.parentNode.getBoundingClientRect().x;
-        const screenYposition = this.element.parentNode.getBoundingClientRect().y;
+        const screenXposition = this.respawnScreen.getBoundingClientRect().x;
+        const screenYposition = this.respawnScreen.getBoundingClientRect().y;
         this.element.style.left = playerSpawnXRelativeToScreen;
         this.element.style.top = playerSpawnYRelativeToScreen;
         this.x = (this.element.getBoundingClientRect().x - screenXposition) - (this.element.getBoundingClientRect().width / 2);
         this.y = (this.element.getBoundingClientRect().y - screenYposition) - (this.element.getBoundingClientRect().height / 2);
     }
 
-    respawn(playerSpawnXRelativeToScreen, playerSpawnYRelativeToScreen, screen) {
+    spawnAt(playerSpawnXRelativeToScreen, playerSpawnYRelativeToScreen, screen) {
         let screensToTheLeft = 0;
         let screensToTheTop = 0;
+        console.log(screen)
         screen.classList.forEach(className => {
             if (className.includes("screen-")) {
                 screensToTheLeft = Number(className.split("-")[1]);
                 screensToTheTop = Number(className.split("-")[2]);
+                console.log(screensToTheLeft, screensToTheTop);
             }
-        });
+        }); 
+        console.log(playerSpawnXRelativeToScreen, playerSpawnYRelativeToScreen);
+        console.log((playerSpawnXRelativeToScreen) + (screensToTheLeft * screen.getBoundingClientRect().width) - (this.element.getBoundingClientRect().width / 2))
+        console.log((playerSpawnYRelativeToScreen) + (screensToTheTop * screen.getBoundingClientRect().height) - (this.element.getBoundingClientRect().height / 2))
         this.x = (playerSpawnXRelativeToScreen) + (screensToTheLeft * screen.getBoundingClientRect().width) - (this.element.getBoundingClientRect().width / 2);
         this.y = (playerSpawnYRelativeToScreen) + (screensToTheTop * screen.getBoundingClientRect().height) - (this.element.getBoundingClientRect().height / 2);
+    }
+
+    setCheckpointScreen(checkpoint_screen) {
+        this.respawnScreen = checkpoint_screen;
+    }
+
+    setCheckpoint(respawnX, respawnY, checkpoint_screen) {
+        // Figure out how this one will actually work
+        this.respawnScreen = checkpoint_screen;
+        this.respawnX = respawnX;
+        this.respawnY = respawnY;
+    }
+
+    respawnAtCheckpoint() {
+        this.spawn()
     }
 
     update() {
@@ -145,14 +173,12 @@ export default class Player {
 
         // Movement calculations here
         if (gameInstance.keyState['A']) {
+            console.log("A")
             this.move(-acceleration, 0);
         }
         if (gameInstance.keyState['D']) {
             this.move(acceleration, 0);
         }
-        // if (gameInstance.keyState['W']) {
-        //     if (this.velocityY < -3) this.velocityY -= 0.6;
-        // }
         if (gameInstance.keyState['S']) this.velocityY += acceleration;
         // Similar for other directions
         if (gameInstance.keyState['W']) {
@@ -164,6 +190,10 @@ export default class Player {
             } else {
                 this.liveGravity = this.gravity;
             }
+        }
+        if (gameInstance.keyState['R']) {
+            console.log("R")
+            this.respawnAtCheckpoint();
         }
     }
 
