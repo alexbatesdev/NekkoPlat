@@ -31,7 +31,7 @@ export default class Player {
         this.velocityY = 0;
         this.liveGravity = this.gravity;
         //   Collision
-        this.walls = [];
+        this.soldObjects = [];
         this.collisionState = {
             left: 0,
             right: 0,
@@ -285,7 +285,7 @@ export default class Player {
     checkVerticalCollisions() {
         const playerRect = this.element.getBoundingClientRect();
         let collisionCount = 0;
-        this.walls.forEach(wall => {
+        this.soldObjects.forEach(soldObject => {
             for (let i = 0.25; i < 1; i += 0.25) {
                 let playerRectNext = {
                     left: playerRect.left + 20,
@@ -297,12 +297,12 @@ export default class Player {
                     width: playerRect.width,
                     height: playerRect.height,
                 }
-                if (intersects(playerRectNext, wall.rect)) {
+                if (intersects(playerRectNext, soldObject.rect)) {
                     this.velocityY = 0;
                 }
             }
-            if (intersects(playerRect, wall.rect)) {
-                const collision = getCollisionOverlap(playerRect, wall.rect);
+            if (intersects(playerRect, soldObject.rect)) {
+                const collision = getCollisionOverlap(playerRect, soldObject.rect);
                 if (collision.bottom > 0) {
                     collisionCount++;
                     this.collisionState.bottom = collision.bottom;
@@ -321,7 +321,7 @@ export default class Player {
     checkHorizontalCollisions() {
         const playerRect = this.element.getBoundingClientRect();
         let collisionCount = 0;
-        this.walls.forEach(wall => {
+        this.soldObjects.forEach(soldObject => {
             for (let i = 0.25; i < 1; i += 0.25) {
                 let playerRectNext = {
                     left: playerRect.left + (this.velocityX * i),
@@ -333,12 +333,12 @@ export default class Player {
                     width: playerRect.width,
                     height: playerRect.height,
                 }
-                if (intersects(playerRectNext, wall.rect)) {
+                if (intersects(playerRectNext, soldObject.rect)) {
                     this.velocityX = 0;
                 }
             }
-            if (intersects(playerRect, wall.rect)) {
-                const collision = getCollisionOverlap(playerRect, wall.rect);
+            if (intersects(playerRect, soldObject.rect)) {
+                const collision = getCollisionOverlap(playerRect, soldObject.rect);
                 if (collision.left > 0) {
                     this.collisionState.left = collision.left;
                     this.x += collision.left; // Adjust the x position by the overlap
@@ -398,7 +398,7 @@ export default class Player {
         return this.element.style.transform === 'rotateY(180deg)';
     }
 
-    setWalls(walls) {
-        this.walls = walls;
+    setSoldObjects(soldObjects) {
+        this.soldObjects = soldObjects;
     }
 }

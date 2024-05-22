@@ -13,14 +13,14 @@ export const getCollisionOverlap = (rect1, rect2) => {
     const playerRightSide = playerLeftSide + rect1.width;
     const playerTopSide = rect1.top;
     const playerBottomSide = playerTopSide + rect1.height;
-    const wallLeftSide = rect2.left;
-    const wallRightSide = wallLeftSide + rect2.width;
-    const wallTopSide = rect2.top;
-    const wallBottomSide = wallTopSide + rect2.height;
+    const soldObjectLeftSide = rect2.left;
+    const soldObjectRightSide = soldObjectLeftSide + rect2.width;
+    const soldObjectTopSide = rect2.top;
+    const soldObjectBottomSide = soldObjectTopSide + rect2.height;
     const playerCenterX = rect1.left + rect1.width / 2;
     const playerCenterY = rect1.top + rect1.height / 2;
-    const wallCenterX = rect2.left + rect2.width / 2;
-    const wallCenterY = rect2.top + rect2.height / 2;
+    const soldObjectCenterX = rect2.left + rect2.width / 2;
+    const soldObjectCenterY = rect2.top + rect2.height / 2;
 
     let collisionDirections = {
         left: false,
@@ -29,36 +29,36 @@ export const getCollisionOverlap = (rect1, rect2) => {
         bottom: false,
     }
 
-    if (playerRightSide > wallLeftSide
-        && playerLeftSide < wallLeftSide
-        && playerCenterY > wallTopSide
-        && playerCenterY < wallBottomSide
+    if (playerRightSide > soldObjectLeftSide
+        && playerLeftSide < soldObjectLeftSide
+        && playerCenterY > soldObjectTopSide
+        && playerCenterY < soldObjectBottomSide
     ) {
-        collisionDirections.right = playerRightSide - wallLeftSide;
+        collisionDirections.right = playerRightSide - soldObjectLeftSide;
     }
 
-    if (playerLeftSide < wallRightSide
-        && playerRightSide > wallRightSide
-        && playerCenterY > wallTopSide
-        && playerCenterY < wallBottomSide
+    if (playerLeftSide < soldObjectRightSide
+        && playerRightSide > soldObjectRightSide
+        && playerCenterY > soldObjectTopSide
+        && playerCenterY < soldObjectBottomSide
     ) {
-        collisionDirections.left = wallRightSide - playerLeftSide;
+        collisionDirections.left = soldObjectRightSide - playerLeftSide;
     }
 
-    if (playerBottomSide > wallTopSide
-        && playerTopSide < wallTopSide
-        && playerCenterX > wallLeftSide
-        && playerCenterX < wallRightSide
+    if (playerBottomSide > soldObjectTopSide
+        && playerTopSide < soldObjectTopSide
+        && playerCenterX > soldObjectLeftSide
+        && playerCenterX < soldObjectRightSide
     ) {
-        collisionDirections.bottom = playerBottomSide - wallTopSide;
+        collisionDirections.bottom = playerBottomSide - soldObjectTopSide;
     }
 
-    if (playerTopSide < wallBottomSide
-        && playerBottomSide > wallBottomSide
-        && playerCenterX > wallLeftSide
-        && playerCenterX < wallRightSide
+    if (playerTopSide < soldObjectBottomSide
+        && playerBottomSide > soldObjectBottomSide
+        && playerCenterX > soldObjectLeftSide
+        && playerCenterX < soldObjectRightSide
     ) {
-        collisionDirections.top = wallBottomSide - playerTopSide;
+        collisionDirections.top = soldObjectBottomSide - playerTopSide;
     }
 
     return collisionDirections;

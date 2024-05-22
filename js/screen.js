@@ -1,4 +1,4 @@
-import { Wall } from "./level_objects.js";
+import { SoldObject } from "./level_objects.js";
 import { intersects, isSubset } from "./tools.js";
 import gameInstance from "./game.js";
 
@@ -10,8 +10,8 @@ export default class Screen {
         this.y = y;
         this.element.classList.add(`screen-${x}-${y}`)
         this.rect = this.element.getBoundingClientRect();
-        this.walls = [];
-        this.initWalls();
+        this.soldObjects = [];
+        this.initSoldObjects();
         this.initStyles();
     }
 
@@ -19,18 +19,18 @@ export default class Screen {
         this.element.style.position = 'relative';
         if (gameInstance.debug) this.element.style.outline = '1px solid yellow';
         else this.element.style.outline = 'none';
-        for (let i = 0; i < this.walls.length; i++) {
-            this.walls[i].reinitStyles();
+        for (let i = 0; i < this.soldObjects.length; i++) {
+            this.soldObjects[i].reinitStyles();
         }
     }
 
-    initWalls() {
-        const wallElements = this.element.querySelectorAll('.wall');
-        this.walls = Array.from(wallElements).map(wall => new Wall(wall));
+    initSoldObjects() {
+        const soldObjectElements = this.element.querySelectorAll('.soldObject');
+        this.soldObjects = Array.from(soldObjectElements).map(soldObject => new SoldObject(soldObject));
 
         window.addEventListener('resize', () => {
-            this.walls.forEach(wall => {
-                wall.updateRect();
+            this.soldObjects.forEach(soldObject => {
+                soldObject.updateRect();
             });
         });
     }
@@ -41,34 +41,34 @@ export default class Screen {
 
     checkIfPlayerInScreen() {
         if (intersects(gameInstance.player.element.getBoundingClientRect(), this.rect)) {
-            this.addAdjacentWallsToPlayer();
+            this.addAdjacentSoldObjectsToPlayer();
         }
     }
 
-    addAdjacentWallsToPlayer() {
-        if (!isSubset(this.walls, gameInstance.player.walls)) {
-            let wallsToAdd = this.walls;
+    addAdjacentSoldObjectsToPlayer() {
+        if (!isSubset(this.soldObjects, gameInstance.player.soldObjects)) {
+            let soldObjectsToAdd = this.soldObjects;
             if (this.x > 0) {
-                wallsToAdd = wallsToAdd.concat(this.level.getScreen(this.x - 1, this.y).walls);
+                soldObjectsToAdd = soldObjectsToAdd.concat(this.level.getScreen(this.x - 1, this.y).soldObjects);
             } 
             if (this.y > 0) {
-                wallsToAdd = wallsToAdd.concat(this.level.getScreen(this.x, this.y - 1).walls);
+                soldObjectsToAdd = soldObjectsToAdd.concat(this.level.getScreen(this.x, this.y - 1).soldObjects);
             } 
             if (this.x < this.level.columns - 1) {
-                wallsToAdd = wallsToAdd.concat(this.level.getScreen(this.x + 1, this.y).walls);
+                soldObjectsToAdd = soldObjectsToAdd.concat(this.level.getScreen(this.x + 1, this.y).soldObjects);
             } 
             if (this.y < this.level.rows - 1) { 
-                wallsToAdd = wallsToAdd.concat(this.level.getScreen(this.x, this.y + 1).walls);
+                soldObjectsToAdd = soldObjectsToAdd.concat(this.level.getScreen(this.x, this.y + 1).soldObjects);
             }
-            gameInstance.player.setWalls(wallsToAdd);
+            gameInstance.player.setSoldObjects(soldObjectsToAdd);
         }
     }
 
     update() {
         this.updateRect();
         this.checkIfPlayerInScreen();
-        this.walls.forEach(wall => {
-            wall.update();
+        this.soldObjects.forEach(soldObject => {
+            soldObject.update();
         });
     }
 }

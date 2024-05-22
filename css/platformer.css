@@ -334,13 +334,13 @@ position: relative or absolute
 
 /*
 
-Wall needs
+SoldObject needs
 position: absolute
 top
 left
 
 */
-.wall {
+.soldObject {
     position: absolute;
     top: 0;
     left: 0;
@@ -460,7 +460,7 @@ left
     z-index: 5;
 }
 
-#wall-1 {
+#soldObject-1 {
     position: absolute;
     left: 50%;
     top: 50%;
@@ -475,7 +475,7 @@ left
     align-items: center;
 }
 
-#wall-2 {
+#soldObject-2 {
     left: 50%;
     top: 50%;
     transform: translate(-50%, 0%);
@@ -483,7 +483,7 @@ left
     height: 500px;
 }
 
-#wall-3 {
+#soldObject-3 {
     left: 30%;
     top: 75%;
     transform: translate(-50%, 0%);
@@ -491,14 +491,14 @@ left
     height: 200px;
 }
 
-#wall-4 {
+#soldObject-4 {
     left: 75%;
     top: 0%;
     width: 400px;
     height: 600px;
 }
 
-.wall>.double-cap {
+.soldObject>.double-cap {
     height: 100%;
     width: 50px;
     background-image: url("../img/stone-double-corners.png");
@@ -509,7 +509,7 @@ left
     right: -10px;
 }
 
-.wall>.double-cap:first-of-type {
+.soldObject>.double-cap:first-of-type {
     transform: rotate(0deg);
     left: -10px;
 }

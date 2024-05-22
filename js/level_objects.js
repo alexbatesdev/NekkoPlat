@@ -1,6 +1,6 @@
 import gameInstance from './game.js';
 
-export class Wall {
+export class SoldObject {
     constructor(element) {
         this.element = element;
         this.rect = this.element.getBoundingClientRect();
@@ -31,14 +31,14 @@ export class Wall {
 // - Run javascript code on player interaction
 
 
-// One Way Wall - a wall that can be passed through in one direction
+// One Way SoldObject - a soldObject that can be passed through in one direction
 // Features:
 // - Can be passed through in one direction
 // - Can't be passed through in the other direction
 // - Vertical or horizontal orientation
 
 
-// Moving platform - a type of wall that moves
+// Moving platform - a type of soldObject that moves
 // Easy example of extending a class
 // Features:
 // - Move between two points
@@ -75,7 +75,7 @@ export class Wall {
 // Features:
 // - Can rotate based on physics calculations
 // - Can be pushed by player
-// - Stops on collision with wall
+// - Stops on collision with soldObject
 // - Pushes other boxes
 // - Pushes player
 // - Pushes other objects
