@@ -4,6 +4,10 @@ export default class Camera {
     constructor() {
         this.element = document.getElementById('viewport');
         this.overlayElement = document.getElementById('overlay');
+        if (!this.overlayElement) {
+            this.overlayElement = document.createElement('div');
+            this.overlayElement.id = 'overlay';
+        }
         this.element.appendChild(this.overlayElement);
         this.filters = [];
         this.initFilters();
