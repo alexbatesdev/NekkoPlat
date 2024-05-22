@@ -6,8 +6,8 @@ export default class Screen {
     constructor(level, element, x, y) {
         this.element = element;
         this.level = level;
-        this.gridXPosition = x;
-        this.gridYPosition = y;
+        this.x = x;
+        this.y = y;
         this.element.classList.add(`screen-${x}-${y}`)
         this.rect = this.element.getBoundingClientRect();
         this.walls = [];
@@ -48,17 +48,17 @@ export default class Screen {
     addAdjacentWallsToPlayer() {
         if (!isSubset(this.walls, gameInstance.player.walls)) {
             let wallsToAdd = this.walls;
-            if (this.gridXPosition > 0) {
-                wallsToAdd = wallsToAdd.concat(this.level.getScreen(this.gridXPosition - 1, this.gridYPosition).walls);
+            if (this.x > 0) {
+                wallsToAdd = wallsToAdd.concat(this.level.getScreen(this.x - 1, this.y).walls);
             } 
-            if (this.gridYPosition > 0) {
-                wallsToAdd = wallsToAdd.concat(this.level.getScreen(this.gridXPosition, this.gridYPosition - 1).walls);
+            if (this.y > 0) {
+                wallsToAdd = wallsToAdd.concat(this.level.getScreen(this.x, this.y - 1).walls);
             } 
-            if (this.gridXPosition < this.level.columns - 1) {
-                wallsToAdd = wallsToAdd.concat(this.level.getScreen(this.gridXPosition + 1, this.gridYPosition).walls);
+            if (this.x < this.level.columns - 1) {
+                wallsToAdd = wallsToAdd.concat(this.level.getScreen(this.x + 1, this.y).walls);
             } 
-            if (this.gridYPosition < this.level.rows - 1) { 
-                wallsToAdd = wallsToAdd.concat(this.level.getScreen(this.gridXPosition, this.gridYPosition + 1).walls);
+            if (this.y < this.level.rows - 1) { 
+                wallsToAdd = wallsToAdd.concat(this.level.getScreen(this.x, this.y + 1).walls);
             }
             gameInstance.player.setWalls(wallsToAdd);
         }
