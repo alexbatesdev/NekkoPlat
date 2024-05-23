@@ -1,5 +1,5 @@
 import gameInstance from "./game.js";
-import { intersects, getCollisionOverlap } from "./tools.js";
+import { intersects, getCollisionOverlap, debugLog } from "./tools.js";
 // CollisionDetection.js
 // COMPLETELY UNTESTED AND UNIMPLEMENTED 😎🐢
 export class CollisionDetection {
@@ -119,9 +119,9 @@ export class CollisionDetection {
         const levelRect = gameInstance.level.element.getBoundingClientRect();
         const outOfBoundEffect = gameInstance.level.outOfBoundEffect;
         if (playerRect.left < levelRect.left) {
+            debugLog("Out of bounds left");
             if (outOfBoundEffect.left == "contain") {
                 object.x -= playerRect.left - levelRect.left;
-                console.log(object.x);
             } else if (outOfBoundEffect.left == "respawn") {
                 this.respawnAtCheckpoint();
             } else if (outOfBoundEffect.left == "wrap") {
@@ -131,6 +131,7 @@ export class CollisionDetection {
                 }, 75)
             }
         } else if (playerRect.right > levelRect.right) {
+            debugLog("Out of bounds right");
             if (outOfBoundEffect.right == "contain") {
                 object.x -= playerRect.right - levelRect.right;
             } else if (outOfBoundEffect.right == "respawn") {
@@ -143,6 +144,7 @@ export class CollisionDetection {
             }
         }
         if (playerRect.top < levelRect.top) {
+            debugLog("Out of bounds top");
             if (outOfBoundEffect.top == "contain") {
                 object.y -= playerRect.top - levelRect.top;
             } else if (outOfBoundEffect.top == "respawn") {
@@ -154,6 +156,7 @@ export class CollisionDetection {
                 }, 75)
             }
         } else if (playerRect.bottom > levelRect.bottom) {
+            debugLog("Out of bounds bottom");
             if (outOfBoundEffect.bottom == "contain") {
                 object.y -= playerRect.bottom - levelRect.bottom;
             } else if (outOfBoundEffect.bottom == "respawn") {

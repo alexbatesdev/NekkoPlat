@@ -115,17 +115,15 @@ export default class Player {
     spawnAt(playerSpawnXRelativeToScreen, playerSpawnYRelativeToScreen, screen) {
         let screensToTheLeft = 0;
         let screensToTheTop = 0;
-        console.log(screen)
+        debugLog(screen);
         screen.classList.forEach(className => {
             if (className.includes("screen-")) {
                 screensToTheLeft = Number(className.split("-")[1]);
                 screensToTheTop = Number(className.split("-")[2]);
-                console.log(screensToTheLeft, screensToTheTop);
             }
         });
-        console.log(playerSpawnXRelativeToScreen, playerSpawnYRelativeToScreen);
-        console.log((playerSpawnXRelativeToScreen) + (screensToTheLeft * screen.getBoundingClientRect().width) - (this.element.getBoundingClientRect().width / 2))
-        console.log((playerSpawnYRelativeToScreen) + (screensToTheTop * screen.getBoundingClientRect().height) - (this.element.getBoundingClientRect().height / 2))
+        debugLog(screensToTheLeft);
+        debugLog(screensToTheTop);
         this.x = (playerSpawnXRelativeToScreen) + (screensToTheLeft * screen.getBoundingClientRect().width) - (this.element.getBoundingClientRect().width / 2);
         this.y = (playerSpawnYRelativeToScreen) + (screensToTheTop * screen.getBoundingClientRect().height) - (this.element.getBoundingClientRect().height / 2);
     }
@@ -154,15 +152,15 @@ export default class Player {
         // Set the position of the player's HTML element
         this.element.style.left = `${this.x}px`;
         this.element.style.top = `${this.y}px`;
-        debugLog({
-            x: this.x,
-            y: this.y,
-            // velocityX: this.velocityX,
-            // velocityY: this.velocityY,
-            // gravity: this.liveGravity,
-            // grounded: this.grounded,
-            // collisionState: this.collision.state,
-        });
+        // debugLog({
+        //     x: this.x,
+        //     y: this.y,
+        //     velocityX: this.velocityX,
+        //     velocityY: this.velocityY,
+        //     gravity: this.liveGravity,
+        //     grounded: this.grounded,
+        //     collisionState: this.collision.state,
+        // });
         document.getElementById('xPositionDisplay').innerHTML = Math.round(this.x + this.element.getBoundingClientRect().width / 2);
         document.getElementById('yPositionDisplay').innerHTML = Math.round(this.y + this.element.getBoundingClientRect().height / 2);
         if (gameInstance.debug) {
