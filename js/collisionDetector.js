@@ -16,10 +16,7 @@ export class CollisionDetection {
         this.checkOutOfBounds(object);
         let horizontal_collision_count = this.checkHorizontalCollisions(object, solidObjects);
         let vertical_collision_count = this.checkVerticalCollisions(object, solidObjects);
-
-        if (horizontal_collision_count > 0) {
-            if (object.velocityY > 0) object.velocityY *= 0.5;
-        } else {
+        if (horizontal_collision_count < 0) {
             this.state = {
                 left: 0,
                 right: 0,
@@ -27,38 +24,21 @@ export class CollisionDetection {
                 bottom: this.state.bottom,
             }
         }
-
-        if (vertical_collision_count > 0) {
-            if (this.state.bottom > 0 && !object.grounded) {
-                object.jumpInProgress = false;
-                object.airJumps = 0;
-                object.grounded = true;
-            }
-        } else {
+        if (vertical_collision_count < 0) {
             this.state = {
                 left: this.state.left,
                 right: this.state.right,
                 top: 0,
                 bottom: 0,
             }
-            object.grounded = false;
-            if (object.velocityY > 0 && !object.jumpInProgress) {
-                object.coyoteTimeActive = true;
-                setTimeout(() => {
-                    object.coyoteTimeActive = false;
-                }, object.coyoteTime);
-            }
         }
-
         if (vertical_collision_count == 0 && horizontal_collision_count == 0) {
-            // this.animationManager.changeAnimation('jump');
             this.state = {
                 left: 0,
                 right: 0,
                 top: 0,
                 bottom: 0,
             }
-
         }
     }
 
@@ -86,11 +66,11 @@ export class CollisionDetection {
                 if (collision.bottom > 0) {
                     collisionCount++;
                     this.state.bottom = collision.bottom;
-                    object.y -= collision.bottom; // Adjust the y position by the overlap
+                    object.y -= collision.bottom;
                 }
                 if (collision.top > 0) {
                     this.state.top = collision.top;
-                    object.y += collision.top; // Adjust the y position by the overlap
+                    object.y += collision.top;
                     collisionCount++;
                 }
             }
@@ -121,12 +101,12 @@ export class CollisionDetection {
                 const collision = getCollisionOverlap(playerRect, solidObject.rect);
                 if (collision.left > 0) {
                     this.state.left = collision.left;
-                    object.x += collision.left; // Adjust the x position by the overlap
+                    object.x += collision.left;
                     collisionCount++;
                 }
                 if (collision.right > 0) {
                     this.state.right = collision.right;
-                    object.x -= collision.right; // Adjust the x position by the overlap
+                    object.x -= collision.right;
                     collisionCount++;
                 }
             }
@@ -147,6 +127,9 @@ export class CollisionDetection {
                 this.respawnAtCheckpoint();
             } else if (outOfBoundEffect.left == "wrap") {
                 object.x = levelRect.right - playerRect.width;
+                setTimeout(() => {   
+                gameInstance.camera.snapToPlayer();
+                }, 75)
             }
         } else if (playerRect.right > levelRect.right) {
             console.log("Out of bounds right");
@@ -156,6 +139,9 @@ export class CollisionDetection {
                 this.respawnAtCheckpoint();
             } else if (outOfBoundEffect.right == "wrap") {
                 object.x = 0;
+                setTimeout(() => {   
+                gameInstance.camera.snapToPlayer();
+                }, 75)
             }
         }
         if (playerRect.top < levelRect.top) {
@@ -165,7 +151,10 @@ export class CollisionDetection {
             } else if (outOfBoundEffect.top == "respawn") {
                 this.respawnAtCheckpoint();
             } else if (outOfBoundEffect.top == "wrap") {
-                object.y = levelRect.height - playerRect.height;
+                object.y = levelRect.height - (playerRect.height + 1);
+                setTimeout(() => {   
+                gameInstance.camera.snapToPlayer();
+                }, 75)
             }
         } else if (playerRect.bottom > levelRect.bottom) {
             console.log("Out of bounds bottom");
@@ -175,6 +164,9 @@ export class CollisionDetection {
                 this.respawnAtCheckpoint();
             } else if (outOfBoundEffect.bottom == "wrap") {
                 object.y = 0;
+                setTimeout(() => {   
+                gameInstance.camera.snapToPlayer();
+                }, 75)
             }
 
         }

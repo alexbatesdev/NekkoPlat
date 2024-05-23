@@ -49,6 +49,11 @@ export default class Level {
                         } else {
                             this.outOfBoundEffect[className.split("-")[1]] = effect;
                         }
+                    } else {
+                        this.outOfBoundEffect.top = effect;
+                        this.outOfBoundEffect.right = effect;
+                        this.outOfBoundEffect.bottom = effect;
+                        this.outOfBoundEffect.left = effect;
                     }
                 }
             });

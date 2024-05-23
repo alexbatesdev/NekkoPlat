@@ -149,6 +149,7 @@ export default class Player {
         this.processInput();
         this.physics.applyPhysics(this, this.collision.state);
         this.collision.applyCollisions(this, this.solidObjects);
+        this.processCollisions();
         this.applyAnimations();
         // Set the position of the player's HTML element
         this.element.style.left = `${this.x}px`;
@@ -170,6 +171,26 @@ export default class Player {
         } else {
             this.element.style.outline = 'none';
         }
+    }
+
+    processCollisions() {
+        if (this.collision.state.bottom > 0) {
+            if (!this.grounded) {
+                this.jumpInProgress = false;
+                this.airJumps = 0;
+            }
+            this.grounded = true;
+        }
+        if (this.collision.state.top == 0 && this.collision.state.bottom == 0) {
+            this.grounded = false;
+            if (this.velocityY > 0 && !this.jumpInProgress) {
+                this.coyoteTimeActive = true;
+                setTimeout(() => {
+                    this.coyoteTimeActive = false;
+                }, this.coyoteTime);
+            }
+        }
+        if ((this.collision.state.left > 0 || this.collision.state.right) && this.velocityY > 0) this.velocityY *= 0.5; 
     }
 
     processInput() {
