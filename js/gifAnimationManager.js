@@ -1,5 +1,5 @@
 // GifAnimationManager.js
-export class GifAnimationManager {
+export default class GifAnimationManager {
     constructor(animationElement) {
         this.animationElement = animationElement;
         this.currentAnimation = '';

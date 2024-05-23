@@ -1,6 +1,7 @@
 import gameInstance from "./game.js";
 import { intersects, getCollisionOverlap, anyTrue, debugLog } from "./tools.js";
-import { GifAnimationManager } from "./AnimationManagers.js";
+import GifAnimationManager from "./gifAnimationManager.js";
+import { Physics } from "./physics.js";
 
 export default class Player {
     constructor(element) {
@@ -17,12 +18,14 @@ export default class Player {
         this.initStyles();
         // HTML config - comes from a .config element in the #player element
         //   Physics and jump variables in order from most physics to least physics
+        this.physics = new Physics();
         this.configElement = null;
-        this.maxVelocity = null;
-        this.acceleration = null;
-        this.deceleration = null;
         this.gravity = null;
         this.fallingGravity = null;
+        this.maxVelocity = null;
+        this.sprintMaxVelocity = null;
+        this.acceleration = null;
+        this.sprintAcceleration = null;
         this.jumpForce = null;
         this.coyoteTime = null;
         this.preJumpAllowance = null;
@@ -38,7 +41,7 @@ export default class Player {
         //   Physics
         this.velocityX = 0;
         this.velocityY = 0;
-        this.liveGravity = this.gravity;
+        this.liveGravity = this.physics.gravity;
         //   Collision
         this.soldObjects = [];
         this.collisionState = {
@@ -63,10 +66,15 @@ export default class Player {
         if (!this.configElement) {
             console.warn("No player config element found in the document, using default values");
         }
-        this.maxVelocity = this.setConfigItem('maxVelocity', 10);
-        this.acceleration = this.setConfigItem('acceleration', 0.7);
-        this.deceleration = this.setConfigItem('deceleration', 0.2);
         this.gravity = this.setConfigItem('gravity', 0.9);
+        this.physics.gravity = this.gravity;
+        this.maxVelocity = this.setConfigItem('maxVelocity', 10);
+        this.physics.maxVelocity = this.maxVelocity;
+        this.sprintMaxVelocity = this.setConfigItem('sprintMaxVelocity', 18);
+        this.physics.sprintMaxVelocity = this.sprintMaxVelocity;
+        this.acceleration = this.setConfigItem('acceleration', 0.7);
+        this.physics.acceleration = this.acceleration;
+        this.sprintAcceleration = this.setConfigItem('sprintAcceleration', 2);
         this.fallingGravity = this.setConfigItem('fallingGravity', 1.5);
         this.jumpForce = this.setConfigItem('jumpForce', 25);
         this.coyoteTime = this.setConfigItem('coyoteTime', 100);
@@ -143,7 +151,7 @@ export default class Player {
 
     update() {
         this.processInput();
-        this.applyPhysics();
+        this.physics.applyPhysics(this, this.collisionState);
         this.applyCollisions();
         this.applyAnimations();
         // Set the position of the player's HTML element
@@ -169,45 +177,38 @@ export default class Player {
     }
 
     processInput() {
-        let acceleration = this.acceleration;
         if (gameInstance.keyState['SHIFT'] && this.grounded) {
-            this.acceleration = 2;
-            this.maxVelocity = 18;
+            this.physics.acceleration = this.sprintAcceleration;
+            this.physics.maxVelocity = this.sprintMaxVelocity;
         } else {
-            this.acceleration = 0.7;
-            this.maxVelocity = 10;
+            this.physics.acceleration = this.acceleration;
+            this.physics.maxVelocity = this.maxVelocity;
         }
 
         // Movement calculations here
         if (gameInstance.keyState['A']) {
-            this.move(-acceleration, 0);
+            this.lookLeft();
+            this.physics.move(this, -this.physics.acceleration, 0);
         }
         if (gameInstance.keyState['D']) {
-            this.move(acceleration, 0);
+            this.lookRight();
+            this.physics.move(this, this.physics.acceleration, 0);
         }
-        if (gameInstance.keyState['S']) this.velocityY += acceleration;
+        if (gameInstance.keyState['S']) this.velocityY += this.physics.acceleration;
         // Similar for other directions
         if (gameInstance.keyState['W']) {
             this.jump();
         } else {
             this.jumpProcessed = false; // Reset the flag when 'W' is not pressed
             if (!this.grounded && this.velocityY < 0) {
-                this.liveGravity = this.fallingGravity;
+                this.physics.gravity = this.fallingGravity;
             } else {
-                this.liveGravity = this.gravity;
+                this.physics.gravity = this.gravity;
             }
         }
         if (gameInstance.keyState['R']) {
             this.respawnAtCheckpoint();
         }
-    }
-
-    move(xVel, yVel) {
-        if (xVel > 0) this.lookRight();
-        if (xVel < 0) this.lookLeft();
-
-        this.velocityX += xVel;
-        this.velocityY += yVel;
     }
 
     jump() {
@@ -239,32 +240,6 @@ export default class Player {
                 }
             }, this.preJumpAllowance);
         }
-    }
-
-    applyPhysics() {
-
-        this.velocityY += this.liveGravity;
-        if (this.grounded && Math.abs(this.velocityX) < 0.2) {
-            this.velocityX = 0;
-            // this.animationManager.changeAnimation('idle');
-        } else if (this.grounded && !(gameInstance.keyState['A'] || gameInstance.keyState['D'])) {
-            this.velocityX *= 0.88;
-        } else if (!this.grounded) {
-            this.velocityX *= 0.95;
-        }
-        // Apply max velocity while grounded
-        if (this.collisionState.bottom > 0) {
-            if (Math.abs(this.velocityX) > this.maxVelocity) {
-                this.velocityX *= 0.9;
-            }
-        } else {
-            if (this.velocityY > 30) {
-                this.velocityY = 30;
-            }
-        }
-
-        this.x += this.velocityX;
-        this.y += this.velocityY;
     }
 
     applyCollisions() {
