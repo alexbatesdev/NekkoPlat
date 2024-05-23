@@ -119,7 +119,6 @@ export class CollisionDetection {
         const levelRect = gameInstance.level.element.getBoundingClientRect();
         const outOfBoundEffect = gameInstance.level.outOfBoundEffect;
         if (playerRect.left < levelRect.left) {
-            console.log("Out of bounds left");
             if (outOfBoundEffect.left == "contain") {
                 object.x -= playerRect.left - levelRect.left;
                 console.log(object.x);
@@ -132,7 +131,6 @@ export class CollisionDetection {
                 }, 75)
             }
         } else if (playerRect.right > levelRect.right) {
-            console.log("Out of bounds right");
             if (outOfBoundEffect.right == "contain") {
                 object.x -= playerRect.right - levelRect.right;
             } else if (outOfBoundEffect.right == "respawn") {
@@ -145,7 +143,6 @@ export class CollisionDetection {
             }
         }
         if (playerRect.top < levelRect.top) {
-            console.log("Out of bounds top");
             if (outOfBoundEffect.top == "contain") {
                 object.y -= playerRect.top - levelRect.top;
             } else if (outOfBoundEffect.top == "respawn") {
@@ -157,7 +154,6 @@ export class CollisionDetection {
                 }, 75)
             }
         } else if (playerRect.bottom > levelRect.bottom) {
-            console.log("Out of bounds bottom");
             if (outOfBoundEffect.bottom == "contain") {
                 object.y -= playerRect.bottom - levelRect.bottom;
             } else if (outOfBoundEffect.bottom == "respawn") {
