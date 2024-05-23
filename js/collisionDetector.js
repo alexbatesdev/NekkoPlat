@@ -1,4 +1,5 @@
 // CollisionDetection.js
+// COMPLETELY UNTESTED AND UNIMPLEMENTED 😎🐢
 export class CollisionDetection {
     constructor() {
         this.collisionState = {
