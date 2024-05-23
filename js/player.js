@@ -2,6 +2,7 @@ import gameInstance from "./game.js";
 import { intersects, getCollisionOverlap, anyTrue, debugLog } from "./tools.js";
 import GifAnimationManager from "./gifAnimationManager.js";
 import { Physics } from "./physics.js";
+import { CollisionDetection } from "./collisionDetector.js";
 
 export default class Player {
     constructor(element) {
@@ -43,13 +44,8 @@ export default class Player {
         this.velocityY = 0;
         this.liveGravity = this.physics.gravity;
         //   Collision
-        this.soldObjects = [];
-        this.collisionState = {
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-        }
+        this.solidObjects = [];
+        this.collision = new CollisionDetection();
         this.grounded = false;
         //   Jumping
         this.airJumps = 0;
@@ -151,8 +147,8 @@ export default class Player {
 
     update() {
         this.processInput();
-        this.physics.applyPhysics(this, this.collisionState);
-        this.applyCollisions();
+        this.physics.applyPhysics(this, this.collision.state);
+        this.collision.applyCollisions(this, this.solidObjects);
         this.applyAnimations();
         // Set the position of the player's HTML element
         this.element.style.left = `${this.x}px`;
@@ -164,7 +160,7 @@ export default class Player {
             // velocityY: this.velocityY,
             // gravity: this.liveGravity,
             // grounded: this.grounded,
-            // collisionState: this.collisionState,
+            // collisionState: this.collision.state,
         });
         document.getElementById('xPositionDisplay').innerHTML = Math.round(this.x + this.element.getBoundingClientRect().width / 2);
         document.getElementById('yPositionDisplay').innerHTML = Math.round(this.y + this.element.getBoundingClientRect().height / 2);
@@ -216,20 +212,20 @@ export default class Player {
             [
                 this.grounded,
                 this.airJumps < this.maxAirJumps,
-                this.collisionState.left > 0,
-                this.collisionState.right > 0,
+                this.collision.state.left > 0,
+                this.collision.state.right > 0,
                 this.coyoteTimeActive,
             ]
         )
         ) {
             this.jumpProcessed = true;
             this.jumpInProgress = true;
-            if (!this.grounded && !(this.collisionState.left > 0 || this.collisionState.right > 0 || this.coyoteTimeActive)) {
+            if (!this.grounded && !(this.collision.state.left > 0 || this.collision.state.right > 0 || this.coyoteTimeActive)) {
                 this.airJumps += 1;
             }
-            if (this.collisionState.left > 0) {
+            if (this.collision.state.left > 0) {
                 this.velocityX += 12;
-            } else if (this.collisionState.right > 0) {
+            } else if (this.collision.state.right > 0) {
                 this.velocityX -= 12;
             }
             this.velocityY = -this.jumpForce;
@@ -242,179 +238,11 @@ export default class Player {
         }
     }
 
-    applyCollisions() {
-        this.checkOutOfBounds();
-        let horizontal_collision_count = this.checkHorizontalCollisions();
-        let vertical_collision_count = this.checkVerticalCollisions();
-
-        if (horizontal_collision_count > 0) {
-            if (this.velocityY > 0) this.velocityY *= 0.5;
-        } else {
-            this.collisionState = {
-                left: 0,
-                right: 0,
-                top: this.collisionState.top,
-                bottom: this.collisionState.bottom,
-            }
-        }
-
-        if (vertical_collision_count > 0) {
-            if (this.collisionState.bottom > 0 && !this.grounded) {
-                this.jumpInProgress = false;
-                this.airJumps = 0;
-                this.grounded = true;
-            }
-        } else {
-            this.collisionState = {
-                left: this.collisionState.left,
-                right: this.collisionState.right,
-                top: 0,
-                bottom: 0,
-            }
-            this.grounded = false;
-            if (this.velocityY > 0 && !this.jumpInProgress) {
-                this.coyoteTimeActive = true;
-                setTimeout(() => {
-                    this.coyoteTimeActive = false;
-                }, this.coyoteTime);
-            }
-        }
-
-        if (vertical_collision_count == 0 && horizontal_collision_count == 0) {
-            // this.animationManager.changeAnimation('jump');
-            this.collisionState = {
-                left: 0,
-                right: 0,
-                top: 0,
-                bottom: 0,
-            }
-
-        }
-    }
-
     applyAnimations() {
         if (Math.abs(this.velocityX) > 0 && gameInstance.keyState['SHIFT']) this.animationManager.changeAnimation('run');
         else if (Math.abs(this.velocityX) > 0 && (gameInstance.keyState['A'] || gameInstance.keyState['D'])) this.animationManager.changeAnimation('walk');
         else if (this.grounded) this.animationManager.changeAnimation('idle');
         else this.animationManager.changeAnimation('jump');
-    }
-
-    checkVerticalCollisions() {
-        const playerRect = this.element.getBoundingClientRect();
-        let collisionCount = 0;
-        this.soldObjects.forEach(soldObject => {
-            for (let i = 0.25; i < 1; i += 0.25) {
-                let playerRectNext = {
-                    left: playerRect.left + 20,
-                    right: playerRect.right - 20,
-                    top: playerRect.top + (this.velocityY * i),
-                    bottom: playerRect.bottom + ((this.velocityY - this.liveGravity) * i),
-                    x: playerRect.x,
-                    y: playerRect.y,
-                    width: playerRect.width,
-                    height: playerRect.height,
-                }
-                if (intersects(playerRectNext, soldObject.rect)) {
-                    this.velocityY = 0;
-                }
-            }
-            if (intersects(playerRect, soldObject.rect)) {
-                const collision = getCollisionOverlap(playerRect, soldObject.rect);
-                if (collision.bottom > 0) {
-                    collisionCount++;
-                    this.collisionState.bottom = collision.bottom;
-                    this.y -= collision.bottom; // Adjust the y position by the overlap
-                }
-                if (collision.top > 0) {
-                    this.collisionState.top = collision.top;
-                    this.y += collision.top; // Adjust the y position by the overlap
-                    collisionCount++;
-                }
-            }
-        });
-        return collisionCount;
-    }
-
-    checkHorizontalCollisions() {
-        const playerRect = this.element.getBoundingClientRect();
-        let collisionCount = 0;
-        this.soldObjects.forEach(soldObject => {
-            for (let i = 0.25; i < 1; i += 0.25) {
-                let playerRectNext = {
-                    left: playerRect.left + (this.velocityX * i),
-                    right: playerRect.right + (this.velocityX * i),
-                    top: playerRect.top,
-                    bottom: playerRect.bottom - 25,
-                    x: playerRect.x,
-                    y: playerRect.y,
-                    width: playerRect.width,
-                    height: playerRect.height,
-                }
-                if (intersects(playerRectNext, soldObject.rect)) {
-                    this.velocityX = 0;
-                }
-            }
-            if (intersects(playerRect, soldObject.rect)) {
-                const collision = getCollisionOverlap(playerRect, soldObject.rect);
-                if (collision.left > 0) {
-                    this.collisionState.left = collision.left;
-                    this.x += collision.left; // Adjust the x position by the overlap
-                    collisionCount++;
-                }
-                if (collision.right > 0) {
-                    this.collisionState.right = collision.right;
-                    this.x -= collision.right; // Adjust the x position by the overlap
-                    collisionCount++;
-                }
-            }
-        });
-        return collisionCount;
-    }
-
-    checkOutOfBounds() {
-        const playerRect = this.element.getBoundingClientRect();
-        const levelRect = gameInstance.level.element.getBoundingClientRect();
-        const outOfBoundEffect = gameInstance.level.outOfBoundEffect;
-        if (playerRect.left < levelRect.left) {
-            console.log("Out of bounds left");
-            if (outOfBoundEffect.left == "contain") {
-                this.x -= playerRect.left - levelRect.left;
-                console.log(this.x);
-            } else if (outOfBoundEffect.left == "respawn") {
-                this.respawnAtCheckpoint();
-            } else if (outOfBoundEffect.left == "wrap") {
-                this.x = levelRect.right - playerRect.width;
-            }
-        } else if (playerRect.right > levelRect.right) {
-            console.log("Out of bounds right");
-            if (outOfBoundEffect.right == "contain") {
-                this.x -= playerRect.right - levelRect.right;
-            } else if (outOfBoundEffect.right == "respawn") {
-                this.respawnAtCheckpoint();
-            } else if (outOfBoundEffect.right == "wrap") {
-                this.x = 0;
-            }
-        }
-        if (playerRect.top < levelRect.top) {
-            console.log("Out of bounds top");
-            if (outOfBoundEffect.top == "contain") {
-                this.y -= playerRect.top - levelRect.top;
-            } else if (outOfBoundEffect.top == "respawn") {
-                this.respawnAtCheckpoint();
-            } else if (outOfBoundEffect.top == "wrap") {
-                this.y = levelRect.height - playerRect.height;
-            }
-        } else if (playerRect.bottom > levelRect.bottom) {
-            console.log("Out of bounds bottom");
-            if (outOfBoundEffect.bottom == "contain") {
-                this.y -= playerRect.bottom - levelRect.bottom;
-            } else if (outOfBoundEffect.bottom == "respawn") {
-                this.respawnAtCheckpoint();
-            } else if (outOfBoundEffect.bottom == "wrap") {
-                this.y = 0;
-            }
-
-        }
     }
 
     lookRight() {
@@ -429,7 +257,7 @@ export default class Player {
         return this.element.style.transform === 'rotateY(180deg)';
     }
 
-    setSoldObjects(soldObjects) {
-        this.soldObjects = soldObjects;
+    setSolidObjects(solidObjects) {
+        this.solidObjects = solidObjects;
     }
 }

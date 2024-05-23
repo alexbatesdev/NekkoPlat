@@ -13,14 +13,14 @@ export const getCollisionOverlap = (rect1, rect2) => {
     const playerRightSide = playerLeftSide + rect1.width;
     const playerTopSide = rect1.top;
     const playerBottomSide = playerTopSide + rect1.height;
-    const soldObjectLeftSide = rect2.left;
-    const soldObjectRightSide = soldObjectLeftSide + rect2.width;
-    const soldObjectTopSide = rect2.top;
-    const soldObjectBottomSide = soldObjectTopSide + rect2.height;
+    const solidObjectLeftSide = rect2.left;
+    const solidObjectRightSide = solidObjectLeftSide + rect2.width;
+    const solidObjectTopSide = rect2.top;
+    const solidObjectBottomSide = solidObjectTopSide + rect2.height;
     const playerCenterX = rect1.left + rect1.width / 2;
     const playerCenterY = rect1.top + rect1.height / 2;
-    const soldObjectCenterX = rect2.left + rect2.width / 2;
-    const soldObjectCenterY = rect2.top + rect2.height / 2;
+    const solidObjectCenterX = rect2.left + rect2.width / 2;
+    const solidObjectCenterY = rect2.top + rect2.height / 2;
 
     let collisionDirections = {
         left: false,
@@ -29,36 +29,36 @@ export const getCollisionOverlap = (rect1, rect2) => {
         bottom: false,
     }
 
-    if (playerRightSide > soldObjectLeftSide
-        && playerLeftSide < soldObjectLeftSide
-        && playerCenterY > soldObjectTopSide
-        && playerCenterY < soldObjectBottomSide
+    if (playerRightSide > solidObjectLeftSide
+        && playerLeftSide < solidObjectLeftSide
+        && playerCenterY > solidObjectTopSide
+        && playerCenterY < solidObjectBottomSide
     ) {
-        collisionDirections.right = playerRightSide - soldObjectLeftSide;
+        collisionDirections.right = playerRightSide - solidObjectLeftSide;
     }
 
-    if (playerLeftSide < soldObjectRightSide
-        && playerRightSide > soldObjectRightSide
-        && playerCenterY > soldObjectTopSide
-        && playerCenterY < soldObjectBottomSide
+    if (playerLeftSide < solidObjectRightSide
+        && playerRightSide > solidObjectRightSide
+        && playerCenterY > solidObjectTopSide
+        && playerCenterY < solidObjectBottomSide
     ) {
-        collisionDirections.left = soldObjectRightSide - playerLeftSide;
+        collisionDirections.left = solidObjectRightSide - playerLeftSide;
     }
 
-    if (playerBottomSide > soldObjectTopSide
-        && playerTopSide < soldObjectTopSide
-        && playerCenterX > soldObjectLeftSide
-        && playerCenterX < soldObjectRightSide
+    if (playerBottomSide > solidObjectTopSide
+        && playerTopSide < solidObjectTopSide
+        && playerCenterX > solidObjectLeftSide
+        && playerCenterX < solidObjectRightSide
     ) {
-        collisionDirections.bottom = playerBottomSide - soldObjectTopSide;
+        collisionDirections.bottom = playerBottomSide - solidObjectTopSide;
     }
 
-    if (playerTopSide < soldObjectBottomSide
-        && playerBottomSide > soldObjectBottomSide
-        && playerCenterX > soldObjectLeftSide
-        && playerCenterX < soldObjectRightSide
+    if (playerTopSide < solidObjectBottomSide
+        && playerBottomSide > solidObjectBottomSide
+        && playerCenterX > solidObjectLeftSide
+        && playerCenterX < solidObjectRightSide
     ) {
-        collisionDirections.top = soldObjectBottomSide - playerTopSide;
+        collisionDirections.top = solidObjectBottomSide - playerTopSide;
     }
 
     return collisionDirections;

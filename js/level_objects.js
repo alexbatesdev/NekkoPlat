@@ -1,6 +1,6 @@
 import gameInstance from './game.js';
 
-export class SoldObject {
+export class SolidObject {
     constructor(element) {
         this.element = element;
         this.rect = this.element.getBoundingClientRect();
@@ -38,14 +38,14 @@ export class SoldObject {
 // Features:
 // - Automatically places itself at the bottom of the screen
 
-// One Way SoldObject - a soldObject that can be passed through in one direction
+// One Way SolidObject - a solidObject that can be passed through in one direction
 // Features:
 // - Can be passed through in one direction
 // - Can't be passed through in the other direction
 // - Vertical or horizontal orientation
 
 
-// Moving platform - a type of soldObject that moves
+// Moving platform - a type of solidObject that moves
 // Easy example of extending a class
 // Features:
 // - Move between two points
@@ -82,7 +82,7 @@ export class SoldObject {
 // Features:
 // - Can rotate based on physics calculations
 // - Can be pushed by player
-// - Stops on collision with soldObject
+// - Stops on collision with solidObject
 // - Pushes other boxes
 // - Pushes player
 // - Pushes other objects

@@ -1,4 +1,4 @@
-import { SoldObject } from "./level_objects.js";
+import { SolidObject } from "./level_objects.js";
 import { intersects, isSubset } from "./tools.js";
 import gameInstance from "./game.js";
 
@@ -10,8 +10,8 @@ export default class Screen {
         this.y = y;
         this.element.classList.add(`screen-${x}-${y}`)
         this.rect = this.element.getBoundingClientRect();
-        this.soldObjects = [];
-        this.initSoldObjects();
+        this.solidObjects = [];
+        this.initSolidObjects();
         this.initStyles();
     }
 
@@ -19,18 +19,18 @@ export default class Screen {
         this.element.style.position = 'relative';
         if (gameInstance.debug) this.element.style.outline = '1px solid yellow';
         else this.element.style.outline = 'none';
-        for (let i = 0; i < this.soldObjects.length; i++) {
-            this.soldObjects[i].reinitStyles();
+        for (let i = 0; i < this.solidObjects.length; i++) {
+            this.solidObjects[i].reinitStyles();
         }
     }
 
-    initSoldObjects() {
-        const soldObjectElements = this.element.querySelectorAll('.soldObject');
-        this.soldObjects = Array.from(soldObjectElements).map(soldObject => new SoldObject(soldObject));
+    initSolidObjects() {
+        const solidObjectElements = this.element.querySelectorAll('.solidObject');
+        this.solidObjects = Array.from(solidObjectElements).map(solidObject => new SolidObject(solidObject));
 
         window.addEventListener('resize', () => {
-            this.soldObjects.forEach(soldObject => {
-                soldObject.updateRect();
+            this.solidObjects.forEach(solidObject => {
+                solidObject.updateRect();
             });
         });
     }
@@ -41,34 +41,34 @@ export default class Screen {
 
     checkIfPlayerInScreen() {
         if (intersects(gameInstance.player.element.getBoundingClientRect(), this.rect)) {
-            this.addAdjacentSoldObjectsToPlayer();
+            this.addAdjacentSolidObjectsToPlayer();
         }
     }
 
-    addAdjacentSoldObjectsToPlayer() {
-        if (!isSubset(this.soldObjects, gameInstance.player.soldObjects)) {
-            let soldObjectsToAdd = this.soldObjects;
+    addAdjacentSolidObjectsToPlayer() {
+        if (!isSubset(this.solidObjects, gameInstance.player.solidObjects)) {
+            let solidObjectsToAdd = this.solidObjects;
             if (this.x > 0) {
-                soldObjectsToAdd = soldObjectsToAdd.concat(this.level.getScreen(this.x - 1, this.y).soldObjects);
+                solidObjectsToAdd = solidObjectsToAdd.concat(this.level.getScreen(this.x - 1, this.y).solidObjects);
             } 
             if (this.y > 0) {
-                soldObjectsToAdd = soldObjectsToAdd.concat(this.level.getScreen(this.x, this.y - 1).soldObjects);
+                solidObjectsToAdd = solidObjectsToAdd.concat(this.level.getScreen(this.x, this.y - 1).solidObjects);
             } 
             if (this.x < this.level.columns - 1) {
-                soldObjectsToAdd = soldObjectsToAdd.concat(this.level.getScreen(this.x + 1, this.y).soldObjects);
+                solidObjectsToAdd = solidObjectsToAdd.concat(this.level.getScreen(this.x + 1, this.y).solidObjects);
             } 
             if (this.y < this.level.rows - 1) { 
-                soldObjectsToAdd = soldObjectsToAdd.concat(this.level.getScreen(this.x, this.y + 1).soldObjects);
+                solidObjectsToAdd = solidObjectsToAdd.concat(this.level.getScreen(this.x, this.y + 1).solidObjects);
             }
-            gameInstance.player.setSoldObjects(soldObjectsToAdd);
+            gameInstance.player.setSolidObjects(solidObjectsToAdd);
         }
     }
 
     update() {
         this.updateRect();
         this.checkIfPlayerInScreen();
-        this.soldObjects.forEach(soldObject => {
-            soldObject.update();
+        this.solidObjects.forEach(solidObject => {
+            solidObject.update();
         });
     }
 }
