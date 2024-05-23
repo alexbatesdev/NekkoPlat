@@ -1,5 +1,6 @@
 import gameInstance from "./game.js";
 import { intersects, getCollisionOverlap, anyTrue, debugLog } from "./tools.js";
+import { GifAnimationManager } from "./AnimationManagers.js";
 
 export default class Player {
     constructor(element) {
@@ -7,9 +8,12 @@ export default class Player {
         this.element = element;
         this.animationElement = this.element.querySelector(".animation-container");
         if (!this.animationElement) {
-            //😎
-            console.warn("You should have an animationElement, I have yet to test what goes wrong when you don't have one")
+            this.animationElement = document.createElement("div");
+            this.element.appendChild(this.animationElement);
         }
+        this.animationManager = new GifAnimationManager(this.animationElement);
+        
+        
         this.initStyles();
         // HTML config - comes from a .config element in the #player element
         //   Physics and jump variables in order from most physics to least physics
@@ -56,25 +60,6 @@ export default class Player {
         let element = this.element;
         element.style.position = "absolute";
         element.style.zIndex = 2;
-
-        this.animationElement.style.position = "absolute";
-        this.animationElement.style.top = 0;
-        this.animationElement.style.left = 0;
-        this.animationElement.style.width = "100%";
-        this.animationElement.style.height = "100%";
-        this.animationElement.style.zIndex = 1;
-
-        let animations = this.animationElement.children;
-        Array.from(animations).forEach(animation => {
-            animation.style.display = 'none';
-            animation.style.position = "absolute";
-            animation.style.top = 0;
-            animation.style.left = 0;
-            animation.style.width = "100%";
-            animation.style.height = "100%";
-            animation.style.zIndex = 1;
-        });
-
         this.element.querySelector(".config").style.display = "none";
     }
 
@@ -147,6 +132,7 @@ export default class Player {
         this.processInput();
         this.applyPhysics();
         this.applyCollisions();
+        this.applyAnimations();
         // Set the position of the player's HTML element
         this.element.style.left = `${this.x}px`;
         this.element.style.top = `${this.y}px`;
@@ -173,7 +159,6 @@ export default class Player {
 
         // Movement calculations here
         if (gameInstance.keyState['A']) {
-            console.log("A")
             this.move(-acceleration, 0);
         }
         if (gameInstance.keyState['D']) {
@@ -198,7 +183,6 @@ export default class Player {
     }
 
     move(xVel, yVel) {
-        if (Math.abs(xVel) > 0) this.changeAnimation('walk');
         if (xVel > 0) this.lookRight();
         if (xVel < 0) this.lookLeft();
 
@@ -242,7 +226,7 @@ export default class Player {
         this.velocityY += this.liveGravity;
         if (this.grounded && Math.abs(this.velocityX) < 0.2) {
             this.velocityX = 0;
-            this.changeAnimation('idle');
+            // this.animationManager.changeAnimation('idle');
         } else if (this.grounded && !(gameInstance.keyState['A'] || gameInstance.keyState['D'])) {
             this.velocityX *= 0.88;
         } else if (!this.grounded) {
@@ -302,7 +286,7 @@ export default class Player {
         }
 
         if (vertical_collision_count == 0 && horizontal_collision_count == 0) {
-            this.changeAnimation('jump');
+            // this.animationManager.changeAnimation('jump');
             this.collisionState = {
                 left: 0,
                 right: 0,
@@ -311,6 +295,13 @@ export default class Player {
             }
 
         }
+    }
+
+    applyAnimations() {
+        if (Math.abs(this.velocityX) > 0 && gameInstance.keyState['SHIFT']) this.animationManager.changeAnimation('run');
+        else if (Math.abs(this.velocityX) > 0 && (gameInstance.keyState['A'] || gameInstance.keyState['D'])) this.animationManager.changeAnimation('walk');
+        else if (this.grounded) this.animationManager.changeAnimation('idle');
+        else this.animationManager.changeAnimation('jump');
     }
 
     checkVerticalCollisions() {
@@ -430,38 +421,6 @@ export default class Player {
 
         }
     }
-
-    // https://chatgpt.com/c/d6c3427f-edfa-4d17-bb39-a9a15b01fda5
-    // We can make an AnimationManager class that will handle the animations for the player
-    // This will build animation functionality for more than just the player
-    changeAnimation(animationName) {
-        if (this.currentAnimation === animationName) return;
-        this.currentAnimation = animationName;
-        // if animation has the gif class
-        if (!this.animationElement) {
-            console.error("Animation Element not found, please add an element with the class of `animation-container` to your player element")
-            return
-        } else if (this.animationElement.classList.contains("gif")) {
-            this.setGifAnimation(animationName)
-        } else if (this.animationElement.classList.contains("sprite-sheet")) {
-            console.warn("Not Implemented Yet")
-        } else {
-            console.warn("No Animation Element type found (gif/spritesheet), defaulting to gif because that's the easier one :>")
-        }
-    }
-
-    setGifAnimation(animationName) {
-        // Iterate over this.animationElement children
-        for (let i = 0; i < this.animationElement.children.length; i++) {
-            const child = this.animationElement.children[i];
-            if (child.classList.contains(animationName)) {
-                child.style.display = 'block';
-            } else {
-                child.style.display = 'none';
-            }
-        }
-    }
-
 
     lookRight() {
         this.element.style.transform = 'rotateY(180deg)';
