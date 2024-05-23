@@ -18,6 +18,10 @@ export default class Camera {
         this.restingOffsetY = 0.9;
         this.offsetX = this.restingOffsetX;
         this.offsetY = this.restingOffsetY;
+        this.followPlayer = true;
+        if (this.element.classList.contains('no-follow')) this.followPlayer = false;
+        if (this.element.classList.contains('scroll-bar')) this.element.style.overflow = 'auto';
+        else this.element.style.overflow = 'hidden';
         this.offsetBounds = 0;
         this.maxOffset = 1 - this.offsetBounds;
         this.minOffset = this.offsetBounds;
@@ -31,8 +35,6 @@ export default class Camera {
     }
 
     initStyles() {
-        this.element.style.overflow = 'hidden';
-
         this.overlayElement.style.zIndex = '5';
         this.overlayElement.style.width = 'var(--screen-width)';
         this.overlayElement.style.height = 'var(--screen-height)';
@@ -50,10 +52,15 @@ export default class Camera {
     }
 
     update() {
-        this.trackPlayer();
+        if (this.followPlayer) this.trackPlayer();
         this.processInput();
         this.applyMaxOffset();
         this.positionOverlay();
+        if (gameInstance && gameInstance.debug) this.element.style.overflow = "auto";
+        else {
+            if (this.element.classList.contains('scroll-bar')) this.element.style.overflow = 'auto';
+            else this.element.style.overflow = 'hidden';
+        }
     }
 
     trackPlayer() {

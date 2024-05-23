@@ -287,12 +287,12 @@ position: relative or absolute
 
 */
 #viewport {
+    position: absolute;
     width: var(--screen-width);
     height: var(--screen-height);
 }
 
 .tv {
-    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
