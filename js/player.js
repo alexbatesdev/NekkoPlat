@@ -12,20 +12,22 @@ export default class Player {
             this.element.appendChild(this.animationElement);
         }
         this.animationManager = new GifAnimationManager(this.animationElement);
-        
-        
+
+
         this.initStyles();
         // HTML config - comes from a .config element in the #player element
         //   Physics and jump variables in order from most physics to least physics
-        this.maxVelocity = this.setConfigItem('maxVelocity', 10);
-        this.acceleration = this.setConfigItem('acceleration', 0.7);
-        this.deceleration = this.setConfigItem('deceleration', 0.2);
-        this.gravity = this.setConfigItem('gravity', 0.9);
-        this.fallingGravity = this.setConfigItem('fallingGravity', 1.5);
-        this.jumpForce = this.setConfigItem('jumpForce', 25);
-        this.coyoteTime = this.setConfigItem('coyoteTime', 100);
-        this.preJumpAllowance = this.setConfigItem('preJumpAllowance', 10);
-        this.maxAirJumps = this.setConfigItem('maxAirJumps', 1);
+        this.configElement = null;
+        this.maxVelocity = null;
+        this.acceleration = null;
+        this.deceleration = null;
+        this.gravity = null;
+        this.fallingGravity = null;
+        this.jumpForce = null;
+        this.coyoteTime = null;
+        this.preJumpAllowance = null;
+        this.maxAirJumps = null;
+        this.initConfig();
         // Character state variables
         //   Position/Respawn
         this.x = 0;
@@ -56,25 +58,36 @@ export default class Player {
         this.currentAnimation = 'idle';
     }
 
+    initConfig() {
+        this.configElement = this.element.querySelector(".config");
+        if (!this.configElement) {
+            console.warn("No player config element found in the document, using default values");
+        }
+        this.maxVelocity = this.setConfigItem('maxVelocity', 10);
+        this.acceleration = this.setConfigItem('acceleration', 0.7);
+        this.deceleration = this.setConfigItem('deceleration', 0.2);
+        this.gravity = this.setConfigItem('gravity', 0.9);
+        this.fallingGravity = this.setConfigItem('fallingGravity', 1.5);
+        this.jumpForce = this.setConfigItem('jumpForce', 25);
+        this.coyoteTime = this.setConfigItem('coyoteTime', 100);
+        this.preJumpAllowance = this.setConfigItem('preJumpAllowance', 10);
+        this.maxAirJumps = this.setConfigItem('maxAirJumps', 1);
+    }
+
     initStyles() {
         let element = this.element;
         element.style.position = "absolute";
         element.style.zIndex = 2;
-        this.element.querySelector(".config").style.display = "none";
+        const configElement = this.element.querySelector(".config");
+        if (configElement) this.element.querySelector(".config").style.display = "none";
     }
 
     setConfigItem(configItem, default_value) {
-        const configElement = this.element.querySelector(".config");
-        if (configElement) {
-            const configItemElement = configElement.querySelector(`.${configItem}`);
-            if (configItemElement) {
-                return Number(configItemElement.innerHTML);
-            } else {
-                console.warn("No config element found for " + configItem + ", using default value: " + default_value);
-                return default_value;
-            }
+        const configItemElement = this.configElement.querySelector(`.${configItem}`);
+        if (configItemElement) {
+            return Number(configItemElement.innerHTML);
         } else {
-            console.warn("No player config element found in the document, using default value for " + configItem + ": " + default_value);
+            console.warn("No config element found for " + configItem + ", using default value: " + default_value);
             return default_value;
         }
     }
@@ -145,6 +158,14 @@ export default class Player {
             // grounded: this.grounded,
             // collisionState: this.collisionState,
         });
+        document.getElementById('xPositionDisplay').innerHTML = Math.round(this.x + this.element.getBoundingClientRect().width / 2);
+        document.getElementById('yPositionDisplay').innerHTML = Math.round(this.y + this.element.getBoundingClientRect().height / 2);
+        if (gameInstance.debug) {
+            this.element.style.outline = '3px solid red';
+            this.element.style.outlineOffset = '-3px';
+        } else {
+            this.element.style.outline = 'none';
+        }
     }
 
     processInput() {
@@ -177,7 +198,6 @@ export default class Player {
             }
         }
         if (gameInstance.keyState['R']) {
-            console.log("R")
             this.respawnAtCheckpoint();
         }
     }

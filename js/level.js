@@ -39,9 +39,7 @@ export default class Level {
         this.element.classList.forEach(className => {
             validEffects.forEach(effect => {
                 if (className.includes(effect)) {
-                    console.log(className)
                     if (className.includes("-")) {
-                        console.log(className.split("-"))
                         if (className.split("-")[1] == "vert") {
                             this.outOfBoundEffect.top = effect;
                             this.outOfBoundEffect.bottom = effect;
@@ -55,7 +53,6 @@ export default class Level {
                 }
             });
         });
-        console.log(this.outOfBoundEffect)
     }
 
     initScreensInitialWindowSize() {
