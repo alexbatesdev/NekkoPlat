@@ -650,3 +650,14 @@ a {
     font-size: 3rem;
     color: white;
 }
+
+.interactionBox {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translate(0, -50%);
+    height: 80%;
+    width: 100px;
+    z-index: 100;
+    border: 3px solid red;
+}
