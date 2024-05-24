@@ -3,6 +3,7 @@ import { intersects, getCollisionOverlap, anyTrue, debugLog } from "./tools.js";
 import GifAnimationManager from "./gifAnimationManager.js";
 import { Physics } from "./physics.js";
 import { CollisionDetection } from "./collisionDetector.js";
+import InteractionBox from "./interactionBox.js";
 
 export default class Player {
     constructor(element) {
@@ -55,6 +56,8 @@ export default class Player {
         this.coyoteTimeActive = false;
         //   Animation
         this.currentAnimation = 'idle';
+        //   Interaction
+        this.interactionBox = new InteractionBox(this);
     }
 
     initConfig() {
@@ -148,6 +151,8 @@ export default class Player {
         this.physics.applyPhysics(this, this.collision.state);
         this.collision.applyCollisions(this, this.solidObjects);
         this.processCollisions();
+        // console.log(this.interactableObjects);
+        this.interactionBox.checkIntersectsInteractable(this.interactableObjects);
         this.applyAnimations();
         // Set the position of the player's HTML element
         this.element.style.left = `${this.x}px`;
@@ -278,5 +283,31 @@ export default class Player {
 
     setSolidObjects(solidObjects) {
         this.solidObjects = solidObjects;
+    }
+
+    // Figuring out how to handle interactable objects
+    setInteractableObjects(interactableObjects) {
+        interactableObjects.forEach(interactableObject => {
+            console.log();
+        });
+        this.interactionBox.interactables = interactableObjects;
+    }
+
+    resolveInteractableObject(interactableObject) {
+        let classList = interactableObject.element.classList.value;
+        if (!classList.outline('interact')) {
+            console.error('Interactable object does not have the class "interact"');
+            return;
+        } else {
+            classList = classList.replace('interact', '').trim();
+        }
+        switch (classList) {
+            case "toggle":
+                return 
+                break;
+        
+            default:
+                break;
+        }
     }
 }

@@ -1,6 +1,7 @@
-import { SolidObject } from "./level_objects.js";
+import { SolidObject } from "./levelObjects.js";
 import { intersects, isSubset } from "./tools.js";
 import gameInstance from "./game.js";
+import { Interactable } from "./interactionBox.js";
 
 export default class Screen {
     constructor(level, element, x, y) {
@@ -12,6 +13,8 @@ export default class Screen {
         this.rect = this.element.getBoundingClientRect();
         this.solidObjects = [];
         this.initSolidObjects();
+        this.interactableObjects = [];
+        this.initInteractableObjects();
         this.initStyles();
     }
 
@@ -22,6 +25,11 @@ export default class Screen {
         for (let i = 0; i < this.solidObjects.length; i++) {
             this.solidObjects[i].reinitStyles();
         }
+    }
+
+    initInteractableObjects() {
+        const interactableElements = this.element.querySelectorAll('.interact');
+        this.interactableObjects = Array.from(interactableElements).map(interactableElement => new Interactable(interactableElement));
     }
 
     initSolidObjects() {
@@ -42,6 +50,7 @@ export default class Screen {
     checkIfPlayerInScreen() {
         if (intersects(gameInstance.player.element.getBoundingClientRect(), this.rect)) {
             this.addAdjacentSolidObjectsToPlayer();
+            this.addAdjacentInteractableObjectsToPlayer();
         }
     }
 
@@ -50,18 +59,23 @@ export default class Screen {
             let solidObjectsToAdd = this.solidObjects;
             if (this.x > 0) {
                 solidObjectsToAdd = solidObjectsToAdd.concat(this.level.getScreen(this.x - 1, this.y).solidObjects);
-            } 
+            }
             if (this.y > 0) {
                 solidObjectsToAdd = solidObjectsToAdd.concat(this.level.getScreen(this.x, this.y - 1).solidObjects);
-            } 
+            }
             if (this.x < this.level.columns - 1) {
                 solidObjectsToAdd = solidObjectsToAdd.concat(this.level.getScreen(this.x + 1, this.y).solidObjects);
-            } 
-            if (this.y < this.level.rows - 1) { 
+            }
+            if (this.y < this.level.rows - 1) {
                 solidObjectsToAdd = solidObjectsToAdd.concat(this.level.getScreen(this.x, this.y + 1).solidObjects);
             }
             gameInstance.player.setSolidObjects(solidObjectsToAdd);
         }
+    }
+
+    addAdjacentInteractableObjectsToPlayer() {
+        let interactableObjectsToAdd = this.interactableObjects;
+        gameInstance.player.setInteractableObjects(interactableObjectsToAdd);
     }
 
     update() {
