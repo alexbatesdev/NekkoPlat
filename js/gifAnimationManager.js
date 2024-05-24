@@ -29,10 +29,6 @@ export default class GifAnimationManager {
     changeAnimation(animationName) {
         if (this.currentAnimation === animationName) return;
         this.currentAnimation = animationName;
-        this.setGifAnimation(animationName);
-    }
-
-    setGifAnimation(animationName) {
         for (let i = 0; i < this.animationElement.children.length; i++) {
             const child = this.animationElement.children[i];
             if (child.classList.contains(animationName)) {
