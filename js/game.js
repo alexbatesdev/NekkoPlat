@@ -1,4 +1,5 @@
 import Camera, { Filter } from './camera.js';
+import SignalManager from './signalManager.js';
 import { debugLog } from './tools.js';
 
 class Game {
@@ -31,6 +32,10 @@ class Game {
             ARROWRIGHT: false,
             ESCAPE: false
         };
+
+        this.signalManager = new SignalManager();
+        this.signalManager.broadcastSignal('test', 'test signal');
+        console.log(this.signalManager.signals)
     }
 
     initPauseElement() {

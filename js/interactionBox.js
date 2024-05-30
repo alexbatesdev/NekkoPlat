@@ -6,31 +6,21 @@ export default class InteractionBox {
         this.player = player;
         this.element = document.getElementById('interactionBox');
         this.interactables = [];
+        this.interacting = false;
     }
 
     checkIntersectsInteractable() {
         for (let i = 0; i < this.interactables.length; i++) {
             const interactable = this.interactables[i];
             const { top, right, bottom, left } = getCollisionOverlap(this.element.getBoundingClientRect(), interactable.element.getBoundingClientRect())
-            console.log(top, right, bottom, left);
-            if ((top || right || bottom || left) && gameInstance.getKeyState('E')) {
+            if ((top || right || bottom || left) && gameInstance.getKeyState('E') && !this.interacting) {
+                this.interacting = true;
                 interactable.interact();
+            } else if (!gameInstance.getKeyState('E')) {
+                this.interacting = false;
             }
         }
     }
 
 
-}
-    // Figuring out how to handle interactable objects
-export class Interactable {
-    constructor(element) {
-        this.element = element;
-        this.active = false;
-        this.enabled = true;
-    }
-
-    interact() {
-        console.log('Interacted with', this.element);
-        this.element.click();
-    }
 }

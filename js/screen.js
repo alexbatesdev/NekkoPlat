@@ -1,7 +1,6 @@
-import { SolidObject } from "./levelObjects.js";
+import { SolidObject, Interactable } from "./levelObjects.js";
 import { intersects, isSubset } from "./tools.js";
 import gameInstance from "./game.js";
-import { Interactable } from "./interactionBox.js";
 
 export default class Screen {
     constructor(level, element, x, y) {
@@ -28,7 +27,7 @@ export default class Screen {
     }
 
     initInteractableObjects() {
-        const interactableElements = this.element.querySelectorAll('.interact');
+        const interactableElements = this.element.querySelectorAll('.interactable');
         this.interactableObjects = Array.from(interactableElements).map(interactableElement => new Interactable(interactableElement));
     }
 

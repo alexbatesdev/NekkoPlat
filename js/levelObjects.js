@@ -1,4 +1,5 @@
 import gameInstance from './game.js';
+import { debugLog } from './tools.js';
 
 export class SolidObject {
     constructor(element) {
@@ -23,6 +24,56 @@ export class SolidObject {
         }
     }
 }
+export class Toggle {
+    constructor(element, startOn = false) {
+        this.parent_element = element;
+        this.on_element = element.querySelector('.on');
+        this.on_element_initial_display = this.on_element.style.display;
+        this.off_element = element.querySelector('.off');
+        this.off_element_initial_display = this.off_element.style.display;
+        this.off_element.style.display = 'none';
+        this.toggledOn = startOn;
+    }
+
+    toggle() {
+        debugLog('Toggled', this.parent_element);
+        if (this.toggledOn) {
+            this.toggledOn = false;
+            this.on_element.style.display = this.on_element_initial_display
+            this.off_element.style.display = 'none';
+            this.on_element.click();
+        } else {
+            this.toggledOn = true;
+            this.on_element.style.display = 'none';
+            this.off_element.style.display = this.off_element_initial_display;
+            this.off_element.click();
+        }
+    }
+
+    setToggledOn() {
+        this.toggledOn = true;
+    }
+
+    setToggledOff() {
+        this.toggledOn = false;
+    }
+
+}
+
+export class Interactable extends Toggle {
+    constructor(element) {
+        super(element);
+        this.element = element;
+        this.enabled = true;
+    }
+
+    interact() {
+        if (!this.enabled) return;
+        debugLog('Interacted', this.element);
+        this.toggle();
+        // this.element.click();
+    }
+}
 
 // USE THIS AS A BASE FOR OTHER INTERACTABLE OBJECTS
 // Effect Area - an object that does something when the player enters it
@@ -33,6 +84,9 @@ export class SolidObject {
 // Features:
 // - Toggle between two states on interaction
 // - Trigger other objects on toggle
+// Interactable Button - an object that triggers other objects on interaction
+// Features:
+// - Trigger other objects on interaction
 
 // Floor - a solid object that the player can stand on
 // Features:

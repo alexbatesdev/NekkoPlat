@@ -58,8 +58,17 @@
                 </div>
 
                 <div id="bonkus"></div>
-                <div class="interact toggle">
-
+                <div class="interactable toggle" onclick="console.log('switch activated')">
+                    <div class="on" onclick="console.log('turned on')">
+                        <p>
+                            ON
+                        </p>
+                    </div>
+                    <div class="off" onclick="console.log('turned off')">
+                        <p>
+                            OFF
+                        </p>
+                    </div>
                 </div>
                 <div class="sign pixel-corners" id="sign-1">
                     Wow! Thanks for completing what exists of Nekko's Journey! All those images you saw were taken by me
@@ -133,21 +142,23 @@
             <div class="screen"></div> -->
         </div>
     </div>
-        <!-- Need to make these elements optional (pause) in the javascript to avoid errors! -->
+    <!-- Need to make these elements optional (pause) in the javascript to avoid errors! -->
     <div id="pause">
         <span class="filter blur"></span>
         <span class="filter dark"></span>
         <div class="pause-text">
             <h1>Paused</h1>
             <p>Press <span class="key">ESC</span> to resume</p>
-        </div>        
+        </div>
     </div>
     <!-- Need to make these elements (overlay) optional in the javascript to avoid errors! -->
     <div id="overlay">
         <!-- <span class="filter crt"></span>  -->
-        <img id="blahaj-pet" src="./img/blahaj-blahaj-pet.gif" alt="A Swedish shark stuffed animal being given a good pet"> 
+        <img id="blahaj-pet" src="./img/blahaj-blahaj-pet.gif"
+            alt="A Swedish shark stuffed animal being given a good pet">
         <div class="debug">
-            <h1 class="positionDisplay">X: <span id="xPositionDisplay">x</span> Y: <span id="yPositionDisplay">y</span></h1>
+            <h1 class="positionDisplay">X: <span id="xPositionDisplay">x</span> Y: <span id="yPositionDisplay">y</span>
+            </h1>
         </div>
     </div>
     <div class="tv-stump">
