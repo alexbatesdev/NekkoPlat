@@ -6,6 +6,10 @@ export class SolidObject {
     constructor(element) {
         this.element = element;
         this.rect = this.element.getBoundingClientRect();
+        this.enabled = true;
+        if (this.element.classList.contains('disabled')) {
+            this.enabled = false;
+        }
     }
 
     updateRect() {
@@ -30,23 +34,40 @@ export class InteractableObject {
     constructor(element) {
         this.element = element;
         this.enabled = true;
+        if (this.element.classList.contains('disabled')) {
+            this.enabled = false;
+        }
+        if (this.element.classList.contains('clickable')) {
+            this.element.addEventListener('click', () => {
+                this.interact();
+            });
+        }
     }
 
     interact() {
         if (!this.enabled) return;
         debugLog('Interacted', this.element);
     }
+
+    update() {
+        if (gameInstance.debug) {
+            this.element.style.outline = '3px solid blue';
+            console.log("blue")
+        } else {
+            this.element.style.outline = 'none';
+        }
+    }
 }
 
 export class Toggle extends InteractableObject {
     constructor(element) {
         super(element);
-        this.toggleManager = new ToggleManager(element);
+        this.stateManager = new ToggleManager(element);
     }
 
     interact() {
         if (!this.enabled) return;
-        this.toggleManager.toggle();
+        this.stateManager.toggle();
     }
 
 }

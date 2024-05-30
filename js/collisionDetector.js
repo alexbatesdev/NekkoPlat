@@ -46,6 +46,7 @@ export class CollisionDetection {
         const playerRect = object.element.getBoundingClientRect();
         let collisionCount = 0;
         solidObjects.forEach(solidObject => {
+            if (!solidObject.enabled) return;
             for (let i = 0.25; i < 1; i += 0.25) {
                 let playerRectNext = {
                     left: playerRect.left + 20,

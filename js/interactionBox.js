@@ -9,6 +9,17 @@ export default class InteractionBox {
         this.interacting = false;
     }
 
+    update() {
+        this.checkIntersectsInteractable();
+        if (gameInstance.debug) {
+            this.element.style.outline = '3px solid #0f9f0f';
+            this.element.style.outlineOffset = '-3px';
+        }
+        else {
+            this.element.style.outline = 'none';
+        }
+    }
+
     checkIntersectsInteractable() {
         let interactions = [];
         for (let i = 0; i < this.interactables.length; i++) {
@@ -21,6 +32,7 @@ export default class InteractionBox {
         if (interactions.length > 0) {
             this.interacting = true;
             interactions.forEach(interactable => {
+                if (!interactable.enabled) return;
                 interactable.interact();
             });
         } 

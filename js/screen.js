@@ -94,5 +94,8 @@ export default class Screen {
         this.solidObjects.forEach(solidObject => {
             solidObject.update();
         });
+        this.interactableObjects.forEach(interactableObject => {
+            interactableObject.update();
+        });
     }
 }

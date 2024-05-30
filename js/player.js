@@ -152,7 +152,7 @@ export default class Player {
         this.collision.applyCollisions(this, this.solidObjects);
         this.processCollisions();
         // console.log(this.interactableObjects);
-        this.interactionBox.checkIntersectsInteractable(this.interactableObjects);
+        this.interactionBox.update();
         this.applyAnimations();
         // Set the position of the player's HTML element
         this.element.style.left = `${this.x}px`;

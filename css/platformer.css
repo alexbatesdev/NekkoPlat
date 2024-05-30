@@ -659,7 +659,6 @@ a {
     height: 80%;
     width: 75px;
     z-index: 100;
-    border: 3px solid red;
 }
 
 .toggle {
@@ -669,7 +668,6 @@ a {
     transform: translate(-50%, -50%);
     width: 100px;
     height: 100px;
-    outline: blue 3px solid;
 }
 
 #toggle-1 {
