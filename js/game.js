@@ -15,6 +15,8 @@ class Game {
         this.debug = false;
         this.paused = false;
         this.processedInput = false;
+        // New input processor/keyState system
+        // https://chatgpt.com/c/f5c9ad3a-6d67-40eb-b2a6-9dc3d5afcff0
         this.keyState = {
             W: false,
             A: false,
