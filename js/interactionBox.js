@@ -10,15 +10,22 @@ export default class InteractionBox {
     }
 
     checkIntersectsInteractable() {
+        let interactions = [];
         for (let i = 0; i < this.interactables.length; i++) {
             const interactable = this.interactables[i];
             const { top, right, bottom, left } = getCollisionOverlap(this.element.getBoundingClientRect(), interactable.element.getBoundingClientRect())
             if ((top || right || bottom || left) && gameInstance.getKeyState('E') && !this.interacting) {
-                this.interacting = true;
+                interactions.push(interactable);
+            } 
+        }
+        if (interactions.length > 0) {
+            this.interacting = true;
+            interactions.forEach(interactable => {
                 interactable.interact();
-            } else if (!gameInstance.getKeyState('E')) {
-                this.interacting = false;
-            }
+            });
+        } 
+        if (!gameInstance.getKeyState('E') && this.interacting) {
+            this.interacting = false;
         }
     }
 

@@ -657,7 +657,7 @@ a {
     right: 0;
     transform: translate(0, -50%);
     height: 80%;
-    width: 100px;
+    width: 75px;
     z-index: 100;
     border: 3px solid red;
 }
@@ -670,6 +670,14 @@ a {
     width: 100px;
     height: 100px;
     outline: blue 3px solid;
+}
+
+#toggle-1 {
+    left: calc(50% - 50px);
+}
+
+#toggle-2 {
+    left: calc(50% + 50px);
 }
 
 .toggle .on {
