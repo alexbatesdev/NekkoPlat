@@ -1,4 +1,4 @@
-import { SolidObject, Interactable } from "./levelObjects.js";
+import { SolidObject, InteractableObject, Toggle } from "./levelObjects.js";
 import { intersects, isSubset } from "./tools.js";
 import gameInstance from "./game.js";
 
@@ -28,7 +28,18 @@ export default class Screen {
 
     initInteractableObjects() {
         const interactableElements = this.element.querySelectorAll('.interactable');
-        this.interactableObjects = Array.from(interactableElements).map(interactableElement => new Interactable(interactableElement));
+        this.interactableObjects = Array.from(interactableElements).map(interactableElement => {
+            return this.resolveInteractableObject(interactableElement);
+        });
+    }
+
+    resolveInteractableObject(interactableElement) {
+        const classList = interactableElement.classList;
+        if (classList.contains('toggle')) {
+            return new Toggle(interactableElement);
+        } else {
+            return new InteractableObject(interactableElement);
+        }
     }
 
     initSolidObjects() {
