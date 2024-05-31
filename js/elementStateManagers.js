@@ -1,34 +1,78 @@
 import { debugLog } from './tools.js';
+import gameInstance from './game.js';
 
 export default class ToggleManager {
     constructor(element, startOn = false) {
         this.parent_element = element;
         this.on_element = element.querySelector('.on');
+        this.on_broadcasts = [];
         this.off_element = element.querySelector('.off');
+        this.off_broadcasts = [];
         this.toggledOn = startOn;
+        this.initBroadcasts();
+        console.log(this.on_broadcasts, this.off_broadcasts);
+        this.syncState();
+    }
+
+    initBroadcasts() {
+        this.on_element.querySelectorAll('.broadcast').forEach(broadcast => {
+            let broadcastChannel = null;
+            broadcast.classList.forEach(className => {
+                console.log(className);
+                if (className.includes('channel-')) {
+                    broadcastChannel = className.split('-')[1];
+                }
+            })
+            this.on_broadcasts.push([broadcastChannel, broadcast.innerHTML]);
+            broadcast.style.display = 'none';
+        });
+        this.off_element.querySelectorAll('.broadcast').forEach(broadcast => {
+            let broadcastChannel = null;
+            broadcast.classList.forEach(className => {
+                if (className.includes('channel-')) {
+                    broadcastChannel = className.split('-')[1];
+                }
+            })
+            this.off_broadcasts.push([broadcastChannel, broadcast.innerHTML]);
+            broadcast.style.display = 'none';
+        });
     }
 
     toggle() {
         debugLog('Toggled', this.parent_element);
         if (this.toggledOn) {
-            this.toggledOn = false;
-            this.on_element.style.visibility = 'hidden';
-            this.off_element.style.visibility = 'visible';
-            this.on_element.click();
+            this.setToggledOff();
         } else {
-            this.toggledOn = true;
-            this.on_element.style.visibility = 'visible';
-            this.off_element.style.visibility = 'hidden';
-            this.off_element.click();
+            this.setToggledOn();
+        }
+    }
+
+    syncState() {
+        if (this.toggledOn) {
+            this.setToggledOn();
+        } else {
+            this.setToggledOff();
         }
     }
 
     setToggledOn() {
+        debugLog('Toggled On');
         this.toggledOn = true;
+        this.on_element.style.visibility = 'visible';
+        this.off_element.style.visibility = 'hidden';
+        this.off_element.click();
+        // this.on_broadcasts.forEach(broadcast => gameInstance.signalManager.stopBroadcast(broadcast[0]));
+        this.off_broadcasts.forEach(broadcast => gameInstance.signalManager.broadcastSignal(broadcast[0], broadcast[1]));
     }
 
     setToggledOff() {
+        debugLog('Toggled Off');
         this.toggledOn = false;
+        this.on_element.style.visibility = 'hidden';
+        this.off_element.style.visibility = 'visible';
+        this.on_element.click();
+        // this.off_broadcasts.forEach(broadcast => gameInstance.signalManager.stopBroadcast(broadcast[0]));
+        this.on_broadcasts.forEach(broadcast => gameInstance.signalManager.broadcastSignal(broadcast[0], broadcast[1]));
     }
 
     getState() {
@@ -37,10 +81,11 @@ export default class ToggleManager {
 }
 
 export class MultiStateManager {
-    constructor(element, states = {}, startState = -1) {
+    constructor(element, states = {}, startState = null) {
         this.parent_element = element;
         this.states = states;
         this.currentState = startState;
+        this.setState(this.currentState);
     }
 
     setState(state) {

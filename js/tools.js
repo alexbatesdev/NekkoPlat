@@ -95,3 +95,7 @@ export const debugLog = (message) => {
 export const isSubset = (subset, set) => {
     return subset.every(element => set.includes(element));
 }
+
+export const hasSubstringInClassList = (classList, substring) => {
+    return Array.from(classList).some(className => className.includes(substring));
+}

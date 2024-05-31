@@ -340,10 +340,13 @@ top
 left
 
 */
-.solidObject {
+.object {
     position: absolute;
     top: 0;
     left: 0;
+}
+
+.solid {
     z-index: 3;
     outline-offset: -1px;
     user-select: none;
@@ -498,7 +501,7 @@ left
     height: 600px;
 }
 
-.solidObject>.double-cap {
+.solid>.double-cap {
     height: 100%;
     width: 50px;
     background-image: url("../img/stone-double-corners.png");
@@ -509,7 +512,7 @@ left
     right: -10px;
 }
 
-.solidObject>.double-cap:first-of-type {
+.solid>.double-cap:first-of-type {
     transform: rotate(0deg);
     left: -10px;
 }
@@ -653,10 +656,9 @@ a {
 
 #interactionBox {
     position: absolute;
-    top: 50%;
+    bottom: 0;
     right: 0;
-    transform: translate(0, -50%);
-    height: 80%;
+    height: 120%;
     width: 75px;
     z-index: 100;
 }
@@ -700,4 +702,44 @@ a {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.reciever {
+    position: absolute;
+    left: 50%;
+    top: 20%;
+    width: 100px;
+    height: 100px;
+}
+
+.reciever .on {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: green;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.reciever .off {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: red;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#reciever-1 {
+    left: 20%;
+}
+
+#reciever-2 {
+    left: 80%;
 }

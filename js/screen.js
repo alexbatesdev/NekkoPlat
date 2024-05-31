@@ -1,4 +1,4 @@
-import { SolidObject, InteractableObject, Toggle } from "./levelObjects.js";
+import { SolidObject, InteractableObject, InteractableToggle, Reciever } from "./levelObjects.js";
 import { intersects, isSubset } from "./tools.js";
 import gameInstance from "./game.js";
 
@@ -11,9 +11,13 @@ export default class Screen {
         this.element.classList.add(`screen-${x}-${y}`)
         this.rect = this.element.getBoundingClientRect();
         this.solidObjects = [];
+        // Merge inits into just one function
+        // initObjects -> iterates over all objects, and initializes them (this includes putting them into these separate lists)
         this.initSolidObjects();
         this.interactableObjects = [];
         this.initInteractableObjects();
+        this.recievers = [];
+        this.initPassiveObjects();
         this.initStyles();
     }
 
@@ -27,6 +31,7 @@ export default class Screen {
     }
 
     initInteractableObjects() {
+        // Merge this with solid objects and passive objects
         const interactableElements = this.element.querySelectorAll('.interactable');
         this.interactableObjects = Array.from(interactableElements).map(interactableElement => {
             return this.resolveInteractableObject(interactableElement);
@@ -36,20 +41,29 @@ export default class Screen {
     resolveInteractableObject(interactableElement) {
         const classList = interactableElement.classList;
         if (classList.contains('toggle')) {
-            return new Toggle(interactableElement);
+            return new InteractableToggle(interactableElement);
         } else {
             return new InteractableObject(interactableElement);
         }
     }
 
     initSolidObjects() {
-        const solidObjectElements = this.element.querySelectorAll('.solidObject');
+        // Merge this with interactable objects and passive objects
+        const solidObjectElements = this.element.querySelectorAll('.solid');
         this.solidObjects = Array.from(solidObjectElements).map(solidObject => new SolidObject(solidObject));
 
         window.addEventListener('resize', () => {
             this.solidObjects.forEach(solidObject => {
                 solidObject.updateRect();
             });
+        });
+    }
+
+    initPassiveObjects() {
+        // Merge this with interactable objects and solid objects
+        const recievers = this.element.querySelectorAll('.reciever');
+        this.recievers = Array.from(recievers).map(reciever => {
+            return new Reciever(reciever);
         });
     }
 
@@ -96,6 +110,9 @@ export default class Screen {
         });
         this.interactableObjects.forEach(interactableObject => {
             interactableObject.update();
+        });
+        this.recievers.forEach(reciever => {
+            reciever.update();
         });
     }
 }

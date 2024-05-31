@@ -49,33 +49,62 @@
                         <img class="wait" src="./img/cat_fall_asleep.gif" alt="A cat falling asleep">
                     </div>
                 </div>
-                <div class="solidObject floor" id="floor-1"></div>
+                <div class="object solid floor" id="floor-1"></div>
                 <!-- <div class="pipe" id="pipe-1"></div> -->
 
-                <div class="solidObject" id="solidObject-1">
+                <div class="object solid" id="solidObject-1">
                     <div class="double-cap"></div>
                     <div class="double-cap"></div>
                 </div>
-
-                <div id="toggle-1" class="interactable toggle" onclick="console.log('switch activated')">
-                    <div class="on" onclick="console.log('turned on')">
+                <div id="reciever-1" class="reciever">
+                    <span class="broadcast channel-toggle_one"></span>
+                    <div class="signal off">
+                        <p>
+                            OFF
+                        </p>
+                    </div>
+                    <div class="signal on">
                         <p>
                             ON
                         </p>
                     </div>
-                    <div class="off" onclick="console.log('turned off')">
+                </div>
+                <div id="reciever-2" class="reciever">
+                    <span class="broadcast channel-toggle_two"></span>
+                    <div class="signal off">
+                        <p>
+                            OFF
+                        </p>
+                    </div>
+                    <div class="signal on">
+                        <p>
+                            ON
+                        </p>
+                    </div>
+                </div>
+                <div id="toggle-1" class="interactable toggle" onclick="console.log('switch activated')">
+                    <div class="on">
+                        <span class="broadcast channel-toggle_one">off</span>
+                        <p>
+                            ON
+                        </p>
+                    </div>
+                    <div class="off">
+                        <span class="broadcast channel-toggle_one">on</span>
                         <p>
                             OFF
                         </p>
                     </div>
                 </div>
                 <div id="toggle-2" class="interactable toggle clickable" onclick="console.log('switch activated')">
-                    <div class="on" onclick="console.log('turned on')">
+                    <div class="on">
+                        <span class="broadcast channel-toggle_two">off</span>
                         <p>
                             ON
                         </p>
                     </div>
-                    <div class="off" onclick="console.log('turned off')">
+                    <div class="off">
+                        <span class="broadcast channel-toggle_two">on</span>
                         <p>
                             OFF
                         </p>
@@ -99,7 +128,7 @@
                 </div> -->
             </div>
             <div class="screen">
-                <div class="solidObject floor" id="floor-2"></div>
+                <div class="object solid floor" id="floor-2"></div>
                 <img src="./img/blj.gif" alt="Mario Backwards Long Jumping" id="img-1">
                 <img src="./img/amogus.gif" alt="amogus club penguin dencing" id="img-2">
                 <img src="./img/cat-planet.gif" alt="Doom Guy standing there regularly" id="img-3">
@@ -108,27 +137,27 @@
                 <img src="./img/explode.gif" alt="Explosion" id="img-6">
                 <img src="./img/explode.gif" alt="Explosion" id="img-7">
 
-                <div class="solidObject" id="solidObject-2"></div>
-                <div class="solidObject" id="solidObject-3"></div>
+                <div class="object solid" id="solidObject-2"></div>
+                <div class="object solid" id="solidObject-3"></div>
 
             </div>
             <div class="screen">
                 <a href="https://youtu.be/GiaD7WSdb4M?si=SPwcMxkN9hLgbPLS">Really Cool link</a>
                 <img src="./img/debug.jpg" class="debug" style="height: 800px; border: solid 1px red;" srcset="">
-                <div class="solidObject floor" id="floor-3"></div>
-                <div class="solidObject floor" id="floor-4"></div>
-                <!-- <div class="solidObject" id="end-cap">
+                <div class="object solid floor" id="floor-3"></div>
+                <div class="object solid floor" id="floor-4"></div>
+                <!-- <div class="object solid" id="end-cap">
                     <div class="cap"></div>
                 </div> -->
             </div>
             <div class="screen">
-                <!-- <div class="solidObject floor"></div> -->
+                <!-- <div class="object solid floor"></div> -->
             </div>
             <div class="screen">
-                <div class="solidObject floor"></div>
+                <div class="object solid floor"></div>
             </div>
             <div class="screen">
-                <!-- <div class="solidObject floor"></div> -->
+                <!-- <div class="object solid floor"></div> -->
             </div>
             <!-- <div class="screen"></div>
             <div class="screen"></div>
@@ -176,16 +205,16 @@
         <div class="tv-base"></div>
     </div>
     <!-- <div class="screen" id="screen initial-2">
-        <div class="solidObject floor" id="floor-3"></div>
-        <div class="solidObject floor" id="floor-4"></div>
-        <div class="solidObject" id="end-cap">
+        <div class="object solid floor" id="floor-3"></div>
+        <div class="object solid floor" id="floor-4"></div>
+        <div class="object solid" id="end-cap">
             <div class="cap"></div>
         </div>
     </div> -->
     <!-- Base Template -->
     <!-- <div class="screen" id="screen initial-2">
-        <div class="solidObject floor" id="floor-3"></div>
-        <div class="solidObject" id="end-cap">
+        <div class="object solid floor" id="floor-3"></div>
+        <div class="object solid" id="end-cap">
             <div class="cap"></div>
         </div>
     </div> -->

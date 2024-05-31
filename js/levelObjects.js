@@ -1,15 +1,14 @@
 import gameInstance from './game.js';
 import { debugLog } from './tools.js';
-import ToggleManager from './elementStateManagers.js';
+import ToggleManager, { MultiStateManager } from './elementStateManagers.js';
 
 export class SolidObject {
     constructor(element) {
         this.element = element;
         this.rect = this.element.getBoundingClientRect();
-        this.enabled = true;
+        this.isSolid = true;
         if (this.element.classList.contains('disabled')) {
-            this.enabled = false;
-            this.element.style.opacity = '0.5';
+            this.isSolid = false;
         }
     }
 
@@ -40,9 +39,11 @@ export class InteractableObject {
             this.element.style.opacity = '0.5';
         }
         if (this.element.classList.contains('clickable')) {
-            this.element.addEventListener('click', () => {
+            this.element.addEventListener('pointerup', () => {
                 this.interact();
             });
+        } else {
+            this.element.style.pointerEvents = 'none';
         }
     }
 
@@ -54,14 +55,13 @@ export class InteractableObject {
     update() {
         if (gameInstance.debug) {
             this.element.style.outline = '3px solid blue';
-            console.log("blue")
         } else {
             this.element.style.outline = 'none';
         }
     }
 }
 
-export class Toggle extends InteractableObject {
+export class InteractableToggle extends InteractableObject {
     constructor(element) {
         super(element);
         this.stateManager = new ToggleManager(element);
@@ -70,6 +70,36 @@ export class Toggle extends InteractableObject {
     interact() {
         if (!this.enabled) return;
         this.stateManager.toggle();
+    }
+}
+
+export class Reciever {
+    constructor(element) {
+        this.element = element;
+        this.signals = Array.from(this.element.querySelectorAll('.signal')).map(signal => signal.classList[1]);
+        this.stateManager = new MultiStateManager(element, this.signals, this.signals[0]);
+        this.broadcastChannel = "";
+        this.broadcastChannelValue = "";
+        this.element.querySelectorAll('.broadcast').forEach(element => {
+            element.style.display = 'none';
+            element.classList.forEach(className => {
+                if (className.includes('channel-')) {
+                    this.broadcastChannel = className.split('-')[1];
+                }
+            })
+        });
+    }
+
+    update() {
+        if (gameInstance.debug) {
+            this.element.style.outline = '3px solid purple';
+        } else {
+            this.element.style.outline = 'none';
+        }
+        this.broadcastChannelValue = gameInstance.signalManager.checkBroadcast(this.broadcastChannel);
+        if (this.broadcastChannelValue) {
+            this.stateManager.setState(this.broadcastChannelValue);
+        }
     }
 
 }

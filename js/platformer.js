@@ -1,6 +1,7 @@
 import gameInstance from "./game.js";
 import Player from "./player.js";
 import Level from "./level.js";
+import { hasSubstringInClassList } from "./tools.js";
 // Animation Implementation Discussion
 // https://chatgpt.com/c/d6c3427f-edfa-4d17-bb39-a9a15b01fda5
 // Usage
@@ -23,3 +24,6 @@ const teleportCheat = () => {
 }
 
 window.teleportCheat = teleportCheat;
+window.game = gameInstance;
+window.player = gameInstance.player;
+window.level = gameInstance.level;
