@@ -85,7 +85,6 @@ export class Reciever {
                 }
             });
         });
-        console.log(this.signals);
         this.broadcastChannel = "";
         this.element.querySelectorAll('.broadcast').forEach(element => {
             element.style.display = 'none';

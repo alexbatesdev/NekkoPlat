@@ -706,10 +706,6 @@ a {
 
 .reciever {
     position: absolute;
-    left: 50%;
-    top: 20%;
-    width: 100px;
-    height: 100px;
 }
 
 .reciever .on {
@@ -738,8 +734,28 @@ a {
 
 #reciever-1 {
     left: 20%;
+    top: 20%;
+    width: 100px;
+    height: 100px;
 }
 
 #reciever-2 {
-    left: 80%;
+    left: 50%;
+    top: 20%;
+    width: 100px;
+    height: 100px;
+}
+
+#reciever-3 {
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+#reciever-4 {
+    left: 0;
+    top: 0;
+    width: 100px;
+    height: 100px;
 }
