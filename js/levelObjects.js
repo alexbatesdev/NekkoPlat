@@ -76,7 +76,16 @@ export class InteractableToggle extends InteractableObject {
 export class Reciever {
     constructor(element) {
         this.element = element;
-        this.signals = Array.from(this.element.querySelectorAll('.signal')).map(signal => signal.classList[1]);
+        this.signals = [];
+         //Array.from(this.element.querySelectorAll('.signal')).map(signal => signal.classList[1]);
+        Array.from(this.element.children).forEach(child => {
+            child.classList.forEach(className => {
+                if (className.includes('signal-')) {
+                    this.signals.push(className.split('-')[1]);
+                }
+            });
+        });
+        console.log(this.signals);
         this.broadcastChannel = "";
         this.element.querySelectorAll('.broadcast').forEach(element => {
             element.style.display = 'none';

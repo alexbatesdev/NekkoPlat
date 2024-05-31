@@ -58,12 +58,12 @@
                 </div>
                 <div id="reciever-1" class="reciever">
                     <span class="broadcast channel-toggle_one"></span>
-                    <div class="signal off">
+                    <div class="signal-off off">
                         <p>
                             OFF
                         </p>
                     </div>
-                    <div class="signal on">
+                    <div class="signal-on on">
                         <p>
                             ON
                         </p>
@@ -71,40 +71,40 @@
                 </div>
                 <div id="reciever-2" class="reciever">
                     <span class="broadcast channel-toggle_two"></span>
-                    <div class="signal off">
+                    <div class="signal-none off">
                         <p>
                             OFF
                         </p>
                     </div>
-                    <div class="signal on">
+                    <div class="signal-crt on">
                         <p>
                             ON
                         </p>
                     </div>
                 </div>
-                <div id="toggle-1" class="interactable toggle" onclick="console.log('switch activated')">
+                <div id="toggle-1" class="interactable toggle">
                     <div class="on">
-                        <span class="broadcast channel-toggle_one">off</span>
-                        <p>
-                            ON
-                        </p>
-                    </div>
-                    <div class="off">
                         <span class="broadcast channel-toggle_one">on</span>
                         <p>
-                            OFF
-                        </p>
-                    </div>
-                </div>
-                <div id="toggle-2" class="interactable toggle clickable" onclick="console.log('switch activated')">
-                    <div class="on">
-                        <span class="broadcast channel-toggle_two">off</span>
-                        <p>
                             ON
                         </p>
                     </div>
                     <div class="off">
-                        <span class="broadcast channel-toggle_two">on</span>
+                        <span class="broadcast channel-toggle_one">off</span>
+                        <p>
+                            OFF
+                        </p>
+                    </div>
+                </div>
+                <div id="toggle-2" class="interactable toggle clickable" onclick="console.log(game.signalManager.broadcasts)">
+                    <div class="on" onclick="console.log('triggered ON')">
+                        <span class="broadcast channel-toggle_two">crt</span>
+                        <p>
+                            ON
+                        </p>
+                    </div>
+                    <div class="off" onclick="console.log('triggered OFF')">
+                        <span class="broadcast channel-toggle_two">none</span>
                         <p>
                             OFF
                         </p>

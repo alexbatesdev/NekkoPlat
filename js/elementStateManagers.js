@@ -58,19 +58,17 @@ export default class ToggleManager {
         this.toggledOn = true;
         this.on_element.style.visibility = 'visible';
         this.off_element.style.visibility = 'hidden';
-        if (!noClick) this.off_element.click();
-        // this.on_broadcasts.forEach(broadcast => gameInstance.signalManager.stopBroadcast(broadcast[0]));
-        this.off_broadcasts.forEach(broadcast => gameInstance.signalManager.broadcastSignal(broadcast[0], broadcast[1]));
+        if (!noClick) this.on_element.click();
+        this.on_broadcasts.forEach(broadcast => gameInstance.signalManager.broadcastSignal(broadcast[0], broadcast[1]));
     }
-
+    
     setToggledOff(noClick = false) {
         debugLog('Toggled Off');
         this.toggledOn = false;
         this.on_element.style.visibility = 'hidden';
         this.off_element.style.visibility = 'visible';
-        if (!noClick) this.on_element.click();
-        // this.off_broadcasts.forEach(broadcast => gameInstance.signalManager.stopBroadcast(broadcast[0]));
-        this.on_broadcasts.forEach(broadcast => gameInstance.signalManager.broadcastSignal(broadcast[0], broadcast[1]));
+        if (!noClick) this.off_element.click();
+        this.off_broadcasts.forEach(broadcast => gameInstance.signalManager.broadcastSignal(broadcast[0], broadcast[1]));
     }
 
     getState() {
@@ -92,7 +90,7 @@ export class MultiStateManager {
         this.currentState = state;
         let child_elements = this.parent_element.children;
         for (let i = 0; i < child_elements.length; i++) {
-            if (child_elements[i].classList.contains(this.currentState)) {
+            if (child_elements[i].classList.contains("signal-" + this.currentState)) {
                 child_elements[i].style.visibility = 'visible';
             } else {
                 child_elements[i].style.visibility = 'hidden';
