@@ -9,6 +9,7 @@ export class SolidObject {
         this.enabled = true;
         if (this.element.classList.contains('disabled')) {
             this.enabled = false;
+            this.element.style.opacity = '0.5';
         }
     }
 
@@ -36,6 +37,7 @@ export class InteractableObject {
         this.enabled = true;
         if (this.element.classList.contains('disabled')) {
             this.enabled = false;
+            this.element.style.opacity = '0.5';
         }
         if (this.element.classList.contains('clickable')) {
             this.element.addEventListener('click', () => {
