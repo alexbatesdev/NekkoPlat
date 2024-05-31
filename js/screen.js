@@ -1,4 +1,4 @@
-import { SolidObject, InteractableObject, InteractableToggle, Reciever } from "./levelObjects.js";
+import { SolidObject, InteractableObject, InteractableToggle, Reciever, LevelObject } from "./levelObjects.js";
 import { intersects, isSubset } from "./tools.js";
 import gameInstance from "./game.js";
 
@@ -10,13 +10,9 @@ export default class Screen {
         this.y = y;
         this.element.classList.add(`screen-${x}-${y}`)
         this.solidObjects = [];
-        // Merge inits into just one function
-        // initObjects -> iterates over all objects, and initializes them (this includes putting them into these separate lists)
-        this.initSolidObjects();
         this.interactableObjects = [];
-        this.initInteractableObjects();
         this.recievers = [];
-        this.initPassiveObjects();
+        this.initObjects();
         this.initStyles();
     }
 
@@ -29,12 +25,23 @@ export default class Screen {
         }
     }
 
-    initInteractableObjects() {
-        // Merge this with solid objects and passive objects
-        const interactableElements = this.element.querySelectorAll('.interactable');
-        this.interactableObjects = Array.from(interactableElements).map(interactableElement => {
-            return this.resolveInteractableObject(interactableElement);
+    initObjects() {
+        // Merge this with solid objects and interactable objects
+        const objectElements = this.element.querySelectorAll('.object');
+        Array.from(objectElements).map(objectElement => {
+            this.resolveObject(objectElement);
         });
+    }
+
+    resolveObject(objectElement) {
+        const classList = objectElement.classList;
+        if (classList.contains('solid')) {
+            this.solidObjects.push(new SolidObject(objectElement));
+        } else if (classList.contains('interactable')) {
+            this.interactableObjects.push(this.resolveInteractableObject(objectElement));
+        } else if (classList.contains('reciever')) {
+            this.recievers.push(new Reciever(objectElement));
+        }
     }
 
     resolveInteractableObject(interactableElement) {
@@ -44,20 +51,6 @@ export default class Screen {
         } else {
             return new InteractableObject(interactableElement);
         }
-    }
-
-    initSolidObjects() {
-        // Merge this with interactable objects and passive objects
-        const solidObjectElements = this.element.querySelectorAll('.solid');
-        this.solidObjects = Array.from(solidObjectElements).map(solidObject => new SolidObject(solidObject));
-    }
-
-    initPassiveObjects() {
-        // Merge this with interactable objects and solid objects
-        const recievers = this.element.querySelectorAll('.reciever');
-        this.recievers = Array.from(recievers).map(reciever => {
-            return new Reciever(reciever);
-        });
     }
 
     checkIfPlayerInScreen() {

@@ -2,7 +2,7 @@ import gameInstance from './game.js';
 import { debugLog } from './tools.js';
 import ToggleManager, { MultiStateManager } from './elementStateManagers.js';
 
-export class GameObject {
+export class LevelObject {
     constructor(element) {
         this.element = element;
         this.enabled = true;
@@ -16,7 +16,7 @@ export class GameObject {
 
     }
 }
-export class SolidObject extends GameObject{
+export class SolidObject extends LevelObject{
     constructor(element) {
         super(element);
     }
@@ -31,7 +31,7 @@ export class SolidObject extends GameObject{
     }
 }
 
-export class InteractableObject extends GameObject {
+export class InteractableObject extends LevelObject {
     constructor(element) {
         super(element);
         if (this.element.classList.contains('clickable')) {
@@ -69,7 +69,7 @@ export class InteractableToggle extends InteractableObject {
     }
 }
 
-export class Reciever extends GameObject{
+export class Reciever extends LevelObject{
     constructor(element) {
         super(element);
         this.signals = [];
