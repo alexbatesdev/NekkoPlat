@@ -77,9 +77,7 @@ export class Reciever {
     constructor(element) {
         this.element = element;
         this.signals = Array.from(this.element.querySelectorAll('.signal')).map(signal => signal.classList[1]);
-        this.stateManager = new MultiStateManager(element, this.signals, this.signals[0]);
         this.broadcastChannel = "";
-        this.broadcastChannelValue = "";
         this.element.querySelectorAll('.broadcast').forEach(element => {
             element.style.display = 'none';
             element.classList.forEach(className => {
@@ -88,6 +86,7 @@ export class Reciever {
                 }
             })
         });
+        this.stateManager = new MultiStateManager(element, this.signals, this.signals[0]);
     }
 
     update() {
@@ -96,10 +95,7 @@ export class Reciever {
         } else {
             this.element.style.outline = 'none';
         }
-        this.broadcastChannelValue = gameInstance.signalManager.checkBroadcast(this.broadcastChannel);
-        if (this.broadcastChannelValue) {
-            this.stateManager.setState(this.broadcastChannelValue);
-        }
+        this.stateManager.syncStateToBroadcast(this.broadcastChannel);
     }
 
 }

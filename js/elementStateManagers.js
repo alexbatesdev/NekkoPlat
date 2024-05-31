@@ -10,7 +10,6 @@ export default class ToggleManager {
         this.off_broadcasts = [];
         this.toggledOn = startOn;
         this.initBroadcasts();
-        console.log(this.on_broadcasts, this.off_broadcasts);
         this.syncState();
     }
 
@@ -18,7 +17,6 @@ export default class ToggleManager {
         this.on_element.querySelectorAll('.broadcast').forEach(broadcast => {
             let broadcastChannel = null;
             broadcast.classList.forEach(className => {
-                console.log(className);
                 if (className.includes('channel-')) {
                     broadcastChannel = className.split('-')[1];
                 }
@@ -49,28 +47,28 @@ export default class ToggleManager {
 
     syncState() {
         if (this.toggledOn) {
-            this.setToggledOn();
+            this.setToggledOn(true);
         } else {
-            this.setToggledOff();
+            this.setToggledOff(true);
         }
     }
 
-    setToggledOn() {
+    setToggledOn(noClick = false) {
         debugLog('Toggled On');
         this.toggledOn = true;
         this.on_element.style.visibility = 'visible';
         this.off_element.style.visibility = 'hidden';
-        this.off_element.click();
+        if (!noClick) this.off_element.click();
         // this.on_broadcasts.forEach(broadcast => gameInstance.signalManager.stopBroadcast(broadcast[0]));
         this.off_broadcasts.forEach(broadcast => gameInstance.signalManager.broadcastSignal(broadcast[0], broadcast[1]));
     }
 
-    setToggledOff() {
+    setToggledOff(noClick = false) {
         debugLog('Toggled Off');
         this.toggledOn = false;
         this.on_element.style.visibility = 'hidden';
         this.off_element.style.visibility = 'visible';
-        this.on_element.click();
+        if (!noClick) this.on_element.click();
         // this.off_broadcasts.forEach(broadcast => gameInstance.signalManager.stopBroadcast(broadcast[0]));
         this.on_broadcasts.forEach(broadcast => gameInstance.signalManager.broadcastSignal(broadcast[0], broadcast[1]));
     }
@@ -82,13 +80,15 @@ export default class ToggleManager {
 
 export class MultiStateManager {
     constructor(element, states = {}, startState = null) {
+        console.log(element, states, startState);
         this.parent_element = element;
         this.states = states;
-        this.currentState = startState;
+        this.currentState = null;
         this.setState(this.currentState);
     }
 
     setState(state) {
+        if (this.currentState == state) return;
         this.currentState = state;
         let child_elements = this.parent_element.children;
         for (let i = 0; i < child_elements.length; i++) {
@@ -102,5 +102,12 @@ export class MultiStateManager {
 
     getState() {
         return this.currentState;
+    }
+
+    syncStateToBroadcast(channel) {
+        const state = gameInstance.signalManager.checkBroadcast(channel);
+        if (state) {
+            this.setState(state);
+        }
     }
 }
