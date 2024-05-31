@@ -7,10 +7,13 @@ export default class InteractionBox {
         this.element = document.getElementById('interactionBox');
         this.interactables = [];
         this.interacting = false;
+        this.interactionIndicatorElement = this.player.element.querySelector('.interaction-indicator');
+        if (this.interactionIndicatorElement) {
+            this.interactionIndicatorElement.style.visibility = 'hidden';
+        }
     }
 
     update() {
-        this.checkIntersectsInteractable();
         if (gameInstance.debug) {
             this.element.style.outline = '3px solid #0f9f0f';
             this.element.style.outlineOffset = '-3px';
@@ -18,13 +21,19 @@ export default class InteractionBox {
         else {
             this.element.style.outline = 'none';
         }
+        return this.checkIntersectsInteractable();
     }
 
     checkIntersectsInteractable() {
         let interactions = [];
+        let intersects = false;
         for (let i = 0; i < this.interactables.length; i++) {
+            if (!this.interactables[i].enabled) continue;
             const interactable = this.interactables[i];
             const { top, right, bottom, left } = getCollisionOverlap(this.element.getBoundingClientRect(), interactable.element.getBoundingClientRect())
+            if (top || right || bottom || left) {
+                intersects = true;
+            }
             if ((top || right || bottom || left) && gameInstance.getKeyState('E') && !this.interacting) {
                 interactions.push(interactable);
             } 
@@ -38,6 +47,11 @@ export default class InteractionBox {
         } 
         if (!gameInstance.getKeyState('E') && this.interacting) {
             this.interacting = false;
+        }
+        if (intersects) {
+            this.interactionIndicatorElement.style.visibility = 'visible';
+        } else {
+            this.interactionIndicatorElement.style.visibility = 'hidden';
         }
     }
 

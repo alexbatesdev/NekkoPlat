@@ -99,3 +99,18 @@ export const isSubset = (subset, set) => {
 export const hasSubstringInClassList = (classList, substring) => {
     return Array.from(classList).some(className => className.includes(substring));
 }
+
+const getTransformMatrix = (element) => {
+    const computedStyle = window.getComputedStyle(element);
+    const transform = computedStyle.transform;
+    return transform === 'none' ? null : new DOMMatrixReadOnly(transform);
+}
+
+export const addTransform = (element, transformString) => {
+    const currentMatrix = getTransformMatrix(element);
+    const additionalTransform = new DOMMatrixReadOnly(transformString);
+    
+    const combinedMatrix = currentMatrix ? currentMatrix.multiply(additionalTransform) : additionalTransform;
+
+    element.style.transform = combinedMatrix.toString();
+}

@@ -663,6 +663,24 @@ a {
     z-index: 100;
 }
 
+.interaction-indicator {
+    position: absolute;
+    top: 0%;
+    left: 50%;
+    transform: translate(-50%, -100%);
+}
+
+.question-indicator {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 2.5rem;
+    text-align: center;
+    font-family: 'Pixel';
+    font-weight: bold;
+    color: rgb(2, 183, 255);
+    text-shadow: 4px 4px 0px black;
+}
+
 .toggle {
     position: absolute;
     top: 40%;

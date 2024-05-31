@@ -271,10 +271,16 @@ export default class Player {
 
     lookRight() {
         this.element.style.transform = 'rotateY(180deg)';
+        if (this.interactionBox.interactionIndicatorElement) {
+            this.interactionBox.interactionIndicatorElement.style.transform = "translate(-50%, -100%) rotateY(180deg)";
+        }
     }
 
     lookLeft() {
         this.element.style.transform = 'rotateY(0deg)';
+        if (this.interactionBox.interactionIndicatorElement) {
+            this.interactionBox.interactionIndicatorElement.style.transform = "translate(-50%, -100%) rotateY(0deg)";
+        }
     }
 
     facingRight() {

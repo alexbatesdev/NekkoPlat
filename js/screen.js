@@ -9,7 +9,6 @@ export default class Screen {
         this.x = x;
         this.y = y;
         this.element.classList.add(`screen-${x}-${y}`)
-        this.rect = this.element.getBoundingClientRect();
         this.solidObjects = [];
         // Merge inits into just one function
         // initObjects -> iterates over all objects, and initializes them (this includes putting them into these separate lists)
@@ -51,12 +50,6 @@ export default class Screen {
         // Merge this with interactable objects and passive objects
         const solidObjectElements = this.element.querySelectorAll('.solid');
         this.solidObjects = Array.from(solidObjectElements).map(solidObject => new SolidObject(solidObject));
-
-        window.addEventListener('resize', () => {
-            this.solidObjects.forEach(solidObject => {
-                solidObject.updateRect();
-            });
-        });
     }
 
     initPassiveObjects() {
@@ -67,12 +60,8 @@ export default class Screen {
         });
     }
 
-    updateRect() {
-        this.rect = this.element.getBoundingClientRect();
-    }
-
     checkIfPlayerInScreen() {
-        if (intersects(gameInstance.player.element.getBoundingClientRect(), this.rect)) {
+        if (intersects(gameInstance.player.element.getBoundingClientRect(), this.element.getBoundingClientRect())) {
             this.addAdjacentSolidObjectsToPlayer();
             this.addAdjacentInteractableObjectsToPlayer();
         }
@@ -103,7 +92,6 @@ export default class Screen {
     }
 
     update() {
-        this.updateRect();
         this.checkIfPlayerInScreen();
         this.solidObjects.forEach(solidObject => {
             solidObject.update();

@@ -46,7 +46,7 @@ export class CollisionDetection {
         const playerRect = object.element.getBoundingClientRect();
         let collisionCount = 0;
         solidObjects.forEach(solidObject => {
-            if (!solidObject.isSolid) return;
+            if (!solidObject.enabled) return;
             for (let i = 0.25; i < 1; i += 0.25) {
                 let playerRectNext = {
                     left: playerRect.left + 20,
@@ -58,12 +58,12 @@ export class CollisionDetection {
                     width: playerRect.width,
                     height: playerRect.height,
                 }
-                if (intersects(playerRectNext, solidObject.rect)) {
+                if (intersects(playerRectNext, solidObject.element.getBoundingClientRect())) {
                     object.velocityY = 0;
                 }
             }
-            if (intersects(playerRect, solidObject.rect)) {
-                const collision = getCollisionOverlap(playerRect, solidObject.rect);
+            if (intersects(playerRect, solidObject.element.getBoundingClientRect())) {
+                const collision = getCollisionOverlap(playerRect, solidObject.element.getBoundingClientRect());
                 if (collision.bottom > 0) {
                     collisionCount++;
                     this.state.bottom = collision.bottom;
@@ -94,12 +94,12 @@ export class CollisionDetection {
                     width: playerRect.width,
                     height: playerRect.height,
                 }
-                if (intersects(playerRectNext, solidObject.rect)) {
+                if (intersects(playerRectNext, solidObject.element.getBoundingClientRect())) {
                     object.velocityX = 0;
                 }
             }
-            if (intersects(playerRect, solidObject.rect)) {
-                const collision = getCollisionOverlap(playerRect, solidObject.rect);
+            if (intersects(playerRect, solidObject.element.getBoundingClientRect())) {
+                const collision = getCollisionOverlap(playerRect, solidObject.element.getBoundingClientRect());
                 if (collision.left > 0) {
                     this.state.left = collision.left;
                     object.x += collision.left;

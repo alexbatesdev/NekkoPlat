@@ -2,22 +2,23 @@ import gameInstance from './game.js';
 import { debugLog } from './tools.js';
 import ToggleManager, { MultiStateManager } from './elementStateManagers.js';
 
-export class SolidObject {
+export class GameObject {
     constructor(element) {
         this.element = element;
-        this.rect = this.element.getBoundingClientRect();
-        this.isSolid = true;
+        this.enabled = true;
         if (this.element.classList.contains('disabled')) {
-            this.isSolid = false;
+            this.enabled = false;
+            this.element.style.opacity = '0.5';
         }
     }
 
-    updateRect() {
-        this.rect = this.element.getBoundingClientRect();
-    }
-
     update() {
-        this.updateRect();
+
+    }
+}
+export class SolidObject extends GameObject{
+    constructor(element) {
+        super(element);
     }
 
     reinitStyles() {
@@ -30,14 +31,9 @@ export class SolidObject {
     }
 }
 
-export class InteractableObject {
+export class InteractableObject extends GameObject {
     constructor(element) {
-        this.element = element;
-        this.enabled = true;
-        if (this.element.classList.contains('disabled')) {
-            this.enabled = false;
-            this.element.style.opacity = '0.5';
-        }
+        super(element);
         if (this.element.classList.contains('clickable')) {
             this.element.addEventListener('pointerup', () => {
                 this.interact();
@@ -73,9 +69,9 @@ export class InteractableToggle extends InteractableObject {
     }
 }
 
-export class Reciever {
+export class Reciever extends GameObject{
     constructor(element) {
-        this.element = element;
+        super(element);
         this.signals = [];
          //Array.from(this.element.querySelectorAll('.signal')).map(signal => signal.classList[1]);
         Array.from(this.element.children).forEach(child => {

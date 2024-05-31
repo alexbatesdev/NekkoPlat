@@ -78,11 +78,10 @@ export default class ToggleManager {
 
 export class MultiStateManager {
     constructor(element, states = {}, startState = null) {
-        console.log(element, states, startState);
         this.parent_element = element;
         this.states = states;
         this.currentState = null;
-        this.setState(this.currentState);
+        this.setState(startState);
     }
 
     setState(state) {
