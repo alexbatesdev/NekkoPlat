@@ -381,6 +381,11 @@ position: absolute
     image-rendering: pixelated;
 }
 
+#floor-1 {
+    transform: translateX(0);
+    left: 150px;
+}
+
 #floor-3 {
     transform: translateX(0);
     right: 0;
@@ -561,7 +566,7 @@ position: absolute
 }
 
 #solidObject-14 {
-    right: 10%;
+    right: 30%;
     bottom: 0;
     width: 200px;
     height: 200px;
@@ -877,4 +882,38 @@ a {
     top: 0;
     width: 100px;
     height: 100px;
+}
+
+#localhosts_game {
+    position: absolute;
+    width: 350px;
+    height: 500px;
+    left: 50%;
+    bottom: 50px;
+    transform: translate(-50%, 0);  
+}
+
+#localhosts_game>iframe {
+    position: absolute;
+    left: 50%;
+    top: 15%;
+    transform: translate(-50%, 0);
+    height: 170px;
+    width: 200px;
+}
+
+#localhosts_game .arcade-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-image: url(../img/arcade_cabinet.png);
+    background-size: contain;
+    image-rendering: pixelated;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    /* opacity: 0.5; */
 }

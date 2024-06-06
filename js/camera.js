@@ -83,10 +83,12 @@ export default class Camera {
     }
 
     snapToPlayer() {
+        this.followPlayer = false;
         this.element.scrollTo(
             (gameInstance.player.x + (gameInstance.player.element.getBoundingClientRect().width / 2)) - (this.element.getBoundingClientRect().width - 80) * this.offsetX,
             (gameInstance.player.y + (gameInstance.player.element.getBoundingClientRect().height / 2)) - (this.element.getBoundingClientRect().height - 80) * this.offsetY
         );
+        this.followPlayer = true;
     }
 
     processInput() {
