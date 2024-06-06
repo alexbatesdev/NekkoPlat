@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     gameInstance.setPlayer(new Player(playerElement));
     gameInstance.setLevel(new Level("level-one"));
     gameInstance.start();
+    console.log("Use WASD to move, Shift to sprint, and E to interact with objects and 3 for the debug menu.");
 });
 
 const teleportCheat = () => {
