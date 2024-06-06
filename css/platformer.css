@@ -237,7 +237,7 @@ table {
 
 /* Necessary variables */
 :root {
-    --screen-size: 1;
+    --screen-size: 0.75;
     --screen-width: calc(1600px*var(--screen-size));
     --screen-height: calc(900px*var(--screen-size));
     --debug: hidden;
@@ -336,14 +336,10 @@ position: relative or absolute
 
 SolidObject needs
 position: absolute
-top
-left
 
 */
 .object {
     position: absolute;
-    top: 0;
-    left: 0;
 }
 
 .solid {
@@ -501,6 +497,111 @@ left
     height: 600px;
 }
 
+#solidObject-5 {
+    right: 20%;
+    top: 25%;
+    width: 500px;
+    height: 100px;
+}
+
+#solidObject-6 {
+    bottom: 0;
+    right: 0;
+    width: 300px;
+    height:300px;
+}
+
+#solidObject-7 {
+    top: 0;
+    left: 25%;
+    width: 175px;
+    height: 250px;
+}
+
+#solidObject-8 {
+    bottom: 0;
+    left: 25%;
+    width: 175px;
+    height: 250px;
+}
+
+#solidObject-9 {
+    bottom: 0;
+    right: 0;
+    width: 300px;
+    height: 300px;
+}
+
+#solidObject-10 {
+    top: 0;
+    right: 0;
+    width: 500px;
+    height: 150px;
+}
+
+#solidObject-11 {
+    right: 300px;
+    bottom: 0;
+    width: 200px;
+    height: 175px;
+}
+
+#solidObject-12 {
+    left: 0;
+    top: 0;
+    width: 500px;
+    height: 500px;
+}
+
+#solidObject-13 {
+    left: 200px;
+    bottom: 0;
+    width: 100px;
+    height: 150px;
+}
+
+#solidObject-14 {
+    right: 10%;
+    bottom: 0;
+    width: 200px;
+    height: 200px;
+}
+
+#solidObject-15 {
+    right: 0;
+    bottom: 0;
+    width: 500px;
+    height: 50px;
+}
+
+#solidObject-16 {
+    left: 0;
+    bottom: 0;
+    width: 500px;
+    height: 50px;
+}
+
+#solidObject-17 {
+    left: 0;
+    bottom: 0;
+    width: 250px;
+    height: 500px;
+}
+
+#solidObject-18 {
+    top: 0;
+    left: 250px;
+    width: 250px;
+    height: 200px;
+}
+
+#solidObject-19 {
+    top: 150px;
+    left: 500px;
+    width: 200px;
+    height: 50px;
+}
+
 .solid>.double-cap {
     height: 100%;
     width: 50px;
@@ -546,7 +647,7 @@ left
 
 #img-1 {
     position: absolute;
-    left: 35%;
+    left: 30%;
     bottom: 25%;
     animation: bljitter 0.1s infinite;
 }
