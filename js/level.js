@@ -40,10 +40,10 @@ export default class Level {
             validEffects.forEach(effect => {
                 if (className.includes(effect)) {
                     if (className.includes("-")) {
-                        if (className.split("-")[1] == "y") {
+                        if (className.split("-")[1] == "vert") {
                             this.outOfBoundEffect.top = effect;
                             this.outOfBoundEffect.bottom = effect;
-                        } else if (className.split("-")[1] == "x") {
+                        } else if (className.split("-")[1] == "hori") {
                             this.outOfBoundEffect.left = effect;
                             this.outOfBoundEffect.right = effect;
                         } else {
