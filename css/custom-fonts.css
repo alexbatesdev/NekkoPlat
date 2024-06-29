@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'Flipnote';
-    src: url("../fonts/flipnote_font.ttf");
+    src: url("./fonts/flipnote_font.ttf");
 }
 
 .flipnote-font {
@@ -18,9 +18,18 @@
 
 @font-face {
     font-family: 'KitKat';
-    src: url("../fonts/KittyKatt.ttf");
+    src: url("./fonts/KittyKatt.ttf");
 }
 
 .kitkat-font {
     font-family: 'KitKat';
+}
+
+@font-face {
+    font-family: 'Pretendo';
+    src: url("./fonts/Pretendo.ttf");
+}
+
+.pretendo-font {
+    font-family: 'Pretendo';
 }

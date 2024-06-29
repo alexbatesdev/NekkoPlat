@@ -9,6 +9,12 @@
     <meta http-equiv="expires" content="Tue, 01 Jan 1980 11:00:00 GMT">
     <meta http-equiv="pragma" content="no-cache">
 
+    <!-- Google font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap"
+        rel="stylesheet">
+
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,7 +30,7 @@
     <span class="cross debug"></span>
 
     <div class="tv" id="viewport">
-        <div class="level 3x3 wrap-hori contain-vert" id="level-one">
+        <div class="level 3x3 wrap-y contain-x" id="level-one">
             <div class="screen">
                 <div class="cat" id="player">
                     <div class="interaction-indicator question-indicator">?</div>
@@ -49,6 +55,28 @@
                         <img class="wait" src="./img/cat_fall_asleep.gif" alt="A cat falling asleep">
                     </div>
                 </div>
+                <!-- <div class="nekkoGAMETOY">
+                    <div class="nGT-title">Game Name</div>
+                    <div class="nGT-screen">
+                        <iframe src="https://augustberchelmann.com/mario/" frameborder="0"></iframe>
+                    </div>
+                    <div class="nGT-name">
+                        <span class="nGT-nekko">Nekko</span>
+                        <span class="nGT-GAMETOY">GAMETOY</span>
+                    </div>
+                    <div class="nGT-controls">
+                        <div class="nGT-dpad"></div>
+                        <div class="nGT-buttons">
+                            <div class="nGT-A"></div>
+                            <div class="nGT-B"></div>
+                        </div>
+                    </div>
+                    <div class="nGT-options">
+                        <div class="nGT-start"></div>
+                        <div class="nGT-select"></div>
+                    </div>
+                    <div class="nGT-speaker"></div>
+                </div> -->
                 <div class="object solid floor" id="floor-1"></div>
                 <!-- <div class="pipe" id="pipe-1"></div> -->
 
@@ -165,6 +193,7 @@
                 <div class="object solid" id="solidObject-17"></div>
                 <div id="localhosts_game">
                     <div class="arcade-overlay"></div>
+                    <!-- <iframe src="https://augustberchelmann.com/mario/" frameborder="0"></iframe> -->
                     <iframe src="https://oldmartijntje.github.io/Project-Kazamata/" frameborder="0"></iframe>
                 </div>
 
@@ -235,7 +264,7 @@
         <div id="reciever-3" class="reciever">
             <span class="broadcast channel-toggle_two"></span>
             <div class="signal-none">
-                <span class="filter darken"></span>
+                <!-- <span class="filter dark"></span> -->
             </div>
             <div class="signal-crt">
                 <span class="filter crt"></span>

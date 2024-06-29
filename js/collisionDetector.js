@@ -1,7 +1,6 @@
 import gameInstance from "./game.js";
 import { intersects, getCollisionOverlap, debugLog } from "./tools.js";
-// CollisionDetection.js
-// COMPLETELY UNTESTED AND UNIMPLEMENTED 😎🐢
+
 export class CollisionDetection {
     constructor() {
         this.state = {
