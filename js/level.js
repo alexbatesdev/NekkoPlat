@@ -85,6 +85,7 @@ export default class Level {
         const classes = this.element.classList;
         let doDefault = true;
         for (let i = 0; i < classes.length; i++) {
+            // This needs to be more nuanced, as it will match any class with an x in it 🐢💭
             if (classes[i].includes('x')) {
                 doDefault = false;
                 const gridValues = classes[i].split('x');
