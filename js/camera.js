@@ -38,8 +38,8 @@ export default class Camera {
 
     initStyles() {
         this.overlayElement.style.zIndex = '5';
-        this.overlayElement.style.width = 'var(--screen-width)';
-        this.overlayElement.style.height = 'var(--screen-height)';
+        this.overlayElement.style.width = '100vw';
+        this.overlayElement.style.height = '100vh';
         this.overlayElement.style.position = 'absolute';
         this.overlayElement.style.top = '0';
         this.overlayElement.style.left = '0';

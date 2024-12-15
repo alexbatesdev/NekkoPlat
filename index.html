@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- anti caching measures -->
+  <meta http-equiv="cache-control" content="max-age=0">
+  <meta http-equiv="cache-control" content="no-cache">
+  <meta http-equiv="expires" content="-1">
+  <meta http-equiv="expires" content="Tue, 01 Jan 1980 11:00:00 GMT">
+  <meta http-equiv="pragma" content="no-cache">
+
+  <!-- Google font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap"
+    rel="stylesheet">
+
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./css/custom-fonts.css">
+  <link rel="stylesheet" href="./css/pixel-corners.css">
+  <script type="module" src="./js/platformer.js" defer></script>
+  <link rel="stylesheet" href="./css/index.css">
+  <title>Nekko's World</title>
+</head>
+
+<body>
+  <span class="criss debug"></span>
+  <span class="cross debug"></span>
+
+  <div class="tv" id="viewport">
+    <div class="level 3x1 contain" id="level-one">
+      <div class="screen">
+        <div class="cat" id="player">
+          <div class="interaction-indicator question-indicator">?</div>
+          <div id="interactionBox"></div>
+          <span class="config">
+            <span class="maxVelocity">10</span>
+            <span class="sprintMaxVelocity">18</span>
+            <span class="acceleration">1</span>
+            <span class="sprintAcceleration">2</span>
+            <span class="maxAirJumps">1</span>
+            <span class="gravity">0.9</span>
+            <span class="fallingGravity">3</span>
+            <span class="preJumpAllowance">10</span>
+            <span class="jumpForce">25</span>
+            <span class="coyoteTime">100</span>
+          </span>
+          <div class="animation-container gif">
+            <img class="idle" src="./img/cat_stand.gif" alt="A cat standing there menacingly">
+            <img class="walk" src="./img/cat_walk.gif" alt="A cat walking">
+            <img class="run" src="./img/cat_run.gif" alt="A cat running">
+            <img class="jump" src="./img/cat_jump.gif" alt="A cat jumping">
+            <img class="wait" src="./img/cat_fall_asleep.gif" alt="A cat falling asleep">
+          </div>
+        </div>
+        <!-- <div class="nekkoGAMETOY">
+          <div class="nGT-title">Game Name</div>
+          <div class="nGT-screen">
+            <iframe src="https://augustberchelmann.com/mario/" frameborder="0"></iframe>
+          </div>
+          <div class="nGT-name">
+            <span class="nGT-nekko">Nekko</span>
+            <span class="nGT-GAMETOY">GAMETOY</span>
+          </div>
+          <div class="nGT-controls">
+            <div class="nGT-dpad"></div>
+            <div class="nGT-buttons">
+              <div class="nGT-A"></div>
+              <div class="nGT-B"></div>
+            </div>
+          </div>
+          <div class="nGT-options">
+            <div class="nGT-start"></div>
+            <div class="nGT-select"></div>
+          </div>
+          <div class="nGT-speaker"></div>
+        </div> -->
+        <div class="object solid floor grass-green"></div>
+        <!-- <div class="pipe" id="pipe-1"></div> -->
+
+        <!-- <div class="object solid" id="solidObject-1">
+          <div class="double-cap"></div>
+          <div class="double-cap"></div>
+        </div> -->
+        <!-- <div id="reciever-1" class="object reciever">
+          <span class="broadcast channel-toggle_one"></span>
+          <div class="signal-off off">
+            <p>
+              OFF
+            </p>
+          </div>
+          <div class="signal-on on">
+            <p>
+              ON
+            </p>
+          </div>
+        </div>
+        <div id="reciever-4" class="object reciever">
+          <span class="broadcast channel-toggle_one"></span>
+          <div class="signal-off off">
+            <p>
+              OFF
+            </p>
+          </div>
+          <div class="signal-on on">
+            <p>
+              ON
+            </p>
+          </div>
+        </div>
+        <div id="reciever-2" class="object reciever">
+          <span class="broadcast channel-toggle_two"></span>
+          <div class="signal-none off">
+            <p>
+              OFF
+            </p>
+          </div>
+          <div class="signal-crt on">
+            <p>
+              ON
+            </p>
+          </div>
+        </div>
+        <div id="toggle-1" class="object interactable toggle">
+          <div class="on">
+            <span class="broadcast channel-toggle_one">on</span>
+            <p>
+              ON
+            </p>
+          </div>
+          <div class="off">
+            <span class="broadcast channel-toggle_one">off</span>
+            <p>
+              OFF
+            </p>
+          </div>
+        </div>
+        <div id="toggle-2" class="object interactable toggle clickable"
+          onclick="console.log(game.signalManager.broadcasts)">
+          <div class="on" onclick="console.log('triggered ON')">
+            <span class="broadcast channel-toggle_two">crt</span>
+            <p>
+              ON
+            </p>
+          </div>
+          <div class="off" onclick="console.log('triggered OFF')">
+            <span class="broadcast channel-toggle_two">none</span>
+            <p>
+              OFF
+            </p>
+          </div>
+        </div> -->
+        <div class="sign pixel-corners" id="sign-1">
+          Welcome to the platformer version of my website! <br />
+          Use WASD to move, Shift to sprint, and E to interact with objects, ESC to pause, and 3 for the debug
+          menu. <br />
+          Right now it's missing a lot, but I plan to make this the primary way to view my site!<br />
+          Thank you for checking out my project! <br />
+        </div>
+
+        <!-- <div class="solidObject" id="start-cap">
+                    <div class="cap"></div>
+                </div> -->
+        <div class="object-label debug">
+          Room 1
+        </div>
+      </div>
+      <div class="screen">
+        <div class="object-label debug">
+          Room 2
+        </div>
+        <div class="object solid floor grass-green" id="floor-2"></div>
+
+        <div class="object solid grass-green" id="solidObject-2"></div>
+        <div class="object solid grass-green" id="solidObject-3"></div>
+        <div class="sign pixel-corners" id="sign-2">
+          Use W or Space to jump, and hold to jump higher! <br />
+          You can also double jump! <br />
+          You can also also wall jump! <br />
+          Your double jump resets when you touch the ground, but not walls <br />
+        </div>
+      </div>
+      <div class="screen">
+        <div class="object-label debug">
+          Room 3
+        </div>
+        <img src="./img/debug.jpg" class="debug" style="height: 800px; border: solid 1px red;" srcset="">
+
+        <div class="sign pixel-corners" id="sign-3">
+          Use E when you see the question mark above your head to interact with objects! <br />
+          This can be used to toggle switches, enter doors, or trigger any other javascript onclick code I attach to an
+          interactable!
+        </div>
+
+        <div id="toggle-1" class="object interactable toggle">
+          <div class="on">
+            <span class="broadcast channel-toggle_one">crt</span>
+            <p>
+              ON
+            </p>
+          </div>
+          <div class="off">
+            <span class="broadcast channel-toggle_one">none</span>
+            <p>
+              OFF
+            </p>
+          </div>
+        </div>
+
+        <div class="door object interactable" id="door-1" onClick="window.location.href='./html/platformer.html'"></div>
+
+        <div class="object solid floor grass-green"></div>
+        <!-- <div class="object solid" id="end-cap">
+                    <div class="cap"></div>
+                </div> -->
+      </div>
+    </div>
+  </div>
+  <!-- Need to make these elements optional (pause) in the javascript to avoid errors! -->
+  <div id="pause">
+    <span class="filter blur"></span>
+    <span class="filter dark"></span>
+    <div class="pause-text">
+      <h1>Paused</h1>
+      <p>Press <span class="key">ESC</span> to resume</p>
+    </div>
+  </div>
+  <!-- Need to make these elements (overlay) optional in the javascript to avoid errors! -->
+  <div id="overlay">
+    <div id="reciever-3" class="reciever">
+      <span class="broadcast channel-toggle_one"></span>
+      <div class="signal-none">
+        <!-- <span class="filter dark"></span> -->
+      </div>
+      <div class="signal-crt">
+        <span class="filter crt"></span>
+      </div>
+    </div>
+    <!-- <img id="blahaj-pet" src="./img/blahaj-blahaj-pet.gif"
+            alt="A Swedish shark stuffed animal being given a good pet"> -->
+    <div class="debug">
+      <h1 class="positionDisplay">X: <span id="xPositionDisplay">x</span> Y: <span id="yPositionDisplay">y</span>
+      </h1>
+    </div>
+  </div>
+  <!-- <div class="screen" id="screen initial-2">
+        <div class="object solid floor" id="floor-3"></div>
+        <div class="object solid floor" id="floor-4"></div>
+        <div class="object solid" id="end-cap">
+            <div class="cap"></div>
+        </div>
+    </div> -->
+  <!-- Base Template -->
+  <!-- <div class="screen" id="screen initial-2">
+        <div class="object solid floor" id="floor-3"></div>
+        <div class="object solid" id="end-cap">
+            <div class="cap"></div>
+        </div>
+    </div> -->
+</body>

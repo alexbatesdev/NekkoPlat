@@ -1,0 +1,1097 @@
+/* http://meyerweb.com/eric/tools/css/reset/
+v2.0 | 20110126
+License: none (public domain)
+*/
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+
+/* HTML5 display-role reset for older browsers */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+    display: block;
+}
+
+body {
+    line-height: 1;
+}
+
+ol,
+ul {
+    list-style: none;
+}
+
+blockquote,
+q {
+    quotes: none;
+}
+
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+    content: '';
+    content: none;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+/* CSS RESET ------------------------------------------------------------------------- */
+
+@keyframes flicker {
+    0% {
+        opacity: 0.37861;
+    }
+
+    5% {
+        opacity: 0.34769;
+    }
+
+    10% {
+        opacity: 0.23604;
+    }
+
+    15% {
+        opacity: 0.80626;
+    }
+
+    20% {
+        opacity: 0.38128;
+    }
+
+    25% {
+        opacity: 0.83891;
+    }
+
+    30% {
+        opacity: 0.65583;
+    }
+
+    35% {
+        opacity: 0.67807;
+    }
+
+    40% {
+        opacity: 0.36559;
+    }
+
+    45% {
+        opacity: 0.84693;
+    }
+
+    50% {
+        opacity: 0.86019;
+    }
+
+    55% {
+        opacity: 0.38594;
+    }
+
+    60% {
+        opacity: 0.30313;
+    }
+
+    65% {
+        opacity: 0.71988;
+    }
+
+    70% {
+        opacity: 0.53455;
+    }
+
+    75% {
+        opacity: 0.37288;
+    }
+
+    80% {
+        opacity: 0.71428;
+    }
+
+    85% {
+        opacity: 0.70419;
+    }
+
+    90% {
+        opacity: 0.7003;
+    }
+
+    95% {
+        opacity: 0.36108;
+    }
+
+    100% {
+        opacity: 0.34387;
+    }
+}
+
+.crt {
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 5px, 10px 100%;
+    animation: flicker 0.05s infinite;
+}
+
+.blur {
+    backdrop-filter: blur(5px);
+}
+
+.dark {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Necessary variables */
+:root {
+    --screen-size: 0.75;
+    --screen-width: calc(1600px*var(--screen-size));
+    --screen-height: calc(900px*var(--screen-size));
+    --debug: hidden;
+    --player-spawn-x: 50px;
+    --player-spawn-y: calc(100% - 100px);
+}
+
+.debug {
+    visibility: var(--debug);
+}
+
+body {
+    overflow-x: hidden;
+    overflow-y: hidden;
+    min-height: 100vh;
+    min-width: 100vw;
+    background-image: url("../img/clouds.png");
+}
+
+.hidden {
+    visibility: hidden !important;
+}
+
+.no-display {
+    display: none !important;
+}
+
+.level {
+    box-shadow: #0000009a -30px 30px 15px;
+    border: solid 5px #9e47e6;
+    margin: 50px;
+}
+
+/* 
+    Properties you need
+    width
+    height
+*/
+
+.cat {
+    width: 50px;
+    height: 50px;
+}
+
+.animation-container > img {
+    image-rendering: pixelated;
+}
+
+/* 
+Necessary styles
+width
+height
+position: relative or absolute
+
+*/
+#viewport {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+}
+
+
+.screen {
+    background-image: url("../img/clouds.png");
+    background-size: cover;
+    background-position: center;
+}
+
+/*
+
+SolidObject needs
+position: absolute
+
+*/
+.object {
+    position: absolute;
+}
+
+.solid {
+    z-index: 3;
+    outline-offset: -1px;
+    user-select: none;
+    image-rendering: pixelated;
+    /* background-image: url("../img/stone-no-edge.png"); */
+    background-size: 50px;
+    background-position: top left;
+    background-color: rebeccapurple;
+}
+
+.pipe {
+    --size: 100px;
+    width: var(--size);
+    height: var(--size);
+    position: absolute;
+    top: calc(100% - var(--size));
+    right: 40px;
+    background-image: url("../img/pipe.png");
+    background-size: cover;
+    background-position: center;
+    image-rendering: pixelated;
+}
+
+
+.floor {
+    --height: 50px;
+    position: absolute;
+    top: calc(100% - var(--height));
+    left: 50%;
+    transform: translateX(-50%);
+    height: var(--height);
+    width: 100%;
+    /* background-image: url("../img/stone-edge-hori.png"); */
+    background-size: contain;
+    background-position: top left;
+    image-rendering: pixelated;
+}
+
+#floor-1 {
+    transform: translateX(0);
+    left: 150px;
+}
+
+#floor-3 {
+    transform: translateX(0);
+    right: 0;
+    left: initial;
+    width: 30%;
+}
+
+#floor-4 {
+    transform: translateX(0);
+    left: 0;
+    left: initial;
+    width: 52%;
+}
+
+.ceiling {
+    --height: 10px;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: var(--height);
+    width: 100%;
+}
+
+#start-cap {
+    position: absolute;
+    top: 0;
+    left: 0px;
+    bottom: 0;
+    width: 50px;
+    background-image: url("../img/stone-edge-vert.png");
+    background-size: contain;
+    background-position: top left;
+    image-rendering: pixelated;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+
+.cap {
+    position: absolute;
+    height: 50px;
+    width: 50px;
+    z-index: 3;
+    background-image: url("../img/stone-no-edge.png");
+    background-size: contain;
+}
+
+#end-cap {
+    position: absolute;
+    top: 0;
+    left: initial;
+    right: -5px;
+    bottom: 0;
+    width: 50px;
+    background-image: url("../img/stone-edge-vert.png");
+    background-size: contain;
+    background-position: top left;
+    image-rendering: pixelated;
+    transform: rotate(180deg);
+}
+
+#pipe-1 {
+    --size: 100px;
+    width: var(--size);
+    height: var(--size);
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%) rotate(180deg);
+    background-image: url("../img/pipe.png");
+    background-size: cover;
+    background-position: center;
+    image-rendering: pixelated;
+    z-index: 5;
+}
+
+#solidObject-1 {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 100px;
+    background-image: url("../img/stone-edge-sides.png");
+    background-size: contain;
+    background-position: top left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#solidObject-2 {
+    left: 50%;
+    top: calc(100% - 350px);
+    width: 350px;
+    height: 350px;
+}
+
+#solidObject-3 {
+    left: calc(50% - 300px);
+    top: calc(100% - 200px);
+    width: 300px;
+    height: 200px;
+}
+
+#solidObject-4 {
+    left: 75%;
+    top: 0%;
+    width: 400px;
+    height: 600px;
+}
+
+#solidObject-5 {
+    right: 20%;
+    top: 25%;
+    width: 500px;
+    height: 100px;
+}
+
+#solidObject-6 {
+    bottom: 0;
+    right: 0;
+    width: 300px;
+    height:300px;
+}
+
+#solidObject-7 {
+    top: 0;
+    left: 25%;
+    width: 175px;
+    height: 250px;
+}
+
+#solidObject-8 {
+    bottom: 0;
+    left: 25%;
+    width: 175px;
+    height: 250px;
+}
+
+#solidObject-9 {
+    bottom: 0;
+    right: 0;
+    width: 300px;
+    height: 300px;
+}
+
+#solidObject-10 {
+    top: 0;
+    right: 0;
+    width: 500px;
+    height: 150px;
+}
+
+#solidObject-11 {
+    right: 300px;
+    bottom: 0;
+    width: 200px;
+    height: 175px;
+}
+
+#solidObject-12 {
+    left: 0;
+    top: 0;
+    width: 500px;
+    height: 500px;
+}
+
+#solidObject-13 {
+    left: 200px;
+    bottom: 0;
+    width: 100px;
+    height: 150px;
+}
+
+#solidObject-14 {
+    right: 30%;
+    bottom: 0;
+    width: 200px;
+    height: 200px;
+}
+
+#solidObject-15 {
+    right: 0;
+    bottom: 0;
+    width: 500px;
+    height: 50px;
+}
+
+#solidObject-16 {
+    left: 0;
+    bottom: 0;
+    width: 500px;
+    height: 50px;
+}
+
+#solidObject-17 {
+    left: 0;
+    bottom: 0;
+    width: 250px;
+    height: 500px;
+}
+
+#solidObject-18 {
+    top: 0;
+    left: 250px;
+    width: 250px;
+    height: 200px;
+}
+
+#solidObject-19 {
+    top: 150px;
+    left: 500px;
+    width: 200px;
+    height: 50px;
+}
+
+.solid>.double-cap {
+    height: 100%;
+    width: 50px;
+    background-image: url("../img/stone-double-corners.png");
+    background-size: contain;
+    transform: rotate(180deg);
+    z-index: 3;
+    position: relative;
+    right: -10px;
+}
+
+.solid>.double-cap:first-of-type {
+    transform: rotate(0deg);
+    left: -10px;
+}
+
+.sign {
+    padding: 1rem;
+    background-color: rgb(255, 244, 240);
+    font-size: 20px;
+    line-height: 1.25;
+}
+
+#sign-1 {
+    position: absolute;
+    top: 75%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: Arial, Helvetica, sans-serif;
+    width: 700px;
+}
+
+#sign-2 {
+    width: max-content;
+    position: absolute;
+    top: 25%;
+    left: 25%;
+}
+
+#sign-3 {
+    width: 30%;
+    position: absolute;
+    top: 25%;
+    left: 25%;
+}
+
+@keyframes bljitter {
+    0% {
+        margin-left: 0px;
+    }
+
+    100% {
+        margin-left: 30px;
+
+    }
+}
+
+#img-1 {
+    position: absolute;
+    left: 30%;
+    bottom: 25%;
+    animation: bljitter 0.1s infinite;
+}
+
+#img-2 {
+    position: absolute;
+    left: 100px;
+    bottom: 45px;
+}
+
+#img-3 {
+    position: absolute;
+    height: 200px;
+    top: 50px;
+    right: 300px;
+    z-index: 2;
+}
+
+#img-4 {
+    position: absolute;
+    height: 500px;
+    top: 50px;
+}
+
+#img-5 {
+    position: absolute;
+    /* height: 200px; */
+    top: 50px;
+    right: 300px;
+}
+
+#img-6 {
+    position: absolute;
+    top: 50px;
+    left: 50px;
+    width: 100px;
+}
+
+#img-7 {
+    position: absolute;
+    bottom: 50px;
+    right: 75px;
+    width: 100px;
+}
+
+.criss {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    background-color: red;
+    height: 1px;
+    z-index: 100;
+}
+
+.cross {
+    position: absolute;
+    left: 50%;
+    height: 100%;
+    background-color: red;
+    width: 1px;
+    z-index: 100;
+}
+
+.pause-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: white;
+    font-family: 'Times New Roman', Times, serif;
+    gap: 1rem;
+}
+
+.pause-text>h1 {
+    font-size: 5rem;
+}
+
+.pause-text>p {
+    font-size: 2rem;
+}
+
+a {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: blue;
+    text-decoration: none;
+    font-size: 10rem;
+}
+
+#blahaj-pet {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+
+.positionDisplay {
+    font-size: 3rem;
+    color: white;
+}
+
+#interactionBox {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    height: 120%;
+    width: 75px;
+    z-index: 100;
+}
+
+.interaction-indicator {
+    position: absolute;
+    top: 0%;
+    left: 50%;
+    transform: translate(-50%, -100%);
+}
+
+.question-indicator {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 2.5rem;
+    text-align: center;
+    font-family: 'Pixel';
+    font-weight: bold;
+    color: rgb(2, 183, 255);
+    text-shadow: 4px 4px 0px black;
+}
+
+.toggle {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+}
+
+#toggle-1 {
+    top: calc(100% - 100px);
+    left: 25%;
+}
+
+#toggle-2 {
+    left: calc(50% + 50px);
+}
+
+.toggle .on {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: green;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.toggle .off {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: red;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.reciever {
+    position: absolute;
+}
+
+.reciever .on {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: green;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.reciever .off {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: red;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#reciever-1 {
+    left: 20%;
+    top: 20%;
+    width: 100px;
+    height: 100px;
+}
+
+#reciever-2 {
+    left: 50%;
+    top: 20%;
+    width: 100px;
+    height: 100px;
+}
+
+#reciever-3 {
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+#reciever-4 {
+    left: 0;
+    top: 0;
+    width: 100px;
+    height: 100px;
+}
+
+#localhosts_game {
+    position: absolute;
+    width: 350px;
+    height: 500px;
+    left: 50%;
+    bottom: 50px;
+    transform: translate(-50%, 0);  
+}
+
+#localhosts_game>iframe {
+    position: absolute;
+    left: 50%;
+    top: 15%;
+    transform: translate(-50%, 0);
+    height: 170px;
+    width: 200px;
+}
+
+#localhosts_game .arcade-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-image: url(../img/arcade_cabinet.png);
+    background-size: contain;
+    image-rendering: pixelated;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    /* opacity: 0.5; */
+}
+
+.nekkoGAMETOY {
+    position: absolute;
+    left: 50%;
+    bottom: 50px;
+    transform: translate(-50%, 0);
+    aspect-ratio: 0.6;
+    background-color: lightslategray;
+    width: 300px;
+    z-index: 100;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    border-radius: 10px;
+    border-bottom-right-radius: 70px;
+}
+
+.nekkoGAMETOY .nGT-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: black;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.nekkoGAMETOY .nGT-screen {
+    width: 100%;
+    aspect-ratio: 4/3;
+    background-color: black;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+
+.nekkoGAMETOY .nGT-screen iframe {
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+}
+
+.nekkoGAMETOY .nGT-name {
+    width: 100%;
+    text-align: left;
+}
+
+.nGT-name .nGT-GAMETOY {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-style: italic;
+    font-weight: bold;
+    margin-left: -3px;
+}
+
+.nGT-name .nGT-nekko {
+    font-family: 'Pretendo';
+}
+
+.nekkoGAMETOY .nGT-controls {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 25px;
+    height: 100px;
+}
+
+.nekkoGAMETOY .nGT-controls .nGT-dpad {
+    aspect-ratio: 1;
+    height: 100%;
+    position: relative;
+}
+
+.nekkoGAMETOY .nGT-controls .nGT-dpad::after {
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: 30%;
+    background-color: black;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 3px;
+}
+
+.nekkoGAMETOY .nGT-controls .nGT-dpad::before {
+    position: absolute;
+    content: "";
+    height: 100%;
+    width: 30%;
+    background-color: black;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 3px;
+}
+
+.nekkoGAMETOY .nGT-controls .nGT-buttons {
+    aspect-ratio: 1.1/1;
+    height: 100%;
+    position: relative;
+}
+
+.nekkoGAMETOY .nGT-controls .nGT-buttons .nGT-A {
+    height: 50%;
+    aspect-ratio: 1;
+    position: absolute;
+    top: 35%;
+    right: 0%;
+    transform: translate(-50%, -50%);
+}
+
+.nekkoGAMETOY .nGT-controls .nGT-buttons .nGT-A::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 100%;
+    aspect-ratio: 1;
+    background-color: darkred;
+    border-radius: 50%;
+}
+
+.nekkoGAMETOY .nGT-controls .nGT-buttons .nGT-A::before {
+    content: "A";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    transform: translate(60%, 60%);
+    font-size: 1.5rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.nekkoGAMETOY .nGT-controls .nGT-buttons .nGT-B {
+    height: 50%;
+    aspect-ratio: 1;
+    position: absolute;
+    bottom: 35%;
+    left: 0%;
+    transform: translate(-50%, 50%);
+    /* float: left; */
+}
+
+.nekkoGAMETOY .nGT-controls .nGT-buttons .nGT-B::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 100%;
+    aspect-ratio: 1;
+    background-color: darkred;
+    border-radius: 50%;
+}
+
+.nekkoGAMETOY .nGT-controls .nGT-buttons .nGT-B::before {
+    content: "B";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    transform: translate(60%, 60%);
+    font-size: 1.5rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.object-label {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 3rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.grass-green {
+    background-color: #25b925;
+}
+
+.door {
+    background-color: black;
+    width: 100px;
+    height: 150px;
+    position: absolute;
+    border-top-left-radius: 50px;
+    border-top-right-radius: 50px;
+}
+
+#door-1 {
+    right: 25%;
+    bottom: 50px;
+}

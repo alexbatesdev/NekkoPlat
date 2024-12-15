@@ -45,7 +45,10 @@ export class InteractableObject extends LevelObject {
 
     interact() {
         if (!this.enabled) return;
-        debugLog('Interacted', this.element);
+        debugLog('Interacted');
+        debugLog(this.element);
+        this.element.click()
+        
     }
 
     update() {

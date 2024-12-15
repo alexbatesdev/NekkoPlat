@@ -75,12 +75,16 @@ class Game {
                 return;
             }
             event.preventDefault();
-            debugLog(event.key.toUpperCase());
-            this.keyState[event.key.toUpperCase()] = true;
+            let key = event.key.toUpperCase();
+            if (event.key == " ") key = "SPACE";
+            debugLog(key);
+            this.keyState[key] = true;
         });
 
         document.addEventListener('keyup', (event) => {
-            this.keyState[event.key.toUpperCase()] = false;
+            let key = event.key.toUpperCase();
+            if (event.key == " ") key = "SPACE";
+            this.keyState[key] = false;
         });
     }
 

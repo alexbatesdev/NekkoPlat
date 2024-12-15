@@ -216,7 +216,7 @@ export default class Player {
         }
         if (gameInstance.keyState['S']) this.velocityY += this.physics.acceleration;
         // Similar for other directions
-        if (gameInstance.keyState['W']) {
+        if (gameInstance.keyState['W'] || gameInstance.keyState['SPACE']) {
             this.jump();
         } else {
             this.jumpProcessed = false; // Reset the flag when 'W' is not pressed
