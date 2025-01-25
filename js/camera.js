@@ -17,7 +17,7 @@ export default class Camera {
         this.targetY = 0;
         this.smoothing = 0.1;
         this.restingOffsetX = 0.5;
-        this.restingOffsetY = 0.5;
+        this.restingOffsetY = 0.7;
         this.offsetX = this.restingOffsetX;
         this.offsetY = this.restingOffsetY;
         this.followPlayer = true;
