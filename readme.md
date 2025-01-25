@@ -4,6 +4,24 @@ This is a simple platformer engine(?) that I'm making for fun. It's not really a
 
 This project has evolved from a project for fun, to a project for fun and practice! I've rewritten everything to be more modular/object oriented to make continued development easier!
 
+## Plans
+
+PiinroPlat Plans:
+
+- [ ] Make object that triggers onclick when touched (onclick area)
+
+- [ ] Make hole to jump into to get to hub cave
+
+- [ ] Make hub cave
+
+- [ ] Make the landing page of the site ask if you want the platformer version or the regular website
+
+- [ ] someday make z-index powered parallax
+
+
+
+NOTE: These docs may be out of date! I really don't remember. Eventually things will be more set in stone and I'll update the docs again
+ 
 ## How to get started
 
 1. hotlink to or download the javascript file

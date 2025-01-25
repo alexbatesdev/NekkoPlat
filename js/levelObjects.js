@@ -48,8 +48,7 @@ export class InteractableObject extends LevelObject {
         if (!this.enabled) return;
         debugLog('Interacted');
         debugLog(this.element);
-        this.element.click()
-        
+        this.element.click();
     }
 
     update() {
@@ -147,6 +146,9 @@ export class Reciever extends LevelObject{
 
 
 // Door - an interactable object that changes player location
+// Instead of making a "door" object, 
+// I just made an interactable that changes player location with the onclick event
+// Less code, more flexibility, same result, I daresay more elegant
 // Features:
 // - Teleport player on interaction
 //   - Teleport to coordinates
@@ -155,6 +157,7 @@ export class Reciever extends LevelObject{
 
 
 // Hazard - an object that teleports player to a checkpoint on collision
+// This should just be an effect area that teleports the player with the onclick
 // This is because the player can't die
 // Features:
 // - Teleport player on collision
