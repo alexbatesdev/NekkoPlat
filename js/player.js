@@ -105,8 +105,12 @@ export default class Player {
     }
 
     spawn() {
-        const playerSpawnXRelativeToScreen = getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-x')
-        const playerSpawnYRelativeToScreen = getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-y')
+        const spawn_x_query_param = new URLSearchParams(window.location.search).get('spawn_x');
+        const spawn_y_query_param = new URLSearchParams(window.location.search).get('spawn_y');
+        console.log(spawn_x_query_param, spawn_y_query_param);
+
+        const playerSpawnXRelativeToScreen = spawn_x_query_param == null ? getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-x') : spawn_x_query_param;
+        const playerSpawnYRelativeToScreen = spawn_y_query_param == null ? getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-y') : spawn_y_query_param;
         const screenXposition = this.respawnScreen.getBoundingClientRect().x;
         const screenYposition = this.respawnScreen.getBoundingClientRect().y;
         this.element.style.left = playerSpawnXRelativeToScreen;

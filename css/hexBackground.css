@@ -1,0 +1,23 @@
+@keyframes background-scroll {
+    from {
+        background-position: var(--starting-position);
+    }
+
+    to {
+        background-position: var(--ending-position);
+    }
+}
+
+
+.hexBackground {
+    --starting-position: 0px 0px;
+    --ending-position: 0px 0px;
+    --background-size: 1920px 1080px;
+    background-image: url("../img/tiledIllusion.png");
+    background-size: var(--background-size);
+}
+
+.hb-text {
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}

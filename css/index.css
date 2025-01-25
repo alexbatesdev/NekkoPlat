@@ -254,7 +254,7 @@ body {
     overflow-y: hidden;
     min-height: 100vh;
     min-width: 100vw;
-    background-image: url("../img/clouds.png");
+    /* background-image: url("../img/clouds.png"); */
 }
 
 .hidden {

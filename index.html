@@ -22,14 +22,16 @@
   <link rel="stylesheet" href="./css/pixel-corners.css">
   <script type="module" src="./js/platformer.js" defer></script>
   <link rel="stylesheet" href="./css/index.css">
-  <title>Nekko's World</title>
+  <link rel="stylesheet" href="./css/hexBackground.css">
+  <script src="./js/hexBackground.js" defer></script>
+  <title>Piinro's Platformer</title>
 </head>
 
-<body>
+<body class="hexBackground">
   <span class="criss debug"></span>
   <span class="cross debug"></span>
 
-  <div class="tv" id="viewport">
+  <div id="viewport">
     <div class="level 3x1 contain" id="level-one">
       <div class="screen">
         <div class="cat" id="player">
@@ -209,7 +211,7 @@
           </div>
         </div>
 
-        <div class="door object interactable" id="door-1" onClick="window.location.href='./html/platformer.html'"></div>
+        <div class="door object interactable" id="door-1" onClick="window.location.href='./html/platformer.html?spawn_x=3427px&spawn_y=1026px'"></div>
 
         <div class="object solid floor grass-green"></div>
         <!-- <div class="object solid" id="end-cap">
