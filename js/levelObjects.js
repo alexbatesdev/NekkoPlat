@@ -38,6 +38,7 @@ export class InteractableObject extends LevelObject {
             this.element.addEventListener('pointerup', () => {
                 this.interact();
             });
+            this.element.style.cursor = 'pointer';
         } else {
             this.element.style.pointerEvents = 'none';
         }
