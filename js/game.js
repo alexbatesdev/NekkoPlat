@@ -34,6 +34,8 @@ class Game {
         };
 
         this.signalManager = new BroadcastManager();
+
+        window.game = this;
     }
 
     initPauseElement() {

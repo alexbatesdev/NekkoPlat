@@ -11,10 +11,11 @@ export class CollisionDetection {
         };
     }
 
-    applyCollisions(object, solidObjects) {
+    applyCollisions(object, collisionObjects) {
         this.checkOutOfBounds(object);
-        let horizontal_collision_count = this.checkHorizontalCollisions(object, solidObjects);
-        let vertical_collision_count = this.checkVerticalCollisions(object, solidObjects);
+        this.checkTriggerCollisions(object, collisionObjects);
+        let horizontal_collision_count = this.checkHorizontalCollisions(object, collisionObjects);
+        let vertical_collision_count = this.checkVerticalCollisions(object, collisionObjects);
         if (horizontal_collision_count < 0) {
             this.state = {
                 left: 0,
@@ -41,11 +42,24 @@ export class CollisionDetection {
         }
     }
 
-    checkVerticalCollisions(object, solidObjects) {
+    checkTriggerCollisions(object, collisionObjects) {
+        const playerRect = object.element.getBoundingClientRect();
+        collisionObjects.forEach(collisionObject => {
+            if (!collisionObject.enabled) return;
+            if (intersects(playerRect, collisionObject.element.getBoundingClientRect())) {
+                if (collisionObject.element.classList.contains('trigger')) {
+                    collisionObject.trigger();
+                }
+            }
+        });
+    }
+
+    checkVerticalCollisions(object, collisionObjects) {
         const playerRect = object.element.getBoundingClientRect();
         let collisionCount = 0;
-        solidObjects.forEach(solidObject => {
-            if (!solidObject.enabled) return;
+        collisionObjects.forEach(collisionObject => {
+            if (!collisionObject.enabled) return;
+            if (collisionObject.element.classList.contains('trigger')) return;
             for (let i = 0.25; i < 1; i += 0.25) {
                 let playerRectNext = {
                     left: playerRect.left + 20,
@@ -57,31 +71,35 @@ export class CollisionDetection {
                     width: playerRect.width,
                     height: playerRect.height,
                 }
-                if (intersects(playerRectNext, solidObject.element.getBoundingClientRect())) {
-                    object.velocityY = 0;
+                if (intersects(playerRectNext, collisionObject.element.getBoundingClientRect())) {
+                    if (collisionObject.element.classList.contains('solid')) {
+                        object.velocityY = 0;
+                    }
                 }
             }
-            if (intersects(playerRect, solidObject.element.getBoundingClientRect())) {
-                const collision = getCollisionOverlap(playerRect, solidObject.element.getBoundingClientRect());
-                if (collision.bottom > 0) {
+            if (intersects(playerRect, collisionObject.element.getBoundingClientRect())) {
+                const collision = getCollisionOverlap(playerRect, collisionObject.element.getBoundingClientRect());
+                if (collision.bottom > 0 && collisionObject.element.classList.contains('solid')) {
                     collisionCount++;
                     this.state.bottom = collision.bottom;
                     object.y -= collision.bottom;
                 }
-                if (collision.top > 0) {
+                if (collision.top > 0 && collisionObject.element.classList.contains('solid')) {
+                    collisionCount++;
                     this.state.top = collision.top;
                     object.y += collision.top;
-                    collisionCount++;
                 }
             }
         });
         return collisionCount;
     }
-
-    checkHorizontalCollisions(object, solidObjects) {
+    
+    checkHorizontalCollisions(object, collisionObjects) {
         const playerRect = object.element.getBoundingClientRect();
         let collisionCount = 0;
-        solidObjects.forEach(solidObject => {
+        collisionObjects.forEach(collisionObject => {
+            if (!collisionObject.enabled) return;
+            if (collisionObject.element.classList.contains('trigger')) return;
             for (let i = 0.25; i < 1; i += 0.25) {
                 let playerRectNext = {
                     left: playerRect.left + (object.velocityX * i),
@@ -93,21 +111,23 @@ export class CollisionDetection {
                     width: playerRect.width,
                     height: playerRect.height,
                 }
-                if (intersects(playerRectNext, solidObject.element.getBoundingClientRect())) {
-                    object.velocityX = 0;
+                if (intersects(playerRectNext, collisionObject.element.getBoundingClientRect())) {
+                    if (collisionObject.element.classList.contains('solid')) {
+                        object.velocityX = 0;
+                    }
                 }
             }
-            if (intersects(playerRect, solidObject.element.getBoundingClientRect())) {
-                const collision = getCollisionOverlap(playerRect, solidObject.element.getBoundingClientRect());
-                if (collision.left > 0) {
+            if (intersects(playerRect, collisionObject.element.getBoundingClientRect())) {
+                const collision = getCollisionOverlap(playerRect, collisionObject.element.getBoundingClientRect());
+                if (collision.left > 0 && collisionObject.element.classList.contains('solid')) {
                     this.state.left = collision.left;
                     object.x += collision.left;
                     collisionCount++;
                 }
-                if (collision.right > 0) {
+                if (collision.right > 0 && collisionObject.element.classList.contains('solid')) {
+                    collisionCount++;
                     this.state.right = collision.right;
                     object.x -= collision.right;
-                    collisionCount++;
                 }
             }
         });

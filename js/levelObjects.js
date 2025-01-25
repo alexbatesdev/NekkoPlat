@@ -31,6 +31,35 @@ export class SolidObject extends LevelObject{
     }
 }
 
+export class TriggerArea extends LevelObject {
+    constructor(element) {
+        super(element);
+        this.element.style.pointerEvents = 'none';
+        if (this.element.classList.contains('disabled')) {
+            this.enabled = false;
+        }
+    }
+
+    trigger() {
+        if (!this.enabled) return;
+        if (this.element.classList.contains('once')) {
+            this.enabled = false;
+            this.element.classList.add('disabled');
+        }
+        debugLog('Triggered');
+        this.element.click();
+    }
+
+    reinitStyles() {
+        if (gameInstance.debug) {
+            this.element.style.outline = '3px solid plum';
+            this.element.style.outlineOffset = '-3px';
+        } else {
+            // this.element.style.outline = 'none';
+        }
+    }
+}
+
 export class InteractableObject extends LevelObject {
     constructor(element) {
         super(element);

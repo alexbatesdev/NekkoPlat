@@ -45,7 +45,7 @@ export default class Player {
         this.velocityY = 0;
         this.liveGravity = this.physics.gravity;
         //   Collision
-        this.solidObjects = [];
+        this.collisionObjects = [];
         this.collision = new CollisionDetection();
         this.grounded = false;
         //   Jumping
@@ -58,6 +58,9 @@ export default class Player {
         this.currentAnimation = 'idle';
         //   Interaction
         this.interactionBox = new InteractionBox(this);
+
+        // This lets the HTML as well as the console access the player object
+        window.player = this;
     }
 
     initConfig() {
@@ -153,7 +156,7 @@ export default class Player {
     update() {
         this.processInput();
         this.physics.applyPhysics(this, this.collision.state);
-        this.collision.applyCollisions(this, this.solidObjects);
+        this.collision.applyCollisions(this, this.collisionObjects);
         this.processCollisions();
         // console.log(this.interactableObjects);
         this.interactionBox.update();
@@ -292,7 +295,7 @@ export default class Player {
     }
 
     setSolidObjects(solidObjects) {
-        this.solidObjects = solidObjects;
+        this.collisionObjects = solidObjects;
     }
 
     // Figuring out how to handle interactable objects
@@ -303,21 +306,22 @@ export default class Player {
         this.interactionBox.interactables = interactableObjects;
     }
 
-    resolveInteractableObject(interactableObject) {
-        let classList = interactableObject.element.classList.value;
-        if (!classList.outline('interact')) {
-            console.error('Interactable object does not have the class "interact"');
-            return;
-        } else {
-            classList = classList.replace('interact', '').trim();
-        }
-        switch (classList) {
-            case "toggle":
-                return 
-                break;
+    // I don't think this is in use anymore
+    // resolveInteractableObject(interactableObject) {
+    //     let classList = interactableObject.element.classList.value;
+    //     if (!classList.outline('interact')) {
+    //         console.error('Interactable object does not have the class "interact"');
+    //         return;
+    //     } else {
+    //         classList = classList.replace('interact', '').trim();
+    //     }
+    //     switch (classList) {
+    //         case "toggle":
+    //             return 
+    //             break;
         
-            default:
-                break;
-        }
-    }
+    //         default:
+    //             break;
+    //     }
+    // }
 }

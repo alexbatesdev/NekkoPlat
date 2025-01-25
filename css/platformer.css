@@ -477,6 +477,16 @@ position: absolute
     height: 500px;
 }
 
+#trigger-1 {
+    left: 50%;
+    top: 0%;
+    transform: translate(-50%, 0%);
+    width: 350px;
+    height: 500px;
+    background-image: url('../img/gust-of-wind.png');
+    background-size: contain;
+}
+
 #solidObject-3 {
     left: 30%;
     top: 75%;
