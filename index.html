@@ -23,6 +23,7 @@
   <script type="module" src="./js/platformer.js" defer></script>
   <link rel="stylesheet" href="./css/index.css">
   <link rel="stylesheet" href="./css/hexBackground.css">
+  <link rel="stylesheet" href="./css/global.css">
   <script src="./js/hexBackground.js" defer></script>
   <title>Piinro's Platformer</title>
 </head>
@@ -212,6 +213,9 @@
         </div>
 
         <div class="door object interactable" id="door-1" onClick="window.location.href='./html/platformer.html?spawn_x=3427px&spawn_y=1026px'"></div>
+
+        <h1 class="debug sign" id="debug-sign">This door leads to a debug room! (click it)</h1>
+        <div class="door object interactable clickable debug" id="door-2" onClick="window.location.href='./html/platformer.html?spawn_x=3427px&spawn_y=1026px'"></div>
 
         <div class="object solid floor grass-green"></div>
         <!-- <div class="object solid" id="end-cap">

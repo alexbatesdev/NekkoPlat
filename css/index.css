@@ -245,10 +245,6 @@ table {
     --player-spawn-y: calc(100% - 100px);
 }
 
-.debug {
-    visibility: var(--debug);
-}
-
 body {
     overflow-x: hidden;
     overflow-y: hidden;
@@ -269,21 +265,6 @@ body {
     box-shadow: #0000009a -30px 30px 15px;
     border: solid 5px #9e47e6;
     margin: 50px;
-}
-
-/* 
-    Properties you need
-    width
-    height
-*/
-
-.cat {
-    width: 50px;
-    height: 50px;
-}
-
-.animation-container > img {
-    image-rendering: pixelated;
 }
 
 /* 
@@ -1082,16 +1063,11 @@ a {
     background-color: #25b925;
 }
 
-.door {
-    background-color: black;
-    width: 100px;
-    height: 150px;
-    position: absolute;
-    border-top-left-radius: 50px;
-    border-top-right-radius: 50px;
-}
-
 #door-1 {
     right: 25%;
     bottom: 50px;
+}
+
+#debug-sign {
+    width: 350px;
 }

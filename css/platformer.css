@@ -269,16 +269,6 @@ body {
     width
     height
 */
-
-.cat {
-    width: 50px;
-    height: 50px;
-}
-
-.animation-container > img {
-    image-rendering: pixelated;
-}
-
 /* 
 Necessary styles
 width
@@ -1079,4 +1069,9 @@ a {
     transform: translate(60%, 60%);
     font-size: 1.5rem;
     font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+#door-1 {
+    top: 225px;
+    left: 980px
 }
