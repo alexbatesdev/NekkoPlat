@@ -16,6 +16,7 @@ export default class Camera {
         this.targetX = 0;
         this.targetY = 0;
         this.smoothing = 0.1;
+        // Should make this configurable via HTML
         this.restingOffsetX = 0.5;
         this.restingOffsetY = 0.7;
         this.offsetX = this.restingOffsetX;

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- anti caching measures -->
+    <meta http-equiv="cache-control" content="max-age=0">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="-1">
+    <meta http-equiv="expires" content="Tue, 01 Jan 1980 11:00:00 GMT">
+    <meta http-equiv="pragma" content="no-cache">
+
+    <!-- Google font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap"
+        rel="stylesheet">
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/custom-fonts.css">
+    <link rel="stylesheet" href="../css/pixel-corners.css">
+    <script type="module" src="../js/platformer.js" defer></script>
+    <link rel="stylesheet" href="../css/hub.css">
+    <link rel="stylesheet" href="../css/global.css">
+    <title>Nekko's World</title>
+</head>
+
+<body>
+    <span class="criss debug"></span>
+    <span class="cross debug"></span>
+
+    <div class="tv" id="viewport">
+        <div class="level 3x3 contain" id="level-one">
+            <div class="screen">
+                <div class="cat" id="player">
+                    <div class="interaction-indicator question-indicator">?</div>
+                    <div id="interactionBox"></div>
+                    <span class="config">
+                        <span class="maxVelocity">10</span>
+                        <span class="sprintMaxVelocity">18</span>
+                        <span class="acceleration">1</span>
+                        <span class="sprintAcceleration">2</span>
+                        <span class="maxAirJumps">1</span>
+                        <span class="gravity">0.9</span>
+                        <span class="fallingGravity">3</span>
+                        <span class="preJumpAllowance">10</span>
+                        <span class="jumpForce">25</span>
+                        <span class="coyoteTime">100</span>
+                    </span>
+                    <div class="animation-container gif">
+                        <img class="idle" src="../img/cat_stand.gif" alt="A cat standing there menacingly">
+                        <img class="walk" src="../img/cat_walk.gif" alt="A cat walking">
+                        <img class="run" src="../img/cat_run.gif" alt="A cat running">
+                        <img class="jump" src="../img/cat_jump.gif" alt="A cat jumping">
+                        <img class="wait" src="../img/cat_fall_asleep.gif" alt="A cat falling asleep">
+                    </div>
+                </div>
+                <!-- <div class="nekkoGAMETOY">
+                    <div class="nGT-title">Game Name</div>
+                    <div class="nGT-screen">
+                        <iframe src="https://augustberchelmann.com/mario/" frameborder="0"></iframe>
+                    </div>
+                    <div class="nGT-name">
+                        <span class="nGT-nekko">Nekko</span>
+                        <span class="nGT-GAMETOY">GAMETOY</span>
+                    </div>
+                    <div class="nGT-controls">
+                        <div class="nGT-dpad"></div>
+                        <div class="nGT-buttons">
+                            <div class="nGT-A"></div>
+                            <div class="nGT-B"></div>
+                        </div>
+                    </div>
+                    <div class="nGT-options">
+                        <div class="nGT-start"></div>
+                        <div class="nGT-select"></div>
+                    </div>
+                    <div class="nGT-speaker"></div>
+                </div> -->
+                <div class="object solid floor" id="floor-1"></div>
+                <!-- <div class="pipe" id="pipe-1"></div> -->
+
+                <div class="object solid edges-art" id="solidObject-1"></div>
+                <div class="object solid edges-art" id="solidObject-2"></div>
+                <div class="object" id="bgObject-1"></div>
+                <div class="door object interactable" onclick="window.location.href='../index.html?spawn_x=3249px&spawn_y=601px'" id="door-1"></div>
+
+                <div class="object solid" id="start-cap">
+                </div>
+            </div>
+            <div class="screen">
+                <div class="object solid floor" id="floor-2"></div>
+                <img src="../img/blj.gif" alt="Mario Backwards Long Jumping" id="img-1">
+                <img src="../img/amogus.gif" alt="amogus club penguin dencing" id="img-2">
+                <img src="../img/cat-planet.gif" alt="Doom Guy standing there regularly" id="img-3">
+                <img src="../img/jinx-cat-javascript.gif" alt="Jinx the cat develops javascript" id="img-4">
+                <img src="../img/slownet.gif" class="debug" alt="A wizard" id="img-5">
+                <img src="../img/explode.gif" alt="Explosion" id="img-6">
+                <img src="../img/explode.gif" alt="Explosion" id="img-7">
+
+                <div class="object trigger" onclick="{
+                    player.velocityX -= 0.9;
+                }" id="trigger-1"></div>
+                <div class="object solid" id="solidObject-3"></div>
+
+            </div>
+            <div class="screen">
+                <a href="https://youtu.be/GiaD7WSdb4M?si=SPwcMxkN9hLgbPLS">Really Cool link</a>
+                <img src="../img/debug.jpg" class="debug" style="height: 800px; border: solid 1px red;" srcset="">
+                <div class="object solid floor" id="floor-3"></div>
+                <div class="object solid floor" id="floor-4"></div>
+                <!-- <div class="object solid" id="end-cap">
+                    <div class="cap"></div>
+                </div> -->
+            </div>
+            <div class="screen">
+                <div class="object solid" id="solidObject-14"></div>
+                <div class="object solid" id="solidObject-15"></div>
+                <div class="object solid" id="solidObject-16"></div>
+                <div class="object solid" id="solidObject-17"></div>
+
+
+                <div class="object solid floor"></div>
+            </div>
+            <div class="screen">
+                <div class="object solid" id="solidObject-9"></div>
+                <div class="object solid" id="solidObject-10"></div>
+                <div class="object solid" id="solidObject-11"></div>
+                <div class="object solid" id="solidObject-12"></div>
+
+                <div class="object solid floor"></div>
+            </div>
+            <div class="screen">
+                <div class="object solid" id="solidObject-5"></div>
+                <div class="object solid" id="solidObject-6"></div>
+                <div class="object solid" id="solidObject-7"></div>
+                <div class="object solid" id="solidObject-8"></div>
+                <div class="object solid" id="solidObject-13"></div>
+
+                <div class="object solid" id="end-cap"></div>
+                <div class="object solid floor"></div>
+            </div>
+            <div class="screen">
+                <div class="object solid" id="solidObject-18"></div>
+                <div class="object solid" id="solidObject-19"></div>
+
+                <!-- <div class="object solid floor"></div> -->
+            </div>
+            <div class="screen">
+
+                <div class="object solid floor"></div>
+            </div>
+            <div class="screen">
+                <div class="object solid floor"></div>
+            </div>
+            <!-- <div class="screen"></div>
+            <div class="screen"></div>
+            <div class="screen"></div>
+            <div class="screen"></div>
+            <div class="screen"></div>
+            <div class="screen"></div>
+            <div class="screen"></div>
+            <div class="screen"></div>
+            <div class="screen"></div>
+            <div class="screen"></div>
+            <div class="screen"></div>
+            <div class="screen"></div>
+            <div class="screen"></div>
+            <div class="screen"></div>
+            <div class="screen"></div>
+            <div class="screen"></div>
+            <div class="screen"></div>
+            <div class="screen"></div> -->
+        </div>
+    </div>
+    <!-- Need to make these elements optional (pause) in the javascript to avoid errors! -->
+    <div id="pause">
+        <span class="filter blur"></span>
+        <span class="filter dark"></span>
+        <div class="pause-text">
+            <h1>Paused</h1>
+            <p>Press <span class="key">ESC</span> to resume</p>
+        </div>
+    </div>
+    <!-- Need to make these elements (overlay) optional in the javascript to avoid errors! -->
+    <div id="overlay">
+        <div id="reciever-3" class="reciever">
+            <span class="broadcast channel-toggle_two"></span>
+            <div class="signal-none">
+                <!-- <span class="filter dark"></span> -->
+            </div>
+            <div class="signal-crt">
+                <span class="filter crt"></span>
+            </div>
+        </div>
+        <img id="blahaj-pet" src="../img/blahaj-blahaj-pet.gif"
+            alt="A Swedish shark stuffed animal being given a good pet">
+        <div class="debug">
+            <h1 class="positionDisplay">X: <span id="xPositionDisplay">x</span> Y: <span id="yPositionDisplay">y</span>
+            </h1>
+        </div>
+    </div>
+    <div class="tv-stump">
+        <div class="tv-base"></div>
+    </div>
+    <!-- <div class="screen" id="screen initial-2">
+        <div class="object solid floor" id="floor-3"></div>
+        <div class="object solid floor" id="floor-4"></div>
+        <div class="object solid" id="end-cap">
+            <div class="cap"></div>
+        </div>
+    </div> -->
+    <!-- Base Template -->
+    <!-- <div class="screen" id="screen initial-2">
+        <div class="object solid floor" id="floor-3"></div>
+        <div class="object solid" id="end-cap">
+            <div class="cap"></div>
+        </div>
+    </div> -->
+</body>

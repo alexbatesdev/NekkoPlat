@@ -241,8 +241,12 @@ table {
     --screen-width: calc(1600px*var(--screen-size));
     --screen-height: calc(900px*var(--screen-size));
     --debug: hidden;
-    --player-spawn-x: 50px;
-    --player-spawn-y: calc(100% - 100px);
+    --player-spawn-x: 602px;
+    --player-spawn-y: 501px;
+}
+
+.debug {
+    visibility: var(--debug);
 }
 
 body {
@@ -250,7 +254,6 @@ body {
     overflow-y: hidden;
     min-height: 100vh;
     min-width: 100vw;
-    /* background-image: url("../img/clouds.png"); */
 }
 
 .hidden {
@@ -261,12 +264,11 @@ body {
     display: none !important;
 }
 
-.level {
-    box-shadow: #0000009a -30px 30px 15px;
-    border: solid 5px black;
-    margin: 50px;
-}
-
+/* 
+    Properties you need
+    width
+    height
+*/
 /* 
 Necessary styles
 width
@@ -276,19 +278,48 @@ position: relative or absolute
 */
 #viewport {
     position: absolute;
-    width: 100vw;
-    height: 100vh;
+    width: var(--screen-width);
+    height: var(--screen-height);
+}
+
+.tv {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: black;
+    border: 40px solid black;
+    border-radius: 5px;
+}
+
+.tv-stump {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, calc(0.5*var(--screen-height)));
+    width: 300px;
+    height: 100px;
+    background-color: black;
+    z-index: -1;
+}
+
+.tv-base {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 0);
+    width: 400px;
+    height: 25px;
+    background-color: black;
+    z-index: -1;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
 }
 
 
 .screen {
-    background-image: url("../img/1_FlipFilter.png");
+    background-image: url("../img/underground_BG.gif");
     background-size: cover;
     background-position: center;
-}
-
-.mirrored-sky {
-    background-image: url("../img/1_FlipFilter_mirror.png");
 }
 
 /*
@@ -306,21 +337,53 @@ position: absolute
     outline-offset: -1px;
     user-select: none;
     image-rendering: pixelated;
-    background-image: 
-        url("../img/grass.png"), /* Top image */
-        url("../img/dirt.png"); /* Rest of the element image */
-    background-repeat: 
-        repeat-x, /* Repeat horizontally */
-        repeat; /* Repeat both horizontally and vertically */
-    background-position: 
-        top left, /* Position the top image at the top */
-        top left; /* Position the rest image at the top */
-    background-size: 
-        auto, /* Default size for the top image */
-        auto 100%; /* Stretch the rest image to cover the height */
+    background-image: url("../img/stone-no-edge.png");
     background-size: 50px;
     background-position: top left;
     background-color: rebeccapurple;
+}
+
+.edges-art {
+    background-image: 
+        url("../img/stone-corner-top-left.png"), /* Top-left corner image */
+        url("../img/stone-corner-top-right.png"), /* Top-right corner image */
+        url("../img/stone-corner-bottom-left.png"), /* Bottom-left corner image */
+        url("../img/stone-corner-bottom-right.png"), /* Bottom-right corner image */
+        url("../img/stone-edge-top.png"), /* Top edge image */
+        url("../img/stone-edge-bottom.png"), /* Bottom edge image */
+        url("../img/stone-edge-left.png"), /* Left edge image */
+        url("../img/stone-edge-right.png"), /* Right edge image */
+        url("../img/stone-no-edge.png"); /* Rest of the element image */
+    background-repeat: 
+        no-repeat, /* No repeat for top-left corner */
+        no-repeat, /* No repeat for top-right corner */
+        no-repeat, /* No repeat for bottom-left corner */
+        no-repeat, /* No repeat for bottom-right corner */
+        repeat-x, /* Repeat horizontally for top edge */
+        repeat-x, /* Repeat horizontally for bottom edge */
+        repeat-y, /* Repeat vertically for left edge */
+        repeat-y, /* Repeat vertically for right edge */
+        repeat; /* Repeat both horizontally and vertically for the rest */
+    background-position: 
+        top left, /* Position the top-left corner image */
+        top right, /* Position the top-right corner image */
+        bottom left, /* Position the bottom-left corner image */
+        bottom right, /* Position the bottom-right corner image */
+        top left, /* Position the top edge image at the top */
+        bottom left, /* Position the bottom edge image at the bottom */
+        top left, /* Position the left edge image at the left */
+        top right, /* Position the right edge image at the right */
+        top left; /* Position the rest image at the top left */
+    background-size: 
+        64px 64px, /* Size for the top-left corner image */
+        64px 64px, /* Size for the top-right corner image */
+        64px 64px, /* Size for the bottom-left corner image */
+        64px 64px, /* Size for the bottom-right corner image */
+        auto 64px, /* Tile the top edge image */
+        auto 64px, /* Tile the bottom edge image */
+        64px auto, /* Tile the left edge image */
+        64px auto, /* Tile the right edge image */
+        64px; /* Tile the rest image */
 }
 
 .pipe {
@@ -345,14 +408,16 @@ position: absolute
     transform: translateX(-50%);
     height: var(--height);
     width: 100%;
-    /* background-image: url("../img/stone-edge-hori.png"); */
+    background-image: url("../img/stone-edge-top.png");
     background-size: contain;
     background-position: top left;
     image-rendering: pixelated;
-    background-image: url(../img/grass.png);
 }
 
 #floor-1 {
+    transform: translateX(0);
+    left: 0;
+    width: calc(100% - 200px);
 }
 
 #floor-3 {
@@ -385,7 +450,7 @@ position: absolute
     left: 0px;
     bottom: 0;
     width: 50px;
-    background-image: url("../img/stone-edge-vert.png");
+    background-image: url("../img/stone-edge-right.png");
     background-size: contain;
     background-position: top left;
     image-rendering: pixelated;
@@ -427,7 +492,7 @@ position: absolute
     left: 50%;
     transform: translateX(-50%) rotate(180deg);
     background-image: url("../img/pipe.png");
-    background-size: cover;
+    background-size: contain;
     background-position: center;
     image-rendering: pixelated;
     z-index: 5;
@@ -435,29 +500,63 @@ position: absolute
 
 #solidObject-1 {
     position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 400px;
-    height: 100px;
-    background-image: url("../img/stone-edge-sides.png");
-    background-size: contain;
-    background-position: top left;
+    left: 00%;
+    bottom: 0%;
+    width: 800px;
+    height: 150px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 #solidObject-2 {
+    position: absolute;
     left: 50%;
-    top: calc(100% - 350px);
+    top: 0%;
+    transform: translate(-50%, 0%);
+    width: 300px;
+    height: 300px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#bgObject-1 {
+    position: absolute;
+    left: 50%;
+    bottom: 100px;
+    transform: translate(-50%, 0%);
+    width: 300px;
+    height: 300px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-image: url("../img/stone-no-edge.png");
+    background-size: 64px;
+    filter: brightness(0.7);
+}
+
+#door-1 {
+    position: absolute;
+    left: 50%;
+    bottom: 150px;
+    transform: translateX(-50%);
+}
+
+#trigger-1 {
+    left: 50%;
+    top: 0%;
+    transform: translate(-50%, 0%);
     width: 350px;
-    height: 350px;
+    height: 500px;
+    background-image: url('../img/gust-of-wind.png');
+    background-size: contain;
 }
 
 #solidObject-3 {
-    left: calc(50% - 300px);
-    top: calc(100% - 200px);
+    left: 30%;
+    top: 75%;
+    transform: translate(-50%, 0%);
     width: 300px;
     height: 200px;
 }
@@ -604,20 +703,6 @@ position: absolute
     transform: translate(-50%, -50%);
     font-family: Arial, Helvetica, sans-serif;
     width: 700px;
-}
-
-#sign-2 {
-    width: max-content;
-    position: absolute;
-    top: 25%;
-    left: 25%;
-}
-
-#sign-3 {
-    width: 30%;
-    position: absolute;
-    top: 25%;
-    left: 25%;
 }
 
 @keyframes bljitter {
@@ -778,8 +863,7 @@ a {
 }
 
 #toggle-1 {
-    top: calc(100% - 100px);
-    left: 25%;
+    left: calc(50% - 50px);
 }
 
 #toggle-2 {
@@ -792,10 +876,7 @@ a {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('../img/lever-right.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center bottom;
+    background-color: green;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -807,22 +888,10 @@ a {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('../img/lever-left.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center bottom;
+    background-color: red;
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.toggle .off>p, .toggle .on>p {
-    background-color: white;
-    border: black 5px solid;
-    text-wrap: nowrap;
-    transform: translate(0, -25px);
-    padding: 5px;
-    border-radius: 10px;
 }
 
 .reciever {
@@ -1076,27 +1145,4 @@ a {
     transform: translate(60%, 60%);
     font-size: 1.5rem;
     font-family: "Plus Jakarta Sans", sans-serif;
-}
-
-.object-label {
-    position: absolute;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    padding: 5px;
-    border-radius: 5px;
-    font-size: 3rem;
-    font-family: "Plus Jakarta Sans", sans-serif;
-}
-
-.grass-green {
-    background-color: #25b925;
-}
-
-#door-1 {
-    right: 25%;
-    bottom: 50px;
-}
-
-#debug-sign {
-    width: 350px;
 }
