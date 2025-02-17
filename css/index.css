@@ -352,9 +352,6 @@ position: absolute
     background-image: url(../img/grass.png);
 }
 
-#floor-1 {
-}
-
 #floor-3 {
     transform: translateX(0);
     right: 0;

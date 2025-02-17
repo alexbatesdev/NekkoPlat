@@ -438,24 +438,42 @@ position: absolute
     image-rendering: pixelated;
 }
 
+.alt-floor {
+    top: calc(100% - (var(--height) + 100px));
+}
+
 #floor-1 {
     transform: translateX(0);
     left: 0;
-    width: calc(100% - 200px);
+    width: calc(100% - 150px);
+}
+
+#floor-2 {
+    transform: translateX(0);
+    right: 0;
+    left: initial;
+    width: calc(100% - 300px);
 }
 
 #floor-3 {
     transform: translateX(0);
     right: 0;
     left: initial;
-    width: 30%;
+    width: calc(50% - 100px);
 }
 
 #floor-4 {
     transform: translateX(0);
     left: 0;
-    left: initial;
-    width: 52%;
+    width: 400px;
+    outline: 2px solid red;
+}
+
+#floor-5 {
+    transform: translateX(0);
+    left: 0;
+    width: 600px;
+    outline: 2px solid red;
 }
 
 .ceiling {
@@ -643,9 +661,9 @@ position: absolute
 
 #solidObject-12 {
     left: 0;
-    top: 0;
-    width: 500px;
-    height: 500px;
+    bottom: 0;
+    width: 250px;
+    height: 450px;
 }
 
 #solidObject-13 {
@@ -678,9 +696,9 @@ position: absolute
 
 #solidObject-17 {
     left: 0;
-    bottom: 0;
+    top: 0px;
     width: 250px;
-    height: 500px;
+    height: 532px;
 }
 
 #solidObject-18 {
@@ -722,11 +740,18 @@ position: absolute
 
 #sign-1 {
     position: absolute;
-    top: 75%;
+    top: 550px;
+    left: 250px;
+    transform: translate(-50%, -50%);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#sign-2 {
+    position: absolute;
+    top: 500px;
     left: 50%;
     transform: translate(-50%, -50%);
     font-family: Arial, Helvetica, sans-serif;
-    width: 700px;
 }
 
 @keyframes bljitter {
