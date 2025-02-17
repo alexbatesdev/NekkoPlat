@@ -55,7 +55,7 @@ export class TriggerArea extends LevelObject {
             this.element.style.outline = '3px solid plum';
             this.element.style.outlineOffset = '-3px';
         } else {
-            // this.element.style.outline = 'none';
+            this.element.style.outline = 'none';
         }
     }
 }
