@@ -11,13 +11,17 @@ export class Physics {
         object.velocityY += this.gravity;
         if (object.grounded && Math.abs(object.velocityX) < 0.2) {
             object.velocityX = 0;
-        } else {
+        } else if (object.grounded) {
+            console.log('friction');
             object.velocityX *= this.friction;
+        } else {
+            object.velocityX *= (this.friction + ((1 - this.friction) * 0.5));
         }
 
-        // Apply max velocity while grounded
+        // Apply max falling velocity
         if (!collisionState.bottom > 0) {
             if (object.velocityY > 30) {
+                console.log('max velocity');
                 object.velocityY = 30;
             }
         }
@@ -27,7 +31,11 @@ export class Physics {
     }
 
     move(object, xVelocity, yVelocity) {
-        object.velocityX += xVelocity;
+        if (object.grounded) {
+            object.velocityX += xVelocity;
+        } else {
+            object.velocityX += (xVelocity * 0.5);
+        }
         object.velocityY += yVelocity;
     }
 }

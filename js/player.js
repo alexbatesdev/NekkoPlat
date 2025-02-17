@@ -71,8 +71,8 @@ export default class Player {
         this.gravity = this.setConfigItem('gravity', 0.9);
         this.physics.gravity = this.gravity;
         this.maxVelocity = this.setConfigItem('maxVelocity', 10);
-        this.physics.maxVelocity = this.maxVelocity;
         this.sprintMaxVelocity = this.setConfigItem('sprintMaxVelocity', 18);
+        this.physics.maxVelocity = this.maxVelocity;
         this.physics.sprintMaxVelocity = this.sprintMaxVelocity;
         this.acceleration = this.setConfigItem('acceleration', 0.7);
         this.physics.acceleration = this.acceleration;
@@ -149,7 +149,7 @@ export default class Player {
     }
 
     respawnAtCheckpoint() {
-        this.spawn()
+        this.spawnAt(this.respawnX, this.respawnY, this.respawnScreen);
     }
 
     update() {
