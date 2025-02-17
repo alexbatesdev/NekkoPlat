@@ -16,7 +16,7 @@ export class CollisionDetection {
         this.checkTriggerCollisions(object, collisionObjects);
         let horizontal_collision_count = this.checkHorizontalCollisions(object, collisionObjects);
         let vertical_collision_count = this.checkVerticalCollisions(object, collisionObjects);
-        if (horizontal_collision_count < 0) {
+        if (horizontal_collision_count <= 0) {
             this.state = {
                 left: 0,
                 right: 0,
@@ -24,7 +24,7 @@ export class CollisionDetection {
                 bottom: this.state.bottom,
             }
         }
-        if (vertical_collision_count < 0) {
+        if (vertical_collision_count <= 0) {
             this.state = {
                 left: this.state.left,
                 right: this.state.right,

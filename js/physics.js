@@ -12,18 +12,20 @@ export class Physics {
         if (object.grounded && Math.abs(object.velocityX) < 0.2) {
             object.velocityX = 0;
         } else if (object.grounded) {
-            console.log('friction');
             object.velocityX *= this.friction;
-        } else {
-            object.velocityX *= (this.friction + ((1 - this.friction) * 0.5));
         }
 
         // Apply max falling velocity
         if (!collisionState.bottom > 0) {
             if (object.velocityY > 30) {
-                console.log('max velocity');
                 object.velocityY = 30;
             }
+        }
+
+        if (object.velocityX > this.maxVelocity) {
+            object.velocityX = this.maxVelocity;
+        } else if (object.velocityX < -this.maxVelocity) {
+            object.velocityX = -this.maxVelocity;
         }
 
         object.x += object.velocityX;

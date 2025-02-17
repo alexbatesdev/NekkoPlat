@@ -206,7 +206,7 @@ export default class Player {
         if (gameInstance.keyState['SHIFT'] && this.grounded) {
             this.physics.acceleration = this.sprintAcceleration;
             this.physics.maxVelocity = this.sprintMaxVelocity;
-        } else {
+        } else if (!gameInstance.keyState['SHIFT'] && this.grounded) {
             this.physics.acceleration = this.acceleration;
             this.physics.maxVelocity = this.maxVelocity;
         }
