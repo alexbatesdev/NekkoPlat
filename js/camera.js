@@ -18,7 +18,7 @@ export default class Camera {
         this.smoothing = 0.1;
         // Should make this configurable via HTML
         this.restingOffsetX = 0.5;
-        this.restingOffsetY = 0.7;
+        this.restingOffsetY = 0.6;
         this.offsetX = this.restingOffsetX;
         this.offsetY = this.restingOffsetY;
         this.followPlayer = true;
