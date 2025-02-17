@@ -173,7 +173,7 @@ export class CollisionDetection {
         } else if (playerRect.bottom > levelRect.bottom) {
             debugLog("Out of bounds bottom");
             if (outOfBoundEffect.bottom == "contain") {
-                object.y -= playerRect.height - levelRect.height;
+                object.y -= playerRect.height - (levelRect.bottom - playerRect.top);
             } else if (outOfBoundEffect.bottom == "respawn") {
                 this.respawnAtCheckpoint();
             } else if (outOfBoundEffect.bottom == "wrap") {
