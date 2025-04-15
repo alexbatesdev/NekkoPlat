@@ -71,8 +71,8 @@ export default class Player {
         this.gravity = this.setConfigItem('gravity', 0.9);
         this.physics.gravity = this.gravity;
         this.maxVelocity = this.setConfigItem('maxVelocity', 10);
-        this.physics.maxVelocity = this.maxVelocity;
         this.sprintMaxVelocity = this.setConfigItem('sprintMaxVelocity', 18);
+        this.physics.maxVelocity = this.maxVelocity;
         this.physics.sprintMaxVelocity = this.sprintMaxVelocity;
         this.acceleration = this.setConfigItem('acceleration', 0.7);
         this.physics.acceleration = this.acceleration;
@@ -110,7 +110,6 @@ export default class Player {
     spawn() {
         const spawn_x_query_param = new URLSearchParams(window.location.search).get('spawn_x');
         const spawn_y_query_param = new URLSearchParams(window.location.search).get('spawn_y');
-        console.log(spawn_x_query_param, spawn_y_query_param);
 
         const playerSpawnXRelativeToScreen = spawn_x_query_param == null ? getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-x') : spawn_x_query_param;
         const playerSpawnYRelativeToScreen = spawn_y_query_param == null ? getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-y') : spawn_y_query_param;
@@ -150,7 +149,7 @@ export default class Player {
     }
 
     respawnAtCheckpoint() {
-        this.spawn()
+        this.spawnAt(this.respawnX, this.respawnY, this.respawnScreen);
     }
 
     update() {
@@ -207,7 +206,7 @@ export default class Player {
         if (gameInstance.keyState['SHIFT'] && this.grounded) {
             this.physics.acceleration = this.sprintAcceleration;
             this.physics.maxVelocity = this.sprintMaxVelocity;
-        } else {
+        } else if (!gameInstance.keyState['SHIFT'] && this.grounded) {
             this.physics.acceleration = this.acceleration;
             this.physics.maxVelocity = this.maxVelocity;
         }

@@ -15,11 +15,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 const teleportCheat = () => {
-    console.log("Just by opening the Inspect Element you distinguished yourself as cool, and you found the teleport cheat??? Coolest person on the planet!")
+    console.log("Congrats on being a hackerman! You've unlocked the teleport cheat! Click anywhere on the screen to teleport there. (also sets that as ur respawn point)");
     document.addEventListener('click', (event) => {
         if (event.target.classList.contains('screen')) {
             const screen = event.target;
-            gameInstance.player.respawn(event.offsetX, event.offsetY, screen);
+            gameInstance.player.setCheckpoint(event.offsetX, event.offsetY, screen);
+            gameInstance.player.respawnAtCheckpoint();
         }
     });
 }
