@@ -265,6 +265,9 @@ body {
     box-shadow: #0000009a -30px 30px 15px;
     border: solid 5px black;
     margin: 50px;
+    background-image: url("../img/1_FlipFilter.png");
+    background-attachment: fixed;
+    background-size: cover;
 }
 
 /* 
@@ -278,17 +281,6 @@ position: relative or absolute
     position: absolute;
     width: 100vw;
     height: 100vh;
-}
-
-
-.screen {
-    background-image: url("../img/1_FlipFilter.png");
-    background-size: cover;
-    background-position: center;
-}
-
-.mirrored-sky {
-    background-image: url("../img/1_FlipFilter_mirror.png");
 }
 
 /*
