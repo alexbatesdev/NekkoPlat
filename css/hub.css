@@ -264,6 +264,12 @@ body {
     display: none !important;
 }
 
+.level {
+    background-image: url("../img/smw_underground/underground_BG.gif");
+    background-attachment: fixed;
+    background-size: contain;
+}
+
 /* 
     Properties you need
     width
@@ -283,11 +289,11 @@ position: relative or absolute
 }
 
 .tv {
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    --border-width: 40px;
+    top: calc(50% - ((var(--screen-height) + (var(--border-width) * 2)) / 2));
+    left: calc(50% - ((var(--screen-width) + (var(--border-width) * 2)) / 2));
     background-color: black;
-    border: 40px solid black;
+    border: var(--border-width) solid black;
     border-radius: 5px;
 }
 
@@ -317,9 +323,8 @@ position: relative or absolute
 
 
 .screen {
-    background-image: url("../img/smw_underground/underground_BG.gif");
-    background-size: cover;
-    background-position: center;
+    
+
 }
 
 /*
