@@ -268,6 +268,7 @@ body {
     background-image: url("../img/1_FlipFilter.png");
     background-attachment: fixed;
     background-size: cover;
+    z-index: -100; /* Need to make this style mandatory */
 }
 
 /* 
@@ -1088,4 +1089,29 @@ a {
 
 #debug-sign {
     width: 350px;
+}
+
+.rock {
+    background-image: url("../img/rock.png");
+    background-size: contain;
+    background-position: center;
+    image-rendering: pixelated;
+    background-repeat: no-repeat;
+}
+
+#rock-1 {
+    position: absolute;
+    left: calc(50% - 50px);
+    bottom: calc(0% + 50px);
+    width: 100px;
+    height: 100px;
+}
+
+#rock-2 {
+    filter: hue-rotate(90deg);
+    position: absolute;
+    left: calc(50% - 50px);
+    bottom: calc(0% + 50px);
+    width: 100px;
+    height: 100px;
 }

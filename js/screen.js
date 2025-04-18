@@ -9,6 +9,8 @@ export default class Screen {
         this.x = x;
         this.y = y;
         this.element.classList.add(`screen-${x}-${y}`)
+        // I really feel I should have a single object list, not sure how to pivot to that easily
+        this.parallaxObjects = [];
         this.collisionObjects = [];
         this.interactableObjects = [];
         this.recievers = [];
@@ -43,6 +45,17 @@ export default class Screen {
             this.recievers.push(new Reciever(objectElement));
         } else if (classList.contains('trigger')) {
             this.collisionObjects.push(new TriggerArea(objectElement));
+        } else if (classList.contains('plax')) {
+            console.log('Parallax object found');
+            for (let i = 0; i < classList.length; i++) {
+                if (classList[i].includes('z')) {
+                    const zIndex = classList[i].split('z')[1];
+                    objectElement.style.zIndex = zIndex;
+                    console.log('Parallax object found with z index', zIndex);
+                }
+            }
+
+            this.parallaxObjects.push(new LevelObject(objectElement));
         }
     }
 
@@ -99,5 +112,8 @@ export default class Screen {
                 reciever.update();
             });
         }
+        this.parallaxObjects.forEach(parallaxObject => {
+            parallaxObject.update();
+        });
     }
 }

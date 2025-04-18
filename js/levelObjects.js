@@ -13,7 +13,31 @@ export class LevelObject {
     }
 
     update() {
+        if (this.element.classList.contains('plax')) {
+            this.calculateParallax();
+        }
+    }
 
+    calculateParallax() {
+        const PARALLAX_SENSITIVITY = 25;
+        let zIndex = 0;
+        for (let i = 0; i < this.element.classList.length; i++) {
+            if (this.element.classList[i].includes('z')) {
+                zIndex = this.element.classList[i].split('z')[1];
+            }
+        }
+        // zIndex is an integer that can be negative
+        const parallaxSpeed = parseInt(zIndex) / PARALLAX_SENSITIVITY;
+        if (parallaxSpeed < 0) {
+            this.element.style.transform = `translate(0px, 0px)`;
+            return;
+        }
+
+        console.log(parallaxSpeed)
+
+        const xOffset = gameInstance.camera.element.scrollLeft * parallaxSpeed;
+        const yOffset = gameInstance.camera.element.scrollTop * parallaxSpeed;
+        this.element.style.transform = `translate(-${xOffset}px, -${yOffset}px)`;
     }
 }
 export class SolidObject extends LevelObject{
