@@ -137,7 +137,6 @@ export class CollisionDetection {
     checkOutOfBounds(object) {
         const playerRect = object.element.getBoundingClientRect();
         const levelRect = gameInstance.level.element.getBoundingClientRect();
-        debugLog(levelRect.width)
         const outOfBoundEffect = gameInstance.level.outOfBoundEffect;
         if (playerRect.left < levelRect.left) {
             debugLog("Out of bounds left");

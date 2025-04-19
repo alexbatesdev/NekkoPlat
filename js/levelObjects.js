@@ -19,25 +19,31 @@ export class LevelObject {
     }
 
     calculateParallax() {
-        const PARALLAX_SENSITIVITY = 25;
+        // Make this a CONFIGURABLE CONSTANT within the HTML setup
+        // Where this goes?? I don't know yet
+        const PARALLAX_SENSITIVITY = 10;
         let zIndex = 0;
         for (let i = 0; i < this.element.classList.length; i++) {
             if (this.element.classList[i].includes('z')) {
-                zIndex = this.element.classList[i].split('z')[1];
+                zIndex = this.element.style.zIndex;
             }
         }
-        // zIndex is an integer that can be negative
-        const parallaxSpeed = parseInt(zIndex) / PARALLAX_SENSITIVITY;
-        if (parallaxSpeed < 0) {
-            this.element.style.transform = `translate(0px, 0px)`;
-            return;
+        const parallaxSpeed = (parseInt(zIndex) / 100) * PARALLAX_SENSITIVITY;
+        const playerCenterX = gameInstance.camera.element.getBoundingClientRect().left + (gameInstance.camera.element.getBoundingClientRect().width / 2);
+        const playerCenterY = gameInstance.camera.element.getBoundingClientRect().top + (gameInstance.camera.element.getBoundingClientRect().height / 2);
+        const objectCenterX = this.element.getBoundingClientRect().left + (this.element.getBoundingClientRect().width / 2);
+        const objectCenterY = this.element.getBoundingClientRect().top + (this.element.getBoundingClientRect().height / 2);
+        
+        let xOffset = ((playerCenterX - objectCenterX) * parallaxSpeed)* -1;
+        let yOffset = ((playerCenterY - objectCenterY) * parallaxSpeed)* -1;
+        
+        if (this.element.classList.contains('noplax-y')) {
+            yOffset = 0;
         }
-
-        console.log(parallaxSpeed)
-
-        const xOffset = gameInstance.camera.element.scrollLeft * parallaxSpeed;
-        const yOffset = gameInstance.camera.element.scrollTop * parallaxSpeed;
-        this.element.style.transform = `translate(-${xOffset}px, -${yOffset}px)`;
+        if (this.element.classList.contains('noplax-x')) {
+            xOffset = 0;
+        }
+        this.element.style.transform = `translate(${xOffset}px, ${yOffset}px) scale(${1 + (parallaxSpeed)})`;
     }
 }
 export class SolidObject extends LevelObject{

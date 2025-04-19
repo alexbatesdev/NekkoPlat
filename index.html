@@ -71,14 +71,16 @@
         <div class="object-label debug">
           Room 1
         </div>
-        <div class="object rock plax z2" id="rock-1"></div>
-        <div class="object rock plax z1" id="rock-2"></div>
+        <div class="object rock plax z-2 rock-2"></div>
+        <div class="object rock rock-3"></div>
+        <div class="object rock plax z2 rock-1"></div>
       </div>
       <div class="screen">
         <div class="object-label debug">
           Room 2
         </div>
         <div class="object solid floor grass-green" id="floor-2"></div>
+        <img src="./img/debug.jpg" class="debug" style="height: 600px; border: solid 1px red;" srcset="">
 
         <div class="object solid grass-green" id="solidObject-2"></div>
         <div class="object solid grass-green" id="solidObject-3"></div>
@@ -88,17 +90,32 @@
           You can also also wall jump! <br />
           Your double jump resets when you touch the ground, but not walls <br />
         </div>
+        <div class="object rock plax z-1 rock-4"></div>
       </div>
       <div class="screen">
         <div class="object-label debug">
           Room 3
         </div>
-        <img src="./img/debug.jpg" class="debug" style="height: 800px; border: solid 1px red;" srcset="">
+        <div class="object rock plax z-1 rock-5"></div>
+        <div class="object rock plax z-3 rock-5"></div>
+        <div class="object rock plax z-5 rock-5"></div>
+        <div class="object rock plax z-7 rock-5"></div>
+
+        <h1 class="debug sign pixel-corners" id="debug-sign">That door in the background leads to a debug room! (click it)</h1>
+        <div class="door object interactable clickable plax z-7" id="door-2" onClick="window.location.href='./html/platformer.html?spawn_x=3427px&spawn_y=1026px'"></div>
+        
+        <div class="object rock plax z-1 rock-6"></div>
+        <div class="object rock plax z-3 rock-6"></div>
+        <div class="object rock plax z-5 rock-6"></div>
+        <div class="object rock plax z-7 rock-6"></div>
+
 
         <div class="sign pixel-corners" id="sign-3">
           Use E when you see the question mark above your head to interact with objects! <br />
           This can be used to toggle switches, enter doors, or trigger any other javascript onclick code I attach to an
           interactable!
+          <br />
+          Also if you hover over something and your cursor turns into a hand, you can click it to interact with it!
         </div>
 
         <div id="toggle-1" class="object interactable toggle">
@@ -118,8 +135,6 @@
 
         <div class="door object interactable" id="door-1" onClick="window.location.href='./html/hub.html?spawn_x=602px&spawn_y=501px'"></div>
 
-        <h1 class="debug sign" id="debug-sign">This door leads to a debug room! (click it)</h1>
-        <div class="door object interactable clickable debug" id="door-2" onClick="window.location.href='./html/platformer.html?spawn_x=3427px&spawn_y=1026px'"></div>
 
         <div class="object solid floor grass-green"></div>
       </div>

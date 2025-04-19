@@ -37,25 +37,27 @@ export default class Screen {
 
     resolveObject(objectElement) {
         const classList = objectElement.classList;
-        if (classList.contains('solid')) {
-            this.collisionObjects.push(new SolidObject(objectElement));
-        } else if (classList.contains('interactable')) {
-            this.interactableObjects.push(this.resolveInteractableObject(objectElement));
-        } else if (classList.contains('reciever')) {
-            this.recievers.push(new Reciever(objectElement));
-        } else if (classList.contains('trigger')) {
-            this.collisionObjects.push(new TriggerArea(objectElement));
-        } else if (classList.contains('plax')) {
-            console.log('Parallax object found');
-            for (let i = 0; i < classList.length; i++) {
-                if (classList[i].includes('z')) {
-                    const zIndex = classList[i].split('z')[1];
-                    objectElement.style.zIndex = zIndex;
-                    console.log('Parallax object found with z index', zIndex);
+        for (let i = 0; i < classList.length; i++) {
+            if (classList[i].includes('solid')) {
+                this.collisionObjects.push(new SolidObject(objectElement));
+            } else if (classList[i].includes('interactable')) {
+                this.interactableObjects.push(this.resolveInteractableObject(objectElement));
+            } else if (classList[i].includes('reciever')) {
+                this.recievers.push(new Reciever(objectElement));
+            } else if (classList[i].includes('trigger')) {
+                this.collisionObjects.push(new TriggerArea(objectElement));
+            } else if (classList[i].includes('plax')) {
+                console.log('Parallax object found');
+                for (let j = i; j < classList.length; j++) {
+                    if (classList[j].includes('z')) {
+                        const zIndex = classList[j].split('z')[1];
+                        objectElement.style.zIndex = zIndex;
+                        console.log('Parallax object found with z index', zIndex);
+                    }
                 }
+    
+                this.parallaxObjects.push(new LevelObject(objectElement));
             }
-
-            this.parallaxObjects.push(new LevelObject(objectElement));
         }
     }
 

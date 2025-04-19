@@ -115,7 +115,7 @@ class Game {
         } else if (this.keyState['ESCAPE'] && !this.processedInput) {
             this.processedInput = true;
             if (this.pauseElement) this.togglePause();
-        } else if (!this.keyState['ESCAPE'] && !this.keyState['3']){
+        } else if (!this.keyState['ESCAPE'] && !this.keyState['3']) {
             this.processedInput = false;
         }
     }
@@ -144,3 +144,11 @@ class Game {
 
 const gameInstance = new Game();
 export default gameInstance;
+
+window.onload = () => {
+    document.addEventListener('click', (event) => {
+        if (gameInstance.debug) {
+            console.log(event.target)
+        }
+    });
+}
