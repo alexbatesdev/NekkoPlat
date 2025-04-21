@@ -4,6 +4,7 @@ import GifAnimationManager from "./gifAnimationManager.js";
 import { Physics } from "./physics.js";
 import { CollisionDetection } from "./collisionDetector.js";
 import InteractionBox from "./interactionBox.js";
+import Inventory, { InventoryItem } from "./inventory.js";
 
 export default class Player {
     constructor(element) {
@@ -58,7 +59,8 @@ export default class Player {
         this.currentAnimation = 'idle';
         //   Interaction
         this.interactionBox = new InteractionBox(this);
-
+        // Inventory
+        this.inventory = new Inventory();
         // This lets the HTML as well as the console access the player object
         window.player = this;
     }
