@@ -48,7 +48,6 @@ export class CollisionDetection {
             if (!collisionObject.enabled) return;
             if (intersects(playerRect, collisionObject.element.getBoundingClientRect())) {
                 if (collisionObject.element.classList.contains('trigger')) {
-                    console.log(collisionObject)
                     collisionObject.trigger();
                 }
             }

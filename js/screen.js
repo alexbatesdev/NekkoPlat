@@ -1,10 +1,6 @@
 import { 
-    SolidObject, 
-    InteractableObject, 
-    InteractableToggle, 
     Reciever, 
     LevelObject, 
-    TriggerArea,
     TriggerMixin,
     InteractableMixin,
     InteractableToggleMixin,
@@ -78,15 +74,6 @@ export default class Screen {
         }
         if (classList.contains('plax')) {
             this.parallaxObjects.push(CombinedObject);
-        }
-    }
-
-    resolveInteractableObject(interactableElement) {
-        const classList = interactableElement.classList;
-        if (classList.contains('toggle')) {
-            return new InteractableToggle(interactableElement);
-        } else {
-            return new InteractableObject(interactableElement);
         }
     }
 

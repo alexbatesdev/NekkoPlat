@@ -361,8 +361,3 @@ export const ParallaxMixin = Base => class extends Base {
         this.element.style.transform = `translate(${xOffset}px, ${yOffset}px) scale(${1 + (parallaxSpeed)})`;
     }
 };
-
-
-export class SolidTriggerArea extends TriggerMixin(SolidMixin(LevelObject)) {}
-export class InteractableSolid extends InteractableMixin(SolidMixin(LevelObject)) {}
-export class ParallaxSolid extends ParallaxMixin(SolidMixin(LevelObject)) {}
