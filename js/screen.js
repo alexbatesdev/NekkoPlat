@@ -7,6 +7,7 @@ import {
     TriggerArea,
     TriggerMixin,
     InteractableMixin,
+    InteractableToggleMixin,
     ParallaxMixin,
     SolidMixin,
 } from "./levelObjects.js";
@@ -58,6 +59,9 @@ export default class Screen {
         }
         if (classList.contains('interactable')) {
             BaseClass = InteractableMixin(BaseClass);
+        }
+        if (classList.contains('toggle')) {
+            BaseClass = InteractableToggleMixin(BaseClass);
         }
         if (classList.contains('plax')) {
             BaseClass = ParallaxMixin(BaseClass);

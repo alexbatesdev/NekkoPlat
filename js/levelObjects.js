@@ -310,6 +310,18 @@ export const InteractableMixin = Base => class extends Base {
     }
 };
 
+export const InteractableToggleMixin = Base => class extends InteractableMixin(Base) {
+    constructor(element) {
+        super(element);
+        this.stateManager = new ToggleManager(element);
+    }
+
+    interact() {
+        if (!this.enabled) return;
+        this.stateManager.toggle();
+    }
+}
+
 export const ParallaxMixin = Base => class extends Base {
     constructor(element) {
         super(element);
