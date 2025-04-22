@@ -245,3 +245,112 @@ export class Reciever extends LevelObject{
 // Features:
 // - Change state on collision
 // - Choose direction impact is needed for state change
+
+export const SolidMixin = Base => class extends Base {
+    constructor(element) {
+        super(element);
+        this.element.classList.add('solid');
+    }
+
+    reinitStyles() {
+        if (gameInstance.debug) {
+            this.element.style.outline = '3px solid red';
+            this.element.style.outlineOffset = '-3px';
+        } else {
+            this.element.style.outline = 'none';
+        }
+    }
+};
+
+export const TriggerMixin = Base => class extends Base {
+    constructor(element) {
+        super(element);
+        this.element.classList.add('trigger');
+        this.element.style.pointerEvents = 'none';
+    }
+
+    reinitStyles() {
+        if (gameInstance.debug) {
+            this.element.style.outline = '3px solid blue';
+            this.element.style.outlineOffset = '-3px';
+        } else {
+            this.element.style.outline = 'none';
+        }
+    }
+
+    trigger() {
+        if (!this.enabled) return;
+        if (this.element.classList.contains('once')) {
+            this.enabled = false;
+            this.element.classList.add('disabled');
+        }
+        debugLog('Triggered');
+        this.element.click();
+    }
+};
+
+export const InteractableMixin = Base => class extends Base {
+    constructor(element) {
+        super(element);
+        if (this.element.classList.contains('clickable')) {
+            this.element.addEventListener('pointerup', () => {
+                this.interact();
+            });
+            this.element.style.cursor = 'pointer';
+        } else {
+            this.element.style.pointerEvents = 'none';
+        }
+    }
+
+    interact() {
+        if (!this.enabled) return;
+        debugLog('Interacted');
+        debugLog(this.element);
+        this.element.click();
+    }
+};
+
+export const ParallaxMixin = Base => class extends Base {
+    constructor(element) {
+        super(element);
+        if (this.element.classList.contains('plax')) {
+            this.calculateParallax();
+        }
+        for (let i = 0; i < this.element.classList.length; i++) {
+            if (this.element.classList[i].includes('z')) {
+                this.element.style.zIndex = this.element.classList[i].replace('z', '');
+            }
+        }
+    }
+
+    calculateParallax() {
+        const PARALLAX_SENSITIVITY = 10;
+        let zIndex = 0;
+        for (let i = 0; i < this.element.classList.length; i++) {
+            if (this.element.classList[i].includes('z')) {
+                zIndex = this.element.style.zIndex;
+            }
+        }
+        const parallaxSpeed = (parseInt(zIndex) / 100) * PARALLAX_SENSITIVITY;
+        const playerCenterX = gameInstance.camera.element.getBoundingClientRect().left + (gameInstance.camera.element.getBoundingClientRect().width / 2);
+        const playerCenterY = gameInstance.camera.element.getBoundingClientRect().top + (gameInstance.camera.element.getBoundingClientRect().height / 2);
+        const objectCenterX = this.element.getBoundingClientRect().left + (this.element.getBoundingClientRect().width / 2);
+        const objectCenterY = this.element.getBoundingClientRect().top + (this.element.getBoundingClientRect().height / 2);
+
+        let xOffset = ((playerCenterX - objectCenterX) * parallaxSpeed) * -1;
+        let yOffset = ((playerCenterY - objectCenterY) * parallaxSpeed) * -1;
+
+        if (this.element.classList.contains('noplax-y')) {
+            yOffset = 0;
+        }
+        if (this.element.classList.contains('noplax-x')) {
+            xOffset = 0;
+        }
+        this.element.style.transform = `translate(${xOffset}px, ${yOffset}px) scale(${1 + (parallaxSpeed)})`;
+    }
+};
+
+
+export class SolidTriggerArea extends TriggerMixin(SolidMixin(LevelObject)) {}
+export class InteractableSolid extends InteractableMixin(SolidMixin(LevelObject)) {}
+export class ParallaxSolid extends ParallaxMixin(SolidMixin(LevelObject)) {}

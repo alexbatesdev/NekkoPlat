@@ -1,6 +1,6 @@
 export default class Inventory {
   constructor() {
-    this.itemsList = {}
+    this.itemsList = []
     // Check localstorage for itemsList 
     // Add them to the itemsList
   }
@@ -34,6 +34,8 @@ export class InventoryItem {
     this.name
     // The description of the item
     this.description
+    // The count of the item in the inventory
+    this.count = 0
     // The element that will be used to display the item in the inventory and in the world
     this.iconElement
     // The element that will be used if you want to inspect the item in the inventory
@@ -43,7 +45,7 @@ export class InventoryItem {
     // Element's HTML classes are used as tags to modify behavior of the item
     // tags for things such as:
     // hat-equipable, hand-equipable (uses interact button in the world),
-    // broadcast-count (for GUI), permanent (for things we want to track even at 0 count like money/keys)
+    // stackable, permanent (for things we want to track even at 0 count like money/keys)
 
   }
 }

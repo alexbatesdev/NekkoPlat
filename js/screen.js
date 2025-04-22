@@ -1,4 +1,15 @@
-import { SolidObject, InteractableObject, InteractableToggle, Reciever, LevelObject, TriggerArea } from "./levelObjects.js";
+import { 
+    SolidObject, 
+    InteractableObject, 
+    InteractableToggle, 
+    Reciever, 
+    LevelObject, 
+    TriggerArea,
+    TriggerMixin,
+    InteractableMixin,
+    ParallaxMixin,
+    SolidMixin,
+} from "./levelObjects.js";
 import { debugLog, intersects, isSubset } from "./tools.js";
 import gameInstance from "./game.js";
 
@@ -37,27 +48,32 @@ export default class Screen {
 
     resolveObject(objectElement) {
         const classList = objectElement.classList;
-        for (let i = 0; i < classList.length; i++) {
-            if (classList[i].includes('solid')) {
-                this.collisionObjects.push(new SolidObject(objectElement));
-            } else if (classList[i].includes('interactable')) {
-                this.interactableObjects.push(this.resolveInteractableObject(objectElement));
-            } else if (classList[i].includes('reciever')) {
-                this.recievers.push(new Reciever(objectElement));
-            } else if (classList[i].includes('trigger')) {
-                this.collisionObjects.push(new TriggerArea(objectElement));
-            } else if (classList[i].includes('plax')) {
-                console.log('Parallax object found');
-                for (let j = i; j < classList.length; j++) {
-                    if (classList[j].includes('z')) {
-                        const zIndex = classList[j].split('z')[1];
-                        objectElement.style.zIndex = zIndex;
-                        console.log('Parallax object found with z index', zIndex);
-                    }
-                }
+        let BaseClass = LevelObject;
     
-                this.parallaxObjects.push(new LevelObject(objectElement));
-            }
+        if (classList.contains('solid')) {
+            BaseClass = SolidMixin(BaseClass);
+        }
+        if (classList.contains('trigger')) {
+            BaseClass = TriggerMixin(BaseClass);
+        }
+        if (classList.contains('interactable')) {
+            BaseClass = InteractableMixin(BaseClass);
+        }
+        if (classList.contains('plax')) {
+            BaseClass = ParallaxMixin(BaseClass);
+        }
+    
+        const CombinedObject = new BaseClass(objectElement);
+    
+        // Add the object to the appropriate list
+        if (classList.contains('solid') || classList.contains('trigger')) {
+            this.collisionObjects.push(CombinedObject);
+        }
+        if (classList.contains('interactable')) {
+            this.interactableObjects.push(CombinedObject);
+        }
+        if (classList.contains('plax')) {
+            this.parallaxObjects.push(CombinedObject);
         }
     }
 
