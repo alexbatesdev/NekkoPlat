@@ -60,7 +60,7 @@ export class CollisionDetection {
         let collisionCount = 0;
         collisionObjects.forEach(collisionObject => {
             if (!collisionObject.enabled) return;
-            if (collisionObject.element.classList.contains('trigger')) return;
+            if (!collisionObject.element.classList.contains('solid')) return;
             for (let i = 0.25; i < 1; i += 0.25) {
                 let playerRectNext = {
                     left: playerRect.left + 20,
@@ -100,7 +100,7 @@ export class CollisionDetection {
         let collisionCount = 0;
         collisionObjects.forEach(collisionObject => {
             if (!collisionObject.enabled) return;
-            if (collisionObject.element.classList.contains('trigger')) return;
+            if (!collisionObject.element.classList.contains('solid')) return;
             for (let i = 0.25; i < 1; i += 0.25) {
                 let playerRectNext = {
                     left: playerRect.left + (object.velocityX * i),
