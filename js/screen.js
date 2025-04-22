@@ -45,23 +45,25 @@ export default class Screen {
 
     resolveObject(objectElement) {
         const classList = objectElement.classList;
-        let BaseClass = LevelObject;
+        let mixins = []
     
         if (classList.contains('solid')) {
-            BaseClass = SolidMixin(BaseClass);
+            mixins.push(SolidMixin)
         }
         if (classList.contains('trigger')) {
-            BaseClass = TriggerMixin(BaseClass);
+            mixins.push(TriggerMixin)
         }
         if (classList.contains('interactable')) {
-            BaseClass = InteractableMixin(BaseClass);
+            mixins.push(InteractableMixin)
         }
         if (classList.contains('toggle')) {
-            BaseClass = InteractableToggleMixin(BaseClass);
+            mixins.push(InteractableToggleMixin)
         }
         if (classList.contains('plax')) {
-            BaseClass = ParallaxMixin(BaseClass);
+            mixins.push(ParallaxMixin)
         }
+
+        let BaseClass = applyMixinsWithChainedUpdates(LevelObject, mixins)
     
         const CombinedObject = new BaseClass(objectElement);
     
@@ -126,3 +128,30 @@ export default class Screen {
         });
     }
 }
+
+// JavaScript code written by an AI assistant
+
+function applyMixinsWithChainedUpdates(BaseClass, mixins, objectElement) {
+    const updateFns = [];
+  
+    for (const mixin of mixins) {
+      const Mixed = mixin(BaseClass);
+      console.log("Before Error")
+      const proto = mixin.prototype || Object.getPrototypeOf(new Mixed(objectElement));
+      console.log("after errpor")
+
+      if (proto.update) {
+        updateFns.push(proto.update);
+      }
+  
+      BaseClass = Mixed;
+    }
+  
+    return class extends BaseClass {
+      update(...args) {
+        for (const fn of updateFns) {
+          fn.call(this, ...args);
+        }
+      }
+    };
+  }
