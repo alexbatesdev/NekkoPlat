@@ -103,7 +103,7 @@ export const SolidMixin = Base => class extends Base {
         }
     }
 };
-SolidMixin.capabilities = ['collision'];
+SolidMixin.tags = ['collision'];
 
 export const TriggerMixin = Base => class extends Base {
     constructor() {
@@ -138,7 +138,7 @@ export const TriggerMixin = Base => class extends Base {
         this.element.click();
     }
 };
-TriggerMixin.capabilities = ['collision'];
+TriggerMixin.tags = ['collision'];
 
 export const InteractableMixin = Base => class extends Base {
     constructor() {
@@ -165,7 +165,7 @@ export const InteractableMixin = Base => class extends Base {
         this.element.click();
     }
 };
-InteractableMixin.capabilities = ['interactable'];
+InteractableMixin.tags = ['interactable'];
 
 export const InteractableToggleMixin = Base => class extends InteractableMixin(Base) {
     constructor() {
@@ -183,7 +183,7 @@ export const InteractableToggleMixin = Base => class extends InteractableMixin(B
         this.stateManager.toggle();
     }
 }
-InteractableToggleMixin.capabilities = ['interactable'];
+InteractableToggleMixin.tags = ['interactable'];
 
 export const RecieverMixin = Base => class extends Base {
     constructor() {
@@ -223,7 +223,7 @@ export const RecieverMixin = Base => class extends Base {
         this.stateManager.syncStateToBroadcast(this.broadcastChannel);
     }
 }
-RecieverMixin.capabilities = [];
+RecieverMixin.tags = [];
 
 export const ParallaxMixin = Base => class extends Base {
     constructor() {
@@ -269,7 +269,7 @@ export const ParallaxMixin = Base => class extends Base {
         this.element.style.transform = `translate(${xOffset}px, ${yOffset}px) scale(${1 + (parallaxSpeed)})`;
     }
 };
-ParallaxMixin.capabilities = ['parallax'];
+ParallaxMixin.tags = ['parallax'];
 
 export class LevelObject {
     constructor() {
@@ -335,18 +335,18 @@ export const applyMixins = (BaseClass, mixins) => {
 
 export const resolveLevelObject = (objectElement) => {
     
-    let capabilities = [];
+    let allTags = [];
     const mixins = Array.from(objectElement.classList)
         .map(className => {
             LevelObject.mixinMap[className]
-            const caps = LevelObject.mixinMap[className]?.capabilities || [];
-            capabilities = [...capabilities, ...caps];
+            const tags = LevelObject.mixinMap[className]?.tags || [];
+            allTags = [...allTags, ...tags];
             return LevelObject.mixinMap[className];
         })
         .filter(Boolean); // Filter out undefined values for classes without a mixin
 
     const BaseClass = applyMixins(LevelObject, mixins);
-    BaseClass.capabilities = capabilities;
+    BaseClass.tags = allTags;
 
     const CombinedObject = new BaseClass();
     CombinedObject.initializeElement(objectElement);

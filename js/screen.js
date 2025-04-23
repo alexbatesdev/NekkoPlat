@@ -34,7 +34,7 @@ export default class Screen {
         const objectElements = this.element.querySelectorAll('.object');
         Array.from(objectElements).map(objectElement => {
             const CombinedObject = resolveLevelObject(objectElement);
-            let capabilities = CombinedObject.constructor.capabilities;
+            let capabilities = CombinedObject.constructor.tags;
             // Add the object to the appropriate list
             if (capabilities.includes('collision')) {
                 this.collisionObjects.push(CombinedObject);
