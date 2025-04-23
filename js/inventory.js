@@ -1,15 +1,41 @@
 export default class Inventory {
   constructor() {
     this.itemsList = []
-    // Check localstorage for itemsList 
-    // Add them to the itemsList
+    this.syncToItemsList()
   }
 
   // Sync itemsList with localstorage
+  syncToLocalStorage() {
+    // Check if itemsList is empty
+    if (this.itemsList.length === 0) {
+      localStorage.removeItem('itemsList')
+    } else {
+      localStorage.setItem('itemsList', JSON.stringify(this.itemsList))
+    }
+  }
 
   // Sync localstorage with itemsList
+  syncToItemsList() {
+    // Check if localstorage is empty
+    if (localStorage.getItem('itemsList') === null) {
+      this.itemsList = []
+    } else {
+      this.itemsList = JSON.parse(localStorage.getItem('itemsList'))
+    }
+  }
 
   // Add item to the inventory
+  addItem(item) {
+    // Check if item is already in the inventory
+    const existingItem = this.itemsList.find(i => i.name === item.name)
+    if (existingItem) {
+      existingItem.count += item.count
+    } else {
+      this.itemsList.push(item)
+    }
+    // Sync localstorage with itemsList
+    this.syncToLocalStorage()
+  }
   
   // Remove item from the inventory
 
@@ -29,19 +55,23 @@ export default class Inventory {
 }
 
 export class InventoryItem {
-  constructor() {
+  constructor(name, pickupID, description, count, iconElement, inspectElement, onclick) {
     // The name of the item
-    this.name
+    this.name = name
+    // The ID of the item's pickup container
+    // We want to use this to track items that shouldnt appear as they have already been picked up
+    // We will need to accomodate for stackables so pickupID needs to be an array
+    this.pickupID = pickupID
     // The description of the item
-    this.description
+    this.description = description
     // The count of the item in the inventory
-    this.count = 0
+    this.count = count
     // The element that will be used to display the item in the inventory and in the world
-    this.iconElement
+    this.iconElement = iconElement
     // The element that will be used if you want to inspect the item in the inventory
-    this.inspectElement
+    this.inspectElement = inspectElement
     // The code to be executed when the item is triggered
-    this.onclick
+    this.onclick = onclick
     // Element's HTML classes are used as tags to modify behavior of the item
     // tags for things such as:
     // hat-equipable, hand-equipable (uses interact button in the world),

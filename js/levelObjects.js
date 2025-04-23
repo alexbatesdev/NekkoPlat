@@ -1,7 +1,7 @@
 import gameInstance from './game.js';
 import { debugLog } from './tools.js';
 import ToggleManager, { MultiStateManager } from './elementStateManagers.js';
-
+import { InventoryItem } from './inventory.js';
 
 
 // USE THIS AS A BASE FOR OTHER INTERACTABLE OBJECTS
@@ -325,8 +325,23 @@ export const ItemPickupMixin = Base => class extends Base {
     pickup() {
         this.enabled = false;
         // this.element.classList.add('disabled');
-        this.element.style.display = 'none';
         this.element.click();
+        const itemElement = this.element.querySelector('.item')
+        let itemName = "";
+        // extract item name from name-ITEMNAME class
+        for (let i = 0; i < itemElement.classList.length; i++) {
+            if (itemElement.classList[i].includes('name-')) {
+                itemName = itemElement.classList[i].replace('name-', '');
+            }
+        }
+        const iconElement = itemElement.querySelector('.iconElement')
+        const inspectElement = itemElement.querySelector('.inspectElement')
+        const description = itemElement.querySelector('.description').innerHTML
+        const count = itemElement.querySelector('.count').innerHTML
+        const item = new InventoryItem(itemName, this.element.id, description, count, iconElement, inspectElement);
+        console.log(item)
+        this.element.remove();
+        player.inventory.addItem(item)
     }
 };
 ItemPickupMixin.tags = ['collision', 'trigger', 'interactable'];
