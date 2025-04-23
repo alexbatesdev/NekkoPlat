@@ -103,7 +103,7 @@ export const SolidMixin = Base => class extends Base {
         }
     }
 };
-SolidMixin.tags = ['collision'];
+SolidMixin.tags = ['collision', 'solid'];
 
 export const TriggerMixin = Base => class extends Base {
     constructor() {
@@ -138,7 +138,7 @@ export const TriggerMixin = Base => class extends Base {
         this.element.click();
     }
 };
-TriggerMixin.tags = ['collision'];
+TriggerMixin.tags = ['collision', 'trigger'];
 
 export const InteractableMixin = Base => class extends Base {
     constructor() {
@@ -271,6 +271,66 @@ export const ParallaxMixin = Base => class extends Base {
 };
 ParallaxMixin.tags = ['parallax'];
 
+export const ItemPickupMixin = Base => class extends Base {
+    constructor() {
+        super();
+        this.element = null;
+        this.isTrigger = false;
+        this.isInteractable = false;
+        this.isClickable = false;
+    }
+
+    initializeElement(element) {
+        this.element = element;
+
+        // Determine behavior based on class list
+        this.isTrigger = this.element.classList.contains('on-touch');
+        this.isInteractable = this.element.classList.contains('on-interact');
+        this.isClickable = this.element.classList.contains('on-click');
+
+        // Set pointer events and styles
+        if (this.isClickable) {
+            this.element.style.pointerEvents = 'auto';
+            this.element.style.cursor = 'pointer';
+            // this.element.addEventListener('pointerup', () => this.interact());
+        } else {
+            this.element.style.pointerEvents = 'none';
+        }
+
+        if (this.element.classList.contains('disabled')) {
+            this.enabled = false;
+            this.element.style.opacity = '0.5';
+        }
+    }
+
+    reinitStyles() {
+        if (gameInstance.debug) {
+            this.element.style.outline = '3px solid green';
+            this.element.style.outlineOffset = '-3px';
+        } else {
+            this.element.style.outline = 'none';
+        }
+    }
+
+    trigger() {
+        if (!this.enabled || !this.isTrigger) return;
+        this.pickup();
+    }
+
+    interact() {
+        if (!this.enabled || !this.isInteractable) return;
+        this.pickup();
+    }
+
+    pickup() {
+        this.enabled = false;
+        // this.element.classList.add('disabled');
+        this.element.style.display = 'none';
+        this.element.click();
+    }
+};
+ItemPickupMixin.tags = ['collision', 'trigger', 'interactable'];
+
 export class LevelObject {
     constructor() {
         this.element = null;
@@ -284,6 +344,7 @@ export class LevelObject {
         toggle: InteractableToggleMixin,
         reciever: RecieverMixin,
         plax: ParallaxMixin,
+        pickup: ItemPickupMixin,
     };
 
     initializeElement(element) {

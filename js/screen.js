@@ -40,7 +40,9 @@ export default class Screen {
                 this.collisionObjects.push(CombinedObject);
             }
             if (capabilities.includes('interactable')) {
-                this.interactableObjects.push(CombinedObject);
+                if (CombinedObject.isInteractable || CombinedObject.isInteractable == undefined) {
+                    this.interactableObjects.push(CombinedObject);
+                }
             }
             if (capabilities.includes('parallax')) {
                 this.parallaxObjects.push(CombinedObject);
