@@ -1,12 +1,5 @@
 import {
-    LevelObject,
-    TriggerMixin,
-    InteractableMixin,
-    InteractableToggleMixin,
-    RecieverMixin,
-    ParallaxMixin,
-    SolidMixin,
-    ApplyMixins,
+    resolveLevelObject,
 } from "./levelObjects.js";
 import { debugLog, intersects, isSubset } from "./tools.js";
 import gameInstance from "./game.js";
@@ -40,48 +33,19 @@ export default class Screen {
         // Merge this with solid objects and interactable objects
         const objectElements = this.element.querySelectorAll('.object');
         Array.from(objectElements).map(objectElement => {
-            this.resolveObject(objectElement);
+            const CombinedObject = resolveLevelObject(objectElement);
+            let capabilities = CombinedObject.constructor.capabilities;
+            // Add the object to the appropriate list
+            if (capabilities.includes('collision')) {
+                this.collisionObjects.push(CombinedObject);
+            }
+            if (capabilities.includes('interactable')) {
+                this.interactableObjects.push(CombinedObject);
+            }
+            if (capabilities.includes('parallax')) {
+                this.parallaxObjects.push(CombinedObject);
+            }
         });
-    }
-
-    resolveObject(objectElement) {
-        const classList = objectElement.classList;
-        let mixins = []
-
-        if (classList.contains('solid')) {
-            mixins.push(SolidMixin)
-        }
-        if (classList.contains('trigger')) {
-            mixins.push(TriggerMixin)
-        }
-        if (classList.contains('interactable')) {
-            mixins.push(InteractableMixin)
-        }
-        if (classList.contains('toggle')) {
-            mixins.push(InteractableToggleMixin)
-        }
-        if (classList.contains('reciever')) {
-            mixins.push(RecieverMixin)
-        }
-        if (classList.contains('plax')) {
-            mixins.push(ParallaxMixin)
-        }
-
-        let BaseClass = ApplyMixins(LevelObject, mixins)
-
-        const CombinedObject = new BaseClass();
-        CombinedObject.initializeElement(objectElement)
-
-        // Add the object to the appropriate list
-        if (classList.contains('solid') || classList.contains('trigger')) {
-            this.collisionObjects.push(CombinedObject);
-        }
-        if (classList.contains('interactable')) {
-            this.interactableObjects.push(CombinedObject);
-        }
-        if (classList.contains('plax')) {
-            this.parallaxObjects.push(CombinedObject);
-        }
     }
 
     checkIfPlayerInScreen() {

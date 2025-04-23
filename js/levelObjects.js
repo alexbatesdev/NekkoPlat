@@ -2,26 +2,7 @@ import gameInstance from './game.js';
 import { debugLog } from './tools.js';
 import ToggleManager, { MultiStateManager } from './elementStateManagers.js';
 
-export class LevelObject {
-    constructor() {
-        this.element = null;
-        this.enabled = true;
-    }
 
-    initializeElement(element) {
-        this.element = element;
-        if (this.element.classList.contains('disabled')) {
-            this.enabled = false;
-            this.element.style.opacity = '0.5';
-        }
-    }
-
-    update() {
-        if (this.element.classList.contains('plax')) {
-            this.calculateParallax();
-        }
-    }
-}
 
 // USE THIS AS A BASE FOR OTHER INTERACTABLE OBJECTS
 // Effect Area - an object that does something when the player enters it
@@ -102,12 +83,12 @@ export class LevelObject {
 // Features:
 // - Change state on collision
 // - Choose direction impact is needed for state change
-
 export const SolidMixin = Base => class extends Base {
     constructor() {
         super();
         this.element = null
     }
+
 
     iinitializeElement(element) {
         this.element = element;
@@ -122,6 +103,7 @@ export const SolidMixin = Base => class extends Base {
         }
     }
 };
+SolidMixin.capabilities = ['collision'];
 
 export const TriggerMixin = Base => class extends Base {
     constructor() {
@@ -156,6 +138,7 @@ export const TriggerMixin = Base => class extends Base {
         this.element.click();
     }
 };
+TriggerMixin.capabilities = ['collision'];
 
 export const InteractableMixin = Base => class extends Base {
     constructor() {
@@ -182,6 +165,7 @@ export const InteractableMixin = Base => class extends Base {
         this.element.click();
     }
 };
+InteractableMixin.capabilities = ['interactable'];
 
 export const InteractableToggleMixin = Base => class extends InteractableMixin(Base) {
     constructor() {
@@ -199,6 +183,7 @@ export const InteractableToggleMixin = Base => class extends InteractableMixin(B
         this.stateManager.toggle();
     }
 }
+InteractableToggleMixin.capabilities = ['interactable'];
 
 export const RecieverMixin = Base => class extends Base {
     constructor() {
@@ -238,6 +223,7 @@ export const RecieverMixin = Base => class extends Base {
         this.stateManager.syncStateToBroadcast(this.broadcastChannel);
     }
 }
+RecieverMixin.capabilities = [];
 
 export const ParallaxMixin = Base => class extends Base {
     constructor() {
@@ -283,9 +269,39 @@ export const ParallaxMixin = Base => class extends Base {
         this.element.style.transform = `translate(${xOffset}px, ${yOffset}px) scale(${1 + (parallaxSpeed)})`;
     }
 };
+ParallaxMixin.capabilities = ['parallax'];
 
+export class LevelObject {
+    constructor() {
+        this.element = null;
+        this.enabled = true;
+    }
 
-export const ApplyMixins = (BaseClass, mixins) => {
+    static mixinMap = {
+        solid: SolidMixin,
+        trigger: TriggerMixin,
+        interactable: InteractableMixin,
+        toggle: InteractableToggleMixin,
+        reciever: RecieverMixin,
+        plax: ParallaxMixin,
+    };
+
+    initializeElement(element) {
+        this.element = element;
+        if (this.element.classList.contains('disabled')) {
+            this.enabled = false;
+            this.element.style.opacity = '0.5';
+        }
+    }
+
+    update() {
+        if (this.element.classList.contains('plax')) {
+            this.calculateParallax();
+        }
+    }
+}
+
+export const applyMixins = (BaseClass, mixins) => {
     const updateFns = [];
     const initializeElementFunctions = []
 
@@ -316,3 +332,24 @@ export const ApplyMixins = (BaseClass, mixins) => {
         }
     };
 }
+
+export const resolveLevelObject = (objectElement) => {
+    
+    let capabilities = [];
+    const mixins = Array.from(objectElement.classList)
+        .map(className => {
+            LevelObject.mixinMap[className]
+            const caps = LevelObject.mixinMap[className]?.capabilities || [];
+            capabilities = [...capabilities, ...caps];
+            return LevelObject.mixinMap[className];
+        })
+        .filter(Boolean); // Filter out undefined values for classes without a mixin
+
+    const BaseClass = applyMixins(LevelObject, mixins);
+    BaseClass.capabilities = capabilities;
+
+    const CombinedObject = new BaseClass();
+    CombinedObject.initializeElement(objectElement);
+
+    return CombinedObject;
+};
