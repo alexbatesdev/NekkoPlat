@@ -1,5 +1,5 @@
 import gameInstance from "./game.js";
-import { Reciever } from "./levelObjects.js";
+import { LevelObject, RecieverMixin, ApplyMixins } from "./levelObjects.js";
 
 export default class Camera {
     constructor() {
@@ -54,7 +54,9 @@ export default class Camera {
         });
         const reciever = this.overlayElement.querySelector('.reciever')
         if (reciever) {
-            this.filterReciever = new Reciever(reciever);
+            let Reciever = ApplyMixins(LevelObject, [RecieverMixin]);
+            this.filterReciever = new Reciever();
+            this.filterReciever.initializeElement(reciever);
         }
 
     }

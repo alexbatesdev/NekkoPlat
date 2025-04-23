@@ -3,9 +3,13 @@ import { debugLog } from './tools.js';
 import ToggleManager, { MultiStateManager } from './elementStateManagers.js';
 
 export class LevelObject {
-    constructor(element) {
-        this.element = element;
+    constructor() {
+        this.element = null;
         this.enabled = true;
+    }
+
+    initializeElement(element) {
+        this.element = element;
         if (this.element.classList.contains('disabled')) {
             this.enabled = false;
             this.element.style.opacity = '0.5';
@@ -17,125 +21,6 @@ export class LevelObject {
             this.calculateParallax();
         }
     }
-}
-export class SolidObject extends LevelObject{
-    constructor(element) {
-        super(element);
-    }
-
-    reinitStyles() {
-        if (gameInstance.debug) {
-            this.element.style.outline = '3px solid red';
-            this.element.style.outlineOffset = '-3px';
-        } else {
-            this.element.style.outline = 'none';
-        }
-    }
-}
-
-export class TriggerArea extends LevelObject {
-    constructor(element) {
-        super(element);
-        this.element.style.pointerEvents = 'none';
-        if (this.element.classList.contains('disabled')) {
-            this.enabled = false;
-        }
-    }
-
-    trigger() {
-        if (!this.enabled) return;
-        if (this.element.classList.contains('once')) {
-            this.enabled = false;
-            this.element.classList.add('disabled');
-        }
-        debugLog('Triggered');
-        this.element.click();
-    }
-
-    reinitStyles() {
-        if (gameInstance.debug) {
-            this.element.style.outline = '3px solid plum';
-            this.element.style.outlineOffset = '-3px';
-        } else {
-            this.element.style.outline = 'none';
-        }
-    }
-}
-
-export class InteractableObject extends LevelObject {
-    constructor(element) {
-        super(element);
-        if (this.element.classList.contains('clickable')) {
-            this.element.addEventListener('pointerup', () => {
-                this.interact();
-            });
-            this.element.style.cursor = 'pointer';
-        } else {
-            this.element.style.pointerEvents = 'none';
-        }
-    }
-
-    interact() {
-        if (!this.enabled) return;
-        debugLog('Interacted');
-        debugLog(this.element);
-        this.element.click();
-    }
-
-    update() {
-        if (gameInstance.debug) {
-            this.element.style.outline = '3px solid blue';
-        } else {
-            this.element.style.outline = 'none';
-        }
-    }
-}
-
-export class InteractableToggle extends InteractableObject {
-    constructor(element) {
-        super(element);
-        this.stateManager = new ToggleManager(element);
-    }
-
-    interact() {
-        if (!this.enabled) return;
-        this.stateManager.toggle();
-    }
-}
-
-export class Reciever extends LevelObject{
-    constructor(element) {
-        super(element);
-        this.signals = [];
-         //Array.from(this.element.querySelectorAll('.signal')).map(signal => signal.classList[1]);
-        Array.from(this.element.children).forEach(child => {
-            child.classList.forEach(className => {
-                if (className.includes('signal-')) {
-                    this.signals.push(className.split('-')[1]);
-                }
-            });
-        });
-        this.broadcastChannel = "";
-        this.element.querySelectorAll('.broadcast').forEach(element => {
-            element.style.display = 'none';
-            element.classList.forEach(className => {
-                if (className.includes('channel-')) {
-                    this.broadcastChannel = className.split('-')[1];
-                }
-            })
-        });
-        this.stateManager = new MultiStateManager(element, this.signals, this.signals[0]);
-    }
-
-    update() {
-        if (gameInstance.debug) {
-            this.element.style.outline = '3px solid purple';
-        } else {
-            this.element.style.outline = 'none';
-        }
-        this.stateManager.syncStateToBroadcast(this.broadcastChannel);
-    }
-
 }
 
 // USE THIS AS A BASE FOR OTHER INTERACTABLE OBJECTS
@@ -219,9 +104,13 @@ export class Reciever extends LevelObject{
 // - Choose direction impact is needed for state change
 
 export const SolidMixin = Base => class extends Base {
-    constructor(element) {
-        super(element);
-        this.element.classList.add('solid');
+    constructor() {
+        super();
+        this.element = null
+    }
+
+    iinitializeElement(element) {
+        this.element = element;
     }
 
     reinitStyles() {
@@ -235,10 +124,17 @@ export const SolidMixin = Base => class extends Base {
 };
 
 export const TriggerMixin = Base => class extends Base {
-    constructor(element) {
-        super(element);
-        this.element.classList.add('trigger');
+    constructor() {
+        super();
+        this.element = null;
+    }
+    
+    iinitializeElement(element) {
+        this.element = element;
         this.element.style.pointerEvents = 'none';
+        if (this.element.classList.contains('disabled')) {
+            this.enabled = false;
+        }
     }
 
     reinitStyles() {
@@ -262,8 +158,13 @@ export const TriggerMixin = Base => class extends Base {
 };
 
 export const InteractableMixin = Base => class extends Base {
-    constructor(element) {
-        super(element);
+    constructor() {
+        super();
+        this.element = null
+    }
+
+    initializeElement(element) {
+        this.element = element;
         if (this.element.classList.contains('clickable')) {
             this.element.addEventListener('pointerup', () => {
                 this.interact();
@@ -283,9 +184,14 @@ export const InteractableMixin = Base => class extends Base {
 };
 
 export const InteractableToggleMixin = Base => class extends InteractableMixin(Base) {
-    constructor(element) {
-        super(element);
-        this.stateManager = new ToggleManager(element);
+    constructor() {
+        super();
+        this.element = null;
+    }
+    
+    initializeElement(element) {
+        this.element = element;
+        this.stateManager = new ToggleManager(this.element);
     }
 
     interact() {
@@ -294,9 +200,53 @@ export const InteractableToggleMixin = Base => class extends InteractableMixin(B
     }
 }
 
+export const RecieverMixin = Base => class extends Base {
+    constructor() {
+        super()
+        this.element = null;
+        this.signals = []
+        this.broadcastChannel = ""
+        this.stateManager = null
+    }
+
+    initializeElement(element) {
+        this.element = element;
+        Array.from(this.element.children).forEach(child => {
+            child.classList.forEach(className => {
+                if (className.includes('signal-')) {
+                    this.signals.push(className.split('-')[1]);
+                }
+            });
+        });
+        this.element.querySelectorAll('.broadcast').forEach(element => {
+            element.style.display = 'none';
+            element.classList.forEach(className => {
+                if (className.includes('channel-')) {
+                    this.broadcastChannel = className.split('-')[1];
+                }
+            })
+        });
+        this.stateManager = new MultiStateManager(element, this.signals, this.signals[0]);
+    }
+
+    update() {
+        if (gameInstance.debug) {
+            this.element.style.outline = '3px solid purple';
+        } else {
+            this.element.style.outline = 'none';
+        }
+        this.stateManager.syncStateToBroadcast(this.broadcastChannel);
+    }
+}
+
 export const ParallaxMixin = Base => class extends Base {
-    constructor(element) {
-        super(element);
+    constructor() {
+        super();
+        this.element = null;
+    }
+
+    initializeElement(element) {
+        this.element = element;
         if (this.element.classList.contains('plax')) {
             this.calculateParallax();
         }
@@ -333,3 +283,36 @@ export const ParallaxMixin = Base => class extends Base {
         this.element.style.transform = `translate(${xOffset}px, ${yOffset}px) scale(${1 + (parallaxSpeed)})`;
     }
 };
+
+
+export const ApplyMixins = (BaseClass, mixins) => {
+    const updateFns = [];
+    const initializeElementFunctions = []
+
+    for (const mixin of mixins) {
+        const Mixed = mixin(BaseClass);
+        const proto = mixin.prototype || Object.getPrototypeOf(new Mixed());
+
+        if (proto.update) {
+            updateFns.push(proto.update);
+        }
+        if (proto.initializeElement) {
+            initializeElementFunctions.push(proto.initializeElement)
+        }
+
+        BaseClass = Mixed;
+    }
+
+    return class extends BaseClass {
+        update(...args) {
+            for (const fn of updateFns) {
+                fn.call(this, ...args);
+            }
+        }
+        initializeElement(...args) {
+            for (const func of initializeElementFunctions) {
+                func.call(this, ...args)
+            }
+        }
+    };
+}

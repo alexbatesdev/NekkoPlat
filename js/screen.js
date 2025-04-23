@@ -1,11 +1,12 @@
-import { 
-    Reciever, 
-    LevelObject, 
+import {
+    LevelObject,
     TriggerMixin,
     InteractableMixin,
     InteractableToggleMixin,
+    RecieverMixin,
     ParallaxMixin,
     SolidMixin,
+    ApplyMixins,
 } from "./levelObjects.js";
 import { debugLog, intersects, isSubset } from "./tools.js";
 import gameInstance from "./game.js";
@@ -46,7 +47,7 @@ export default class Screen {
     resolveObject(objectElement) {
         const classList = objectElement.classList;
         let mixins = []
-    
+
         if (classList.contains('solid')) {
             mixins.push(SolidMixin)
         }
@@ -59,14 +60,18 @@ export default class Screen {
         if (classList.contains('toggle')) {
             mixins.push(InteractableToggleMixin)
         }
+        if (classList.contains('reciever')) {
+            mixins.push(RecieverMixin)
+        }
         if (classList.contains('plax')) {
             mixins.push(ParallaxMixin)
         }
 
-        let BaseClass = applyMixinsWithChainedUpdates(LevelObject, mixins)
-    
-        const CombinedObject = new BaseClass(objectElement);
-    
+        let BaseClass = ApplyMixins(LevelObject, mixins)
+
+        const CombinedObject = new BaseClass();
+        CombinedObject.initializeElement(objectElement)
+
         // Add the object to the appropriate list
         if (classList.contains('solid') || classList.contains('trigger')) {
             this.collisionObjects.push(CombinedObject);
@@ -130,28 +135,3 @@ export default class Screen {
 }
 
 // JavaScript code written by an AI assistant
-
-function applyMixinsWithChainedUpdates(BaseClass, mixins, objectElement) {
-    const updateFns = [];
-  
-    for (const mixin of mixins) {
-      const Mixed = mixin(BaseClass);
-      console.log("Before Error")
-      const proto = mixin.prototype || Object.getPrototypeOf(new Mixed(objectElement));
-      console.log("after errpor")
-
-      if (proto.update) {
-        updateFns.push(proto.update);
-      }
-  
-      BaseClass = Mixed;
-    }
-  
-    return class extends BaseClass {
-      update(...args) {
-        for (const fn of updateFns) {
-          fn.call(this, ...args);
-        }
-      }
-    };
-  }
