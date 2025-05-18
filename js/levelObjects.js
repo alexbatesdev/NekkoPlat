@@ -301,6 +301,15 @@ export const ItemPickupMixin = Base => class extends Base {
             this.enabled = false;
             this.element.style.opacity = '0.5';
         }
+
+        if (!this.element.classList.contains('respawn') && player.inventory.pickupIDs.includes(this.element.id)) {
+            this.enabled = false;
+            if (this.element.classList.contains('show-ghost')) {
+                this.element.style.opacity = '0.5';
+            } else {
+                this.element.style.display = 'none';
+            }
+        }
     }
 
     reinitStyles() {
@@ -337,9 +346,8 @@ export const ItemPickupMixin = Base => class extends Base {
         const iconElement = itemElement.querySelector('.iconElement')
         const inspectElement = itemElement.querySelector('.inspectElement')
         const description = itemElement.querySelector('.description').innerHTML
-        const count = itemElement.querySelector('.count').innerHTML
+        const count = parseInt(itemElement.querySelector('.count').innerHTML)
         const item = new InventoryItem(itemName, this.element.id, description, count, iconElement, inspectElement);
-        console.log(item)
         this.element.remove();
         player.inventory.addItem(item)
     }

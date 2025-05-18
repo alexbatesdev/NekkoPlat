@@ -1,26 +1,28 @@
 export default class Inventory {
   constructor() {
+    this.pickupIDs = []
     this.itemsList = []
-    this.syncToItemsList()
+    this.syncToInventory()
   }
 
   // Sync itemsList with localstorage
   syncToLocalStorage() {
-    // Check if itemsList is empty
-    if (this.itemsList.length === 0) {
-      localStorage.removeItem('itemsList')
-    } else {
-      localStorage.setItem('itemsList', JSON.stringify(this.itemsList))
-    }
+    localStorage.setItem('itemsList', JSON.stringify(this.itemsList));
   }
 
   // Sync localstorage with itemsList
-  syncToItemsList() {
+  syncToInventory() {
     // Check if localstorage is empty
     if (localStorage.getItem('itemsList') === null) {
       this.itemsList = []
     } else {
       this.itemsList = JSON.parse(localStorage.getItem('itemsList'))
+      for (let i = 0; i < this.itemsList.length; i++) {
+        const item = this.itemsList[i]
+        this.pickupIDs = this.pickupIDs.concat(item.pickupIDs);
+        // Remove duplicate pickupIDs
+        this.pickupIDs = [...new Set(this.pickupIDs)];
+      }
     }
   }
 
@@ -30,7 +32,11 @@ export default class Inventory {
     const existingItem = this.itemsList.find(i => i.name === item.name)
     if (existingItem) {
       existingItem.count += item.count
+      existingItem.pickupIDs.push(item.pickupID)
     } else {
+      const pickupID = item.pickupID
+      delete item.pickupID
+      item.pickupIDs = [pickupID]
       this.itemsList.push(item)
     }
     // Sync localstorage with itemsList
