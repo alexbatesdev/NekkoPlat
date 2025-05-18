@@ -22,12 +22,16 @@ export class LevelObject {
         // Make this a CONFIGURABLE CONSTANT within the HTML setup
         // Where this goes?? I don't know yet
         const PARALLAX_SENSITIVITY = 10;
-        let zIndex = 0;
+        let zIndex = null;
         for (let i = 0; i < this.element.classList.length; i++) {
             if (this.element.classList[i].includes('z')) {
                 zIndex = this.element.style.zIndex;
             }
         }
+        if (zIndex === null) {
+            zIndex = this.element.computedStyleMap().get('z-index').value;
+        }
+
         const parallaxSpeed = (parseInt(zIndex) / 100) * PARALLAX_SENSITIVITY;
         const playerCenterX = gameInstance.camera.element.getBoundingClientRect().left + (gameInstance.camera.element.getBoundingClientRect().width / 2);
         const playerCenterY = gameInstance.camera.element.getBoundingClientRect().top + (gameInstance.camera.element.getBoundingClientRect().height / 2);
