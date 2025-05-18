@@ -3,6 +3,7 @@ export default class Inventory {
     this.pickupIDs = []
     this.itemsList = []
     this.syncToInventory()
+    this.HUD = new HUD(this)
   }
 
   // Sync itemsList with localstorage
@@ -28,11 +29,16 @@ export default class Inventory {
 
   // Add item to the inventory
   addItem(item) {
+    item.inspectElement = item.inspectElement.outerHTML
     // Check if item is already in the inventory
     const existingItem = this.itemsList.find(i => i.name === item.name)
     if (existingItem) {
       existingItem.count += item.count
       existingItem.pickupIDs.push(item.pickupID)
+      // Remove duplicate pickupIDs
+      existingItem.pickupIDs = [...new Set(existingItem.pickupIDs)];
+      // Update the HUD count for the item
+      this.HUD.updateCountForItem(item.name)
     } else {
       const pickupID = item.pickupID
       delete item.pickupID
@@ -44,24 +50,66 @@ export default class Inventory {
   }
   
   // Remove item from the inventory
+  removeItemByName(name, count) {
+    const item = this.itemsList.find(i => i.name === name)
+    if (item) {
+      item.count -= count
+      if (item.count <= 0) {
+        this.itemsList = this.itemsList.filter(i => i.name !== name)
+      }
+      // Sync localstorage with itemsList
+      this.syncToLocalStorage()
+    }
+  }
+  // Remove item from the inventory by pickupID
+  removeItemByPickupID(pickupID) {
+    const item = this.itemsList.find(i => i.pickupIDs.includes(pickupID))
+    if (item) {
+      item.count -= 1
+      item.pickupIDs = item.pickupIDs.filter(id => id !== pickupID)
+      if (item.count <= 0) {
+        this.itemsList = this.itemsList.filter(i => i.name !== item.name)
+      }
+      // Sync localstorage with itemsList
+      this.syncToLocalStorage()
+    }
+  }
 
   // Check if item is in the inventory
+  hasItem(name) {
+    return this.itemsList.some(i => i.name === name)
+  }
 
   // Get item by name
+  getItemByName(name) {
+    const result = this.itemsList.find(i => i.name === name)
+    return result
+  }
 
   // Get all items from the inventory
+  getAllItems() {
+    return this.itemsList
+  }
 
   // Get all items from the inventory with a specific tag
-
-  // Get item icon element
   
   // Modify item in the inventory
-
-
+  modifyItem(name, newItem) {
+    const item = this.itemsList.find(i => i.name === name)
+    if (item) {
+      item.name = newItem.name
+      item.description = newItem.description
+      item.count = newItem.count
+      item.inspectElement = newItem.inspectElement
+      item.onclick = newItem.onclick
+      // Sync localstorage with itemsList
+      this.syncToLocalStorage()
+    }
+  }
 }
 
 export class InventoryItem {
-  constructor(name, pickupID, description, count, iconElement, inspectElement, onclick) {
+  constructor(name, pickupID, description, count, inspectElement, onclick, tags = []) {
     // The name of the item
     this.name = name
     // The ID of the item's pickup container
@@ -72,16 +120,107 @@ export class InventoryItem {
     this.description = description
     // The count of the item in the inventory
     this.count = count
-    // The element that will be used to display the item in the inventory and in the world
-    this.iconElement = iconElement
     // The element that will be used if you want to inspect the item in the inventory
     this.inspectElement = inspectElement
     // The code to be executed when the item is triggered
     this.onclick = onclick
-    // Element's HTML classes are used as tags to modify behavior of the item
+    // tags will be used to modify behavior of the item
+    this.tags = tags
     // tags for things such as:
     // hat-equipable, hand-equipable (uses interact button in the world),
     // stackable, permanent (for things we want to track even at 0 count like money/keys)
 
+  }
+}
+
+export class HUD {
+  constructor(player_inventory) {
+    this.inventory = player_inventory
+    this.HUD = {}
+    this.initialize()
+  }
+
+  initialize() {
+    let elements = document.querySelectorAll('.hud-item')
+    let itemsList = []
+    let hudElements = {}
+    for (let i = 0; i < elements.length; i++) {
+      const element = elements[i]
+      for (let j = 0; j < element.classList.length; j++) {
+        const className = element.classList[j]
+        if (className.startsWith('hud-') && className !== 'hud-item') {
+          const tag = className.split('-')[1]
+          itemsList.push(tag)
+        }
+        if (className.startsWith('hud-') && className !== 'hud-item') {
+          const tag = className.replace('hud-', '')
+          hudElements[tag] = element
+        }
+      }
+    }
+    for (let i = 0; i < itemsList.length; i++) {
+      const item = itemsList[i]
+      for (let j = 0; j < Object.keys(hudElements).length; j++) {
+        const element = hudElements[Object.keys(hudElements)[j]]
+        for (let k = 0; k < element.classList.length; k++) {
+          const className = element.classList[k]
+          if (className.includes(item)) {
+            if (this.HUD[item] === undefined) {
+              this.HUD[item] = [element]
+            } else {
+              this.HUD[item].push(element)
+            }
+
+          }
+        }
+      }
+      // clear duplicates from this.HUD[item]
+      if (this.HUD[item] !== undefined) {
+        this.HUD[item] = [...new Set(this.HUD[item])]
+      }
+    }
+    this.syncCounts()
+  }
+
+  syncCounts() {
+    for (let i = 0; i < Object.keys(this.HUD).length; i++) {
+      const item = Object.keys(this.HUD)[i]
+      const elements = this.HUD[item]
+      for (let j = 0; j < elements.length; j++) {
+        const element = elements[j]
+        const itemObj = this.inventory.getItemByName(item)
+        for (let k = 0; k < element.classList.length; k++) {
+          const className = element.classList[k]
+          if (className.includes('-count')) {
+            if (itemObj) {
+              element.innerHTML = itemObj.count
+            } else {
+              element.innerHTML = '0'
+            }
+          }
+        }
+      }
+    }
+  }
+
+  updateCountForItem(name) {
+    const item = this.inventory.getItemByName(name)
+    if (item) {
+      for (let i = 0; i < Object.keys(this.HUD).length; i++) {
+        const itemName = Object.keys(this.HUD)[i]
+        if (itemName === name) {
+          const elements = this.HUD[itemName]
+          for (let j = 0; j < elements.length; j++) {
+            const element = elements[j]
+            for (let k = 0; k < element.classList.length; k++) {
+              const className = element.classList[k]
+              if (className.includes('-count')) {
+                element.innerHTML = item.count
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }

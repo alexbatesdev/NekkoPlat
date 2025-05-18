@@ -1201,6 +1201,8 @@ a {
     bottom: 50px;
     width: 50px;
     height: 50px;
+    background-image: url("../img/proxy-image.png");
+    background-size: cover;
 }
 
 .item {
@@ -1208,11 +1210,8 @@ a {
     height: 100%;
 }
 
-#mushroom .iconElement {
-    width: 100%;
-    height: 100%;
-    background-image: url("../img/proxy-image.png");
-    background-size: cover;
+.item>span {
+    display: none;
 }
 
 #block {
@@ -1232,5 +1231,29 @@ a {
     width: 100%;
     height: 100%;
     background-color: blue;
+    background-size: cover;
+}
+
+.mushroom-hud {
+    position: absolute;
+    left: 1rem;
+    bottom: 1rem;
+    width: 100px;
+    height: 50px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    font-size: 2rem;
+    font-family: 'Pixel';
+}
+
+.shroom-icon {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    background-image: url("../img/proxy-image.png");
     background-size: cover;
 }

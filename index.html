@@ -75,9 +75,8 @@
         <div class="object rock rock-3"></div>
         <div class="object rock plax z2 rock-1"></div>
 
-        <div class="object pickup on-touch show-ghost" id="mushroom" onclick="console.log('picked up mushroom')">
+        <div class="object pickup on-touch respawn" id="mushroom" onclick="console.log('picked up mushroom')">
           <div class="item name-shroom" onclick="console.log('used mushroom')">
-            <div class="iconElement"></div>
             <span class="inspectElement"></span>
             <span class="description">A mushroom that a plumber told you would increase your size</span>
             <span class="count">1</span>
@@ -150,7 +149,7 @@
       </div>
     </div>
   </div>
-  <!-- Need to make these elements optional (pause) in the javascript to avoid errors! -->
+  <!-- Need to make these elements (pause) optional in the javascript to avoid errors! -->
   <div id="pause">
     <span class="filter blur"></span>
     <span class="filter dark"></span>
@@ -161,6 +160,10 @@
   </div>
   <!-- Need to make these elements (overlay) optional in the javascript to avoid errors! -->
   <div id="overlay">
+    <div class="mushroom-hud">
+      <span class="shroom-icon"></span>
+      <span class="hud-item hud-shroom-count"></span>
+    </div>
     <div id="reciever-3" class="reciever">
       <span class="broadcast channel-toggle_one"></span>
       <div class="signal-none">
