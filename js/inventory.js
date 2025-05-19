@@ -29,7 +29,6 @@ export default class Inventory {
 
   // Add item to the inventory
   addItem(item) {
-    console.log(item)
     item.inspectElement = item.inspectElement.outerHTML
     item.iconElement = item.iconElement.outerHTML
     // Check if item is already in the inventory
@@ -148,6 +147,12 @@ export class InventoryItem {
     // hat-equipable, hand-equipable (uses interact button in the world),
     // stackable, permanent (for things we want to track even at 0 count like money/keys)
 
+  }
+
+  triggerOnClick() {
+    const body = this.onclick.substring(this.onclick.indexOf('{') + 1, this.onclick.lastIndexOf('}')).trim();
+    const func = new Function(body);
+    func.call(this);
   }
 }
 

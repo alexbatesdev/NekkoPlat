@@ -333,7 +333,6 @@ export const ItemPickupMixin = Base => class extends Base {
 
     pickup() {
         this.enabled = false;
-        // this.element.classList.add('disabled');
         this.element.click();
         const itemElement = this.element.querySelector('.item')
         let itemName = "";
@@ -343,12 +342,25 @@ export const ItemPickupMixin = Base => class extends Base {
                 itemName = itemElement.classList[i].replace('name-', '');
             }
         }
+        const onClick = itemElement.onclick
+        // convert onClick to a string
+        let onClickString;
+        if (onClick) {
+            onClickString = onClick.toString();
+            // remove the function keyword and the parameters
+            onClickString = onClickString.replace('function', '');
+            onClickString = onClickString.replace(/\(.*?\)/, '');
+        }
         const inspectElement = itemElement.querySelector('.inspectElement')
         const iconElement = itemElement.querySelector('.iconElement')
         const description = itemElement.querySelector('.description').innerHTML
         const count = parseInt(itemElement.querySelector('.count').innerHTML)
-        const item = new InventoryItem(itemName, this.element.id, description, count, iconElement, inspectElement);
+        const item = new InventoryItem(itemName, this.element.id, description, count, iconElement, inspectElement, onClickString);
         this.element.remove();
+        if (this.element.classList.contains('instant-use')) {
+            item.triggerOnClick();
+            return;
+        }
         player.inventory.addItem(item)
     }
 };
