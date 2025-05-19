@@ -77,6 +77,7 @@
 
         <div class="object pickup on-touch respawn" id="mushroom" onclick="console.log('picked up mushroom')">
           <div class="item name-shroom" onclick="console.log('used mushroom')">
+            <div class="iconElement shroom-icon"></div>
             <span class="inspectElement"></span>
             <span class="description">A mushroom that a plumber told you would increase your size</span>
             <span class="count">1</span>
@@ -161,7 +162,7 @@
   <!-- Need to make these elements (overlay) optional in the javascript to avoid errors! -->
   <div id="overlay">
     <div class="mushroom-hud">
-      <span class="shroom-icon"></span>
+      <span class="hud-item hud-shroom-icon"></span>
       <span class="hud-item hud-shroom-count"></span>
     </div>
     <div id="reciever-3" class="reciever">

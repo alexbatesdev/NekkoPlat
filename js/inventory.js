@@ -29,7 +29,9 @@ export default class Inventory {
 
   // Add item to the inventory
   addItem(item) {
+    console.log(item)
     item.inspectElement = item.inspectElement.outerHTML
+    item.iconElement = item.iconElement.outerHTML
     // Check if item is already in the inventory
     const existingItem = this.itemsList.find(i => i.name === item.name)
     if (existingItem) {
@@ -44,7 +46,11 @@ export default class Inventory {
       delete item.pickupID
       item.pickupIDs = [pickupID]
       this.itemsList.push(item)
+      // Update the HUD count for the item
+      this.HUD.updateCountForItem(item.name)
+      this.HUD.setIcons()
     }
+    console.log(this.itemsList)
     // Sync localstorage with itemsList
     this.syncToLocalStorage()
   }
@@ -91,6 +97,15 @@ export default class Inventory {
     return this.itemsList
   }
 
+  // Get Item Icon by name
+  getItemIcon(name) {
+    const item = this.itemsList.find(i => i.name === name)
+    if (item) {
+      return item.iconElement
+    }
+    return null
+  }
+
   // Get all items from the inventory with a specific tag
   
   // Modify item in the inventory
@@ -100,7 +115,8 @@ export default class Inventory {
       item.name = newItem.name
       item.description = newItem.description
       item.count = newItem.count
-      item.inspectElement = newItem.inspectElement
+      item.inspectElement = newItem.inspectElement.outerHTML
+      item.iconElement = newItem.iconElement.outerHTML
       item.onclick = newItem.onclick
       // Sync localstorage with itemsList
       this.syncToLocalStorage()
@@ -109,7 +125,7 @@ export default class Inventory {
 }
 
 export class InventoryItem {
-  constructor(name, pickupID, description, count, inspectElement, onclick, tags = []) {
+  constructor(name, pickupID, description, count, iconElement, inspectElement, onclick, tags = []) {
     // The name of the item
     this.name = name
     // The ID of the item's pickup container
@@ -120,6 +136,8 @@ export class InventoryItem {
     this.description = description
     // The count of the item in the inventory
     this.count = count
+    // The element that will be used to display the item in the inventory
+    this.iconElement = iconElement
     // The element that will be used if you want to inspect the item in the inventory
     this.inspectElement = inspectElement
     // The code to be executed when the item is triggered
@@ -180,6 +198,31 @@ export class HUD {
       }
     }
     this.syncCounts()
+    this.setIcons()
+  }
+
+  setIcons() {
+    for (let i = 0; i < Object.keys(this.HUD).length; i++) {
+      const item = Object.keys(this.HUD)[i]
+      const elements = this.HUD[item]
+      for (let j = 0; j < elements.length; j++) {
+        const element = elements[j]
+        const itemObj = this.inventory.getItemByName(item)
+        for (let k = 0; k < element.classList.length; k++) {
+          const className = element.classList[k]
+          if (className.includes('-icon')) {
+            console.log('setting icon for ' + item)
+            console.log(itemObj)
+            console.log(element)
+            if (itemObj) {
+              element.innerHTML = itemObj.iconElement
+            } else {
+              element.innerHTML = ''
+            }
+          }
+        }
+      }
+    }
   }
 
   syncCounts() {
@@ -195,7 +238,7 @@ export class HUD {
             if (itemObj) {
               element.innerHTML = itemObj.count
             } else {
-              element.innerHTML = '0'
+              element.innerHTML = ''
             }
           }
         }

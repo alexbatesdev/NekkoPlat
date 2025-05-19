@@ -344,9 +344,10 @@ export const ItemPickupMixin = Base => class extends Base {
             }
         }
         const inspectElement = itemElement.querySelector('.inspectElement')
+        const iconElement = itemElement.querySelector('.iconElement')
         const description = itemElement.querySelector('.description').innerHTML
         const count = parseInt(itemElement.querySelector('.count').innerHTML)
-        const item = new InventoryItem(itemName, this.element.id, description, count, inspectElement);
+        const item = new InventoryItem(itemName, this.element.id, description, count, iconElement, inspectElement);
         this.element.remove();
         player.inventory.addItem(item)
     }
