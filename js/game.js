@@ -125,6 +125,7 @@ class Game {
         if (this.paused) {
             this.pauseElement.style.visibility = 'visible';
             this.pauseElement.style.pointerEvents = 'all';
+            this.player.inventory.HUD.syncInventoryMenu();
         } else {
             this.pauseElement.style.visibility = 'hidden';
             this.pauseElement.style.pointerEvents = 'none';

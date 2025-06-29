@@ -1,3 +1,5 @@
+import gameInstance from "./game.js";
+
 export default class Inventory {
   constructor() {
     this.pickupIDs = []
@@ -96,6 +98,13 @@ export default class Inventory {
     return this.itemsList
   }
 
+  // Get a page of items from the inventory
+  getItemsPage(page, pageSize) {
+    const start = (page - 1) * pageSize
+    const end = start + pageSize
+    return this.itemsList.slice(start, end)
+  }
+
   // Get Item Icon by name
   getItemIcon(name) {
     const item = this.itemsList.find(i => i.name === name)
@@ -164,6 +173,12 @@ export class HUD {
   }
 
   initialize() {
+    this.mapHudElements();
+    this.syncCounts()
+    this.setIcons()
+  }
+
+  mapHudElements() {
     let elements = document.querySelectorAll('.hud-item')
     let itemsList = []
     let hudElements = {}
@@ -193,7 +208,6 @@ export class HUD {
             } else {
               this.HUD[item].push(element)
             }
-
           }
         }
       }
@@ -202,8 +216,6 @@ export class HUD {
         this.HUD[item] = [...new Set(this.HUD[item])]
       }
     }
-    this.syncCounts()
-    this.setIcons()
   }
 
   setIcons() {
@@ -216,9 +228,6 @@ export class HUD {
         for (let k = 0; k < element.classList.length; k++) {
           const className = element.classList[k]
           if (className.includes('-icon')) {
-            console.log('setting icon for ' + item)
-            console.log(itemObj)
-            console.log(element)
             if (itemObj) {
               element.innerHTML = itemObj.iconElement
             } else {
@@ -269,6 +278,88 @@ export class HUD {
           }
         }
       }
+    }
+  }
+
+    // Sync the inventory menu with the itemsList
+  syncInventoryMenu() {
+    const inventoryMenu = document.getElementById('inventory-menu')
+    const itemList = inventoryMenu.querySelector('.item-list')
+    const itemListPatternElement = inventoryMenu.querySelector('.list-pattern')
+    const itemListPattern = itemListPatternElement.querySelector('.item-wrapper')
+    
+    // Create a copy of the itemListPattern to use as a template
+    const itemListPatternTemplate = itemListPattern.cloneNode(true)
+    // Clear the itemList
+    itemList.innerHTML = ''
+    itemList.appendChild(itemListPatternElement)
+    if (!gameInstance.debug) {
+      itemListPatternElement.style.display = 'none'
+    }
+    
+    for (let i = 0; i < this.inventory.itemsList.length; i++) {
+      const item = this.inventory.itemsList[i]
+      console.log(item)
+      const itemElement = itemListPatternTemplate.cloneNode(true)
+      const itemIcon = itemElement.querySelector('.item-icon')
+      const itemName = itemElement.querySelector('.item-name')
+      const itemCount = itemElement.querySelector('.item-count')
+      const itemDescription = itemElement.querySelector('.item-description')
+      
+      // Replace the itemElement onClick with a method that displays the element's "inspectElement" in a window on screen
+
+      // Set the item icon, name, count, and description if not undefined
+      if (itemIcon && item.iconElement) {
+        itemIcon.innerHTML = item.iconElement
+        if (itemIcon.title == 'item-description') {
+          itemIcon.title = item.description || 'No description available'
+        } else if (itemIcon.title == 'item-name') {
+          itemIcon.title = item.name || 'No name available'
+        } else if (itemIcon.title == 'item-count') {
+          itemIcon.title = item.count || 'No count available'
+        }
+      }
+      if (itemName) {
+        itemName.innerHTML = item.name
+        if (itemName.title == 'item-description') {
+          itemName.title = item.description || 'No description available'
+        } else if (itemName.title == 'item-name') {
+          itemName.title = item.name || 'No name available'
+        } else if (itemName.title == 'item-count') {
+          itemName.title = item.count || 'No count available'
+        }
+      }
+      if (itemCount) {
+        itemCount.innerHTML = item.count
+        if (itemCount.title == 'item-description') {
+          itemCount.title = item.description || 'No description available'
+        } else if (itemCount.title == 'item-name') {
+          itemCount.title = item.name || 'No name available'
+        } else if (itemCount.title == 'item-count') {
+          itemCount.title = item.count || 'No count available'
+        }
+      }
+      if (itemDescription) {
+        itemDescription.innerHTML = item.description || 'No description available'
+        if (itemDescription.title == 'item-description') {
+          itemDescription.title = item.description || 'No description available'
+        } else if (itemDescription.title == 'item-name') {
+          itemDescription.title = item.name || 'No name available'
+        } else if (itemDescription.title == 'item-count') {
+          itemDescription.title = item.count || 'No count available'
+        }
+      }
+
+      console.log(itemElement)
+      
+      
+      itemElement.onclick = () => {
+        // Open item menu here
+        console.log('clicked item, open item menu here')
+        // You can add your own logic to handle item click
+        // For example, you can open a modal with item details
+      }
+      itemList.appendChild(itemElement)
     }
   }
 }
