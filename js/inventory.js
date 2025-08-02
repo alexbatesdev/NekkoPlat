@@ -372,6 +372,24 @@ export class HUD {
         }
       }
 
+      const inspectButton = itemElement.querySelector('.inspect-button')
+      if (inspectButton) {
+        inspectButton.onclick = () => {
+          console.log('Inspecting item:', item.name);
+          // Create a new window to display the inspectElement
+          const inspectWindow = document.createElement('div');
+          inspectWindow.className = 'inspect-window';
+          inspectWindow.innerHTML = item.inspectElement;
+          inspectWindow.title = 'click to close';
+          document.body.appendChild(inspectWindow);
+          
+          // Close the inspect window when clicked
+          inspectWindow.onclick = () => {
+            document.body.removeChild(inspectWindow);
+          }
+        }
+      }
+
       itemList.appendChild(itemElement)
     }
   }
