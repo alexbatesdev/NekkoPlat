@@ -39,6 +39,7 @@
     background-color: rgba(0, 0, 0, 0.5);
     color: white;
     border-radius: 10px;
+    min-width: 350px;
 }
 
 #inventory-menu h1 {
@@ -55,13 +56,21 @@
 
 .item-wrapper {
     display: flex;
+    overflow-x: hidden;
+    overflow-y: auto;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between;
     gap: 1rem;
     padding: 0.5rem;
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 5px;
-    cursor: pointer;
+    /* cursor: pointer; */
+}
+
+.item-wrapper > div {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .item-name {
@@ -72,4 +81,10 @@
 .item-count {
     font-size: 1.5rem;
     font-weight: bold;
+}
+
+.use-button,
+.inspect-button {
+    cursor: pointer;
+    user-select: none;
 }

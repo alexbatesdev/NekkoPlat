@@ -352,13 +352,26 @@ export class HUD {
 
       console.log(itemElement)
       
-      
-      itemElement.onclick = () => {
-        // Open item menu here
-        console.log('clicked item, open item menu here')
-        // You can add your own logic to handle item click
-        // For example, you can open a modal with item details
+      const useButton = itemElement.querySelector('.use-button')
+      if (useButton) {
+        useButton.onclick = () => {
+          if (item.onclick) {
+            // Extract the function body from the string
+            const body = item.onclick.substring(item.onclick.indexOf('{') + 1, item.onclick.lastIndexOf('}')).trim();
+            const func = new Function(body);
+            func.call(item); // 'item' as 'this'
+          }
+        }
+      } else {
+        itemElement.onclick = () => {
+          if (item.onclick) {
+            const body = item.onclick.substring(item.onclick.indexOf('{') + 1, item.onclick.lastIndexOf('}')).trim();
+            const func = new Function(body);
+            func.call(item);
+          }
+        }
       }
+
       itemList.appendChild(itemElement)
     }
   }

@@ -6,7 +6,7 @@ This project has evolved from a project for fun, to a project for fun and practi
 
 ## Trello
 
-Sometimes I'm bad at updating it, but the trello board for this project is here: [NekkoPlat Trello](https://trello.com/b/2b0d1Z3E/nekko-plat)
+Sometimes I'm bad at updating it, but the trello board for this project is here: [NekkoPlat Trello](https://trello.com/b/zEzz79qL/nekkoplat)
 
 
 NOTE: These docs may be out of date! I really don't remember. Eventually things will be more set in stone and I'll update the docs again

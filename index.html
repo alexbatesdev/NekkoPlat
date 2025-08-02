@@ -165,11 +165,19 @@
       <h1>Inventory</h1>
       <div class="item-list">
         <div class="list-pattern">
-          <div class="item-wrapper" onclick="console.log('clicked item, open item menu here')">
-            <span class="item-icon" title="item-name"><span class="shroom-icon" style="filter: invert();"></span></span>
-            <span class="item-name" title="item-description">Placeholder</span>
-            <span>X</span>
-            <span class="item-count">-1</span>
+          <div class="item-wrapper">
+            <div>
+              <span class="item-icon" title="item-name"><span class="shroom-icon" style="filter: invert();"></span></span>
+              <span class="item-name" title="item-description">Placeholder</span>
+              <span>X</span>
+              <span class="item-count">-1</span>
+            </div>
+            <div>
+              <!-- USE BUTTON -->
+              <span class="use-button">use</span>
+              <!-- INSPECT BUTTON -->
+              <span class="inspect-button">inspect</span>
+            </div>
           </div>
         </div>
         <!-- Items will be dynamically added here -->
