@@ -91,8 +91,8 @@
               <p>ON</p>
             </div>
           </div>
-          
-          <div id="toggle-1" class="object interactable toggle">
+
+          <div id="toggle-2" class="object clickable interactable toggle">
             <div class="on">
               <span class="broadcast channel-toggle_two">on</span>
               <p>ON</p>
@@ -117,8 +117,15 @@
                 <h2>This is the dev mushroom</h2>
                 <p>Click the button below to toggle the broadcast on or off</p>
                 <button
-                  class="toggle-broadcast"
-                  onclick="alert('make me integrate with the broadcast system')"
+                  onclick="
+                  console.log('awooga')
+                  const broadcastValue = game.signalManager.checkBroadcast('toggle_two');
+                  if (broadcastValue === 'on') {
+                    game.signalManager.broadcastSignal('toggle_two', 'off');
+                  } else {
+                    game.signalManager.broadcastSignal('toggle_two', 'on');
+                  }
+                "
                 >
                   Toggle Broadcast
                 </button>
