@@ -223,7 +223,7 @@ export const RecieverMixin = Base => class extends Base {
         this.stateManager.syncStateToBroadcast(this.broadcastChannel);
     }
 }
-RecieverMixin.tags = [];
+RecieverMixin.tags = ['reciever'];
 
 export const ParallaxMixin = Base => class extends Base {
     constructor() {

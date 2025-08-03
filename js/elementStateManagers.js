@@ -103,7 +103,7 @@ export class MultiStateManager {
 
     syncStateToBroadcast(channel) {
         const state = gameInstance.signalManager.checkBroadcast(channel);
-        if (state) {
+        if (this.currentState !== state) {
             this.setState(state);
         }
     }

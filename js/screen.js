@@ -47,6 +47,9 @@ export default class Screen {
             if (capabilities.includes('parallax')) {
                 this.parallaxObjects.push(CombinedObject);
             }
+            if (capabilities.includes('reciever')) {
+                this.recievers.push(CombinedObject);
+            }
         });
     }
 
