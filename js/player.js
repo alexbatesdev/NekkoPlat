@@ -93,11 +93,19 @@ export default class Player {
     }
 
     setConfigItem(configItem, default_value) {
+        if (!this.configElement) {
+            console.warn(
+                `No player config element found for ${configItem}, using default value: ${default_value}`,
+            );
+            return default_value;
+        }
         const configItemElement = this.configElement.querySelector(`.${configItem}`);
         if (configItemElement) {
             return Number(configItemElement.innerHTML);
         } else {
-            console.warn("No config element found for " + configItem + ", using default value: " + default_value);
+            console.warn(
+                `No config element found for ${configItem}, using default value: ${default_value}`,
+            );
             return default_value;
         }
     }
