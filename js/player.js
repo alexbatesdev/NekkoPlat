@@ -152,9 +152,9 @@ export default class Player {
         this.spawnAt(this.respawnX, this.respawnY, this.respawnScreen);
     }
 
-    update() {
-        this.processInput();
-        this.physics.applyPhysics(this, this.collision.state);
+    update(delta) {
+        this.processInput(delta);
+        this.physics.applyPhysics(this, this.collision.state, delta);
         this.collision.applyCollisions(this, this.collisionObjects);
         this.processCollisions();
         // console.log(this.interactableObjects);
@@ -202,7 +202,7 @@ export default class Player {
         if ((this.collision.state.left > 0 || this.collision.state.right) && this.velocityY > 0) this.velocityY *= 0.5; 
     }
 
-    processInput() {
+    processInput(delta) {
         if (gameInstance.keyState['SHIFT'] && this.grounded) {
             this.physics.acceleration = this.sprintAcceleration;
             this.physics.maxVelocity = this.sprintMaxVelocity;
@@ -214,13 +214,13 @@ export default class Player {
         // Movement calculations here
         if (gameInstance.keyState['A']) {
             this.lookLeft();
-            this.physics.move(this, -this.physics.acceleration, 0);
+            this.physics.move(this, -this.physics.acceleration, 0, delta);
         }
         if (gameInstance.keyState['D']) {
             this.lookRight();
-            this.physics.move(this, this.physics.acceleration, 0);
+            this.physics.move(this, this.physics.acceleration, 0, delta);
         }
-        if (gameInstance.keyState['S']) this.velocityY += this.physics.acceleration;
+        if (gameInstance.keyState['S']) this.physics.move(this, 0, this.physics.acceleration, delta);
         // Similar for other directions
         if (gameInstance.keyState['W'] || gameInstance.keyState['SPACE']) {
             this.jump();

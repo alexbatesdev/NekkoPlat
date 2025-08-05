@@ -91,17 +91,21 @@ class Game {
     }
 
     start() {
+        this.lastTime = performance.now();
         requestAnimationFrame(this.update.bind(this));
         this.initKeyStateListeners();
         this.player.start();
     }
 
     update() {
+        const now = performance.now();
+        const delta = (now - this.lastTime) / 1000; // seconds elapsed since last frame
+        this.lastTime = now;
         this.processInput();
         if (!this.paused) {
-            this.player.update(this.keyState);
-            this.level.update();
-            this.camera.update();
+            this.player.update(delta);
+            this.level.update(delta);
+            this.camera.update(delta);
         }
 
 
