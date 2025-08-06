@@ -111,6 +111,25 @@ This is the most basic object. It is a wall that the player cannot pass through.
 
 This would make a black floor that covers the entire width of the screen.
 
+### Slope
+
+Sloped terrain can be created with regular HTML elements as well. Add the
+classes `object`, `solid`, and `slope` to an element and describe the ramp's
+direction with a `data-slope` attribute. The value can be `up-right`,
+`up-left`, `down-right`, or `down-left`.
+
+You are free to style the element using CSS transforms or `clip-path` to draw
+the actual slope. The engine uses the element's bounding box and the
+`data-slope` direction to calculate collisions and sliding.
+
+```html
+<div class="object solid slope" data-slope="up-right"
+     style="width:200px;height:200px;clip-path:polygon(0% 100%,100% 100%,100% 0%);"></div>
+```
+
+The example above creates a triangle that rises to the right, allowing the
+player to walk up or slide down the surface.
+
 ### Screen
 
 ```html
