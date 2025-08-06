@@ -103,8 +103,12 @@ Applies gravity, friction and acceleration limits. Provides a `move` method used
 ### `interactionBox.js`
 Tracks nearby interactable objects relative to the player. When the player presses `E`, it calls `interact()` on any overlapping interactables and shows an indicator while in range.
 
+Idea 🐢: Make the interaction only happen with 1 interactable in range, then add a button to cycle through them. Only show the interaction indicator over the currently selected interactable.
+
 ### `broadcastManager.js`
 Minimal pub/sub system. Stores channel → signal mappings, allowing toggles to broadcast state changes and receivers to query them.
+
+Idea 🐢: Instead of having receivers query every frame, have them listen for specific broadcast events and only update when those events occur. We can make custom events for event listeners, right? 
 
 ### `elementStateManagers.js`
 `ToggleManager` swaps visibility of `.on`/`.off` elements and issues broadcasts. `MultiStateManager` selects a child matching a broadcast signal from a channel.

@@ -15,7 +15,6 @@ class BroadcastManager {
     }
 
     stopBroadcast(channel) {
-        this.broadcasts[channel] = null; // Probly dont need this? >🐢
         delete this.broadcasts[channel];
     }
 
