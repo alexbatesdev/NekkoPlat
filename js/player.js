@@ -219,26 +219,29 @@ export default class Player {
     }
 
     processInput() {
-        if (gameInstance.keyState['SHIFT'] && this.grounded) {
+        const input = gameInstance.inputManager;
+        const shift = input.isKeyActive('ShiftLeft') || input.isKeyActive('ShiftRight');
+
+        if (shift && this.grounded) {
             this.physics.acceleration = this.sprintAcceleration;
             this.physics.maxVelocity = this.sprintMaxVelocity;
-        } else if (!gameInstance.keyState['SHIFT'] && this.grounded) {
+        } else if (!shift && this.grounded) {
             this.physics.acceleration = this.acceleration;
             this.physics.maxVelocity = this.maxVelocity;
         }
 
         // Movement calculations here
-        if (gameInstance.keyState['A']) {
+        if (input.isKeyActive('KeyA')) {
             this.lookLeft();
             this.physics.move(this, -this.physics.acceleration, 0);
         }
-        if (gameInstance.keyState['D']) {
+        if (input.isKeyActive('KeyD')) {
             this.lookRight();
             this.physics.move(this, this.physics.acceleration, 0);
         }
-        if (gameInstance.keyState['S']) this.velocityY += this.physics.acceleration;
+        if (input.isKeyActive('KeyS')) this.velocityY += this.physics.acceleration;
         // Similar for other directions
-        if (gameInstance.keyState['W'] || gameInstance.keyState['SPACE']) {
+        if (input.isKeyActive('KeyW') || input.isKeyActive('Space')) {
             this.jump();
         } else {
             this.jumpProcessed = false; // Reset the flag when 'W' is not pressed
@@ -248,7 +251,7 @@ export default class Player {
                 this.physics.gravity = this.gravity;
             }
         }
-        if (gameInstance.keyState['R']) {
+        if (input.isKeyActive('KeyR')) {
             this.respawnAtCheckpoint();
         }
     }
@@ -285,8 +288,10 @@ export default class Player {
     }
 
     applyAnimations() {
-        if (Math.abs(this.velocityX) > 0 && gameInstance.keyState['SHIFT']) this.animationManager.changeAnimation('run');
-        else if (Math.abs(this.velocityX) > 0 && (gameInstance.keyState['A'] || gameInstance.keyState['D'])) this.animationManager.changeAnimation('walk');
+        const input = gameInstance.inputManager;
+        const shift = input.isKeyActive('ShiftLeft') || input.isKeyActive('ShiftRight');
+        if (Math.abs(this.velocityX) > 0 && shift) this.animationManager.changeAnimation('run');
+        else if (Math.abs(this.velocityX) > 0 && (input.isKeyActive('KeyA') || input.isKeyActive('KeyD'))) this.animationManager.changeAnimation('walk');
         else if (this.grounded) this.animationManager.changeAnimation('idle');
         else this.animationManager.changeAnimation('jump');
     }
