@@ -6,16 +6,11 @@ class Game {
     constructor() {
         this.player = null;
         this.level = null;
-        this.camera = new Camera();
-        this.pauseElement = document.getElementById('pause');
-        if (this.pauseElement) {
-            this.camera.overlayElement.appendChild(this.pauseElement);
-            this.initPauseElement();
-        }
 
         this.debug = false;
         this.paused = false;
         this.processedInput = false;
+
         // New input processor/keyState system
         // https://chatgpt.com/c/f5c9ad3a-6d67-40eb-b2a6-9dc3d5afcff0
         this.keyState = {
@@ -32,6 +27,13 @@ class Game {
             ARROWRIGHT: false,
             ESCAPE: false
         };
+
+        this.camera = new Camera(this.player, this.keyState, () => this.debug);
+        this.pauseElement = document.getElementById('pause');
+        if (this.pauseElement) {
+            this.camera.overlayElement.appendChild(this.pauseElement);
+            this.initPauseElement();
+        }
 
         this.signalManager = new BroadcastManager();
 
@@ -61,6 +63,7 @@ class Game {
 
     setPlayer(player) {
         this.player = player;
+        this.camera.setPlayer(player);
     }
 
     getPlayer() {
