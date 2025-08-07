@@ -154,7 +154,6 @@ export default class Player {
 
     update() {
 
-        console.log(this.grounded)
         this.processInput();
         this.physics.applyPhysics(this, this.collision.state);
 
