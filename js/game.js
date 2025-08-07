@@ -92,22 +92,29 @@ class Game {
 
     start() {
         this.lastTime = performance.now();
+        this.accumulator = 0;
+        this.fixedDelta = 1 / 60; // 60 FPS simulation step
         requestAnimationFrame(this.update.bind(this));
         this.initKeyStateListeners();
         this.player.start();
     }
 
-    update() {
-        const now = performance.now();
-        const delta = (now - this.lastTime) / 1000; // seconds elapsed since last frame
+    update(timestamp) {
+        const now = timestamp || performance.now();
+        let frameTime = (now - this.lastTime) / 1000; // convert to seconds
+        if (frameTime > 0.25) frameTime = 0.25; // avoid spiral of death
         this.lastTime = now;
-        this.processInput();
-        if (!this.paused) {
-            this.player.update(delta);
-            this.level.update(delta);
-            this.camera.update(delta);
-        }
+        this.accumulator += frameTime;
 
+        while (this.accumulator >= this.fixedDelta) {
+            this.processInput();
+            if (!this.paused) {
+                this.player.update(this.fixedDelta);
+                this.level.update(this.fixedDelta);
+                this.camera.update(this.fixedDelta);
+            }
+            this.accumulator -= this.fixedDelta;
+        }
 
         requestAnimationFrame(this.update.bind(this));
     }

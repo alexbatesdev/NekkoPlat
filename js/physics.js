@@ -7,13 +7,12 @@ export class Physics {
         this.friction = 0.93;
     }
 
-    applyPhysics(object, collisionState, delta) {
-        const frameMult = delta * 60; // scale values to maintain 60fps behaviour
-        object.velocityY += this.gravity * frameMult;
+    applyPhysics(object, collisionState) {
+        object.velocityY += this.gravity;
         if (object.grounded && Math.abs(object.velocityX) < 0.2) {
             object.velocityX = 0;
         } else if (object.grounded) {
-            object.velocityX *= Math.pow(this.friction, frameMult);
+            object.velocityX *= this.friction;
         }
 
         // Apply max falling velocity
@@ -28,18 +27,14 @@ export class Physics {
         } else if (object.velocityX < -this.maxVelocity) {
             object.velocityX = -this.maxVelocity;
         }
-
-        object.x += object.velocityX * frameMult;
-        object.y += object.velocityY * frameMult;
     }
 
-    move(object, xVelocity, yVelocity, delta) {
-        const frameMult = delta * 60;
+    move(object, xVelocity, yVelocity) {
         if (object.grounded) {
-            object.velocityX += xVelocity * frameMult;
+            object.velocityX += xVelocity;
         } else {
-            object.velocityX += (xVelocity * 0.5) * frameMult;
+            object.velocityX += (xVelocity * 0.5);
         }
-        object.velocityY += yVelocity * frameMult;
+        object.velocityY += yVelocity;
     }
 }

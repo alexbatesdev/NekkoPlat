@@ -153,25 +153,24 @@ export default class Player {
     }
 
     update(delta) {
-        this.processInput(delta);
-        this.physics.applyPhysics(this, this.collision.state, delta);
-        this.collision.applyCollisions(this, this.collisionObjects);
+        this.processInput();
+        this.physics.applyPhysics(this, this.collision.state);
+
+        const steps = Math.ceil(Math.max(Math.abs(this.velocityX), Math.abs(this.velocityY)));
+        const iterations = Math.max(1, steps);
+        for (let i = 0; i < iterations; i++) {
+            this.x += this.velocityX / iterations;
+            this.y += this.velocityY / iterations;
+            this.element.style.left = `${this.x}px`;
+            this.element.style.top = `${this.y}px`;
+            this.collision.applyCollisions(this, this.collisionObjects);
+            if (this.velocityX === 0 && this.velocityY === 0) break;
+        }
+
         this.processCollisions();
-        // console.log(this.interactableObjects);
         this.interactionBox.update();
         this.applyAnimations();
-        // Set the position of the player's HTML element
-        this.element.style.left = `${this.x}px`;
-        this.element.style.top = `${this.y}px`;
-        // debugLog({
-        //     x: this.x,
-        //     y: this.y,
-        //     velocityX: this.velocityX,
-        //     velocityY: this.velocityY,
-        //     gravity: this.liveGravity,
-        //     grounded: this.grounded,
-        //     collisionState: this.collision.state,
-        // });
+
         document.getElementById('xPositionDisplay').innerHTML = Math.round(this.x + this.element.getBoundingClientRect().width / 2);
         document.getElementById('yPositionDisplay').innerHTML = Math.round(this.y + this.element.getBoundingClientRect().height / 2);
         if (gameInstance.debug) {
@@ -202,7 +201,7 @@ export default class Player {
         if ((this.collision.state.left > 0 || this.collision.state.right) && this.velocityY > 0) this.velocityY *= 0.5; 
     }
 
-    processInput(delta) {
+    processInput() {
         if (gameInstance.keyState['SHIFT'] && this.grounded) {
             this.physics.acceleration = this.sprintAcceleration;
             this.physics.maxVelocity = this.sprintMaxVelocity;
@@ -214,13 +213,13 @@ export default class Player {
         // Movement calculations here
         if (gameInstance.keyState['A']) {
             this.lookLeft();
-            this.physics.move(this, -this.physics.acceleration, 0, delta);
+            this.physics.move(this, -this.physics.acceleration, 0);
         }
         if (gameInstance.keyState['D']) {
             this.lookRight();
-            this.physics.move(this, this.physics.acceleration, 0, delta);
+            this.physics.move(this, this.physics.acceleration, 0);
         }
-        if (gameInstance.keyState['S']) this.physics.move(this, 0, this.physics.acceleration, delta);
+        if (gameInstance.keyState['S']) this.physics.move(this, 0, this.physics.acceleration);
         // Similar for other directions
         if (gameInstance.keyState['W'] || gameInstance.keyState['SPACE']) {
             this.jump();
