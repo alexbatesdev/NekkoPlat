@@ -109,9 +109,9 @@ class Game {
         while (this.accumulator >= this.fixedDelta) {
             this.processInput();
             if (!this.paused) {
-                this.player.update(this.fixedDelta);
-                this.level.update(this.fixedDelta);
-                this.camera.update(this.fixedDelta);
+                this.player.update();
+                this.level.update();
+                this.camera.update();
             }
             this.accumulator -= this.fixedDelta;
         }

@@ -152,7 +152,9 @@ export default class Player {
         this.spawnAt(this.respawnX, this.respawnY, this.respawnScreen);
     }
 
-    update(delta) {
+    update() {
+
+        console.log(this.grounded)
         this.processInput();
         this.physics.applyPhysics(this, this.collision.state);
 
