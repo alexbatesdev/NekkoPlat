@@ -60,78 +60,63 @@ export class CollisionDetection {
         collisionObjects.forEach(collisionObject => {
             if (!collisionObject.enabled) return;
             if (collisionObject.element.classList.contains('trigger')) return;
-            for (let i = 0.25; i < 1; i += 0.25) {
-                let playerRectNext = {
-                    left: playerRect.left + 20,
-                    right: playerRect.right - 20,
-                    top: playerRect.top + (object.velocityY * i),
-                    bottom: playerRect.bottom + ((object.velocityY - object.physics.gravity) * i),
-                    x: playerRect.x,
-                    y: playerRect.y,
-                    width: playerRect.width,
-                    height: playerRect.height,
-                }
-                if (intersects(playerRectNext, collisionObject.element.getBoundingClientRect())) {
-                    if (collisionObject.element.classList.contains('solid')) {
-                        object.velocityY = 0;
-                    }
-                }
-            }
             if (intersects(playerRect, collisionObject.element.getBoundingClientRect())) {
                 const collision = getCollisionOverlap(playerRect, collisionObject.element.getBoundingClientRect());
                 if (collision.bottom > 0 && collisionObject.element.classList.contains('solid')) {
                     collisionCount++;
                     this.state.bottom = collision.bottom;
                     object.y -= collision.bottom;
+                    object.velocityY = 0;
                 }
                 if (collision.top > 0 && collisionObject.element.classList.contains('solid')) {
                     collisionCount++;
                     this.state.top = collision.top;
                     object.y += collision.top;
+                    object.velocityY = 0;
                 }
             }
         });
         return collisionCount;
     }
-    
+
     checkHorizontalCollisions(object, collisionObjects) {
         const playerRect = object.element.getBoundingClientRect();
         let collisionCount = 0;
         collisionObjects.forEach(collisionObject => {
             if (!collisionObject.enabled) return;
             if (collisionObject.element.classList.contains('trigger')) return;
-            for (let i = 0.25; i < 1; i += 0.25) {
-                let playerRectNext = {
-                    left: playerRect.left + (object.velocityX * i),
-                    right: playerRect.right + (object.velocityX * i),
-                    top: playerRect.top,
-                    bottom: playerRect.bottom - 25,
-                    x: playerRect.x,
-                    y: playerRect.y,
-                    width: playerRect.width,
-                    height: playerRect.height,
-                }
-                if (intersects(playerRectNext, collisionObject.element.getBoundingClientRect())) {
-                    if (collisionObject.element.classList.contains('solid')) {
-                        object.velocityX = 0;
-                    }
-                }
-            }
             if (intersects(playerRect, collisionObject.element.getBoundingClientRect())) {
                 const collision = getCollisionOverlap(playerRect, collisionObject.element.getBoundingClientRect());
                 if (collision.left > 0 && collisionObject.element.classList.contains('solid')) {
                     this.state.left = collision.left;
                     object.x += collision.left;
+                    object.velocityX = 0;
                     collisionCount++;
                 }
                 if (collision.right > 0 && collisionObject.element.classList.contains('solid')) {
                     collisionCount++;
                     this.state.right = collision.right;
                     object.x -= collision.right;
+                    object.velocityX = 0;
                 }
             }
         });
         return collisionCount;
+    }
+
+    isGrounded(object, collisionObjects) {
+        const playerRect = object.element.getBoundingClientRect();
+        const probeRect = {
+            left: playerRect.left,
+            right: playerRect.right,
+            top: playerRect.bottom,
+            bottom: playerRect.bottom + 1,
+        };
+        return collisionObjects.some(collisionObject => {
+            if (!collisionObject.enabled) return false;
+            if (!collisionObject.element.classList.contains('solid')) return false;
+            return intersects(probeRect, collisionObject.element.getBoundingClientRect());
+        });
     }
 
     checkOutOfBounds(object) {
