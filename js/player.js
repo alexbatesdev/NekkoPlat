@@ -1,13 +1,16 @@
 import gameInstance from "./game.js";
-import { intersects, getCollisionOverlap, anyTrue, debugLog } from "./tools.js";
+import { debugLog } from "./tools.js";
 import GifAnimationManager from "./gifAnimationManager.js";
 import { Physics } from "./physics.js";
 import { CollisionDetection } from "./collisionDetector.js";
 import InteractionBox from "./interactionBox.js";
+import PlayerConfig from "./playerConfig.js";
+import PlayerMovement from "./playerMovement.js";
+import PlayerAnimation from "./playerAnimation.js";
+import PlayerHUD from "./playerHUD.js";
 
 export default class Player {
     constructor(element) {
-        // HTML element
         this.element = element;
         this.animationElement = this.element.querySelector(".animation-container");
         if (!this.animationElement) {
@@ -16,76 +19,33 @@ export default class Player {
         }
         this.animationManager = new GifAnimationManager(this.animationElement);
 
-
         this.initStyles();
-        // HTML config - comes from a .config element in the #player element
-        //   Physics and jump variables in order from most physics to least physics
+
+        this.config = new PlayerConfig(this.element);
         this.physics = new Physics();
-        this.configElement = null;
-        this.gravity = null;
-        this.fallingGravity = null;
-        this.maxVelocity = null;
-        this.sprintMaxVelocity = null;
-        this.acceleration = null;
-        this.sprintAcceleration = null;
-        this.jumpForce = null;
-        this.coyoteTime = null;
-        this.preJumpAllowance = null;
-        this.maxAirJumps = null;
-        this.initConfig();
-        // Character state variables
-        //   Position/Respawn
+        this.physics.gravity = this.config.gravity;
+        this.physics.maxVelocity = this.config.maxVelocity;
+        this.physics.acceleration = this.config.acceleration;
+
         this.x = 0;
         this.y = 0;
         this.respawnX = 0;
         this.respawnY = 0;
         this.respawnScreen = null;
-        //   Physics
+
         this.velocityX = 0;
         this.velocityY = 0;
         this.liveGravity = this.physics.gravity;
-        //   Collision
+
         this.collisionObjects = [];
         this.collision = new CollisionDetection();
         this.grounded = false;
-        //   Jumping
-        this.airJumps = 0;
-        this.jumpProcessed = false;
-        this.jumpInProgress = false;
-        this.coyoteTimer = 0;
-        this.coyoteTimeActive = false;
-        //   Animation
-        this.currentAnimation = 'idle';
-        //   Interaction
+
         this.interactionBox = new InteractionBox(this);
 
-        // Cached DOM references
-        this.xPositionDisplay = document.getElementById('xPositionDisplay');
-        this.yPositionDisplay = document.getElementById('yPositionDisplay');
-
-        // This lets the HTML as well as the console access the player object
-        window.player = this;
-    }
-
-    initConfig() {
-        this.configElement = this.element.querySelector(".config");
-        if (!this.configElement) {
-            console.warn("No player config element found in the document, using default values");
-        }
-        this.gravity = this.setConfigItem('gravity', 0.9);
-        this.physics.gravity = this.gravity;
-        this.maxVelocity = this.setConfigItem('maxVelocity', 10);
-        this.sprintMaxVelocity = this.setConfigItem('sprintMaxVelocity', 18);
-        this.physics.maxVelocity = this.maxVelocity;
-        this.physics.sprintMaxVelocity = this.sprintMaxVelocity;
-        this.acceleration = this.setConfigItem('acceleration', 0.7);
-        this.physics.acceleration = this.acceleration;
-        this.sprintAcceleration = this.setConfigItem('sprintAcceleration', 2);
-        this.fallingGravity = this.setConfigItem('fallingGravity', 1.5);
-        this.jumpForce = this.setConfigItem('jumpForce', 25);
-        this.coyoteTime = this.setConfigItem('coyoteTime', 100);
-        this.preJumpAllowance = this.setConfigItem('preJumpAllowance', 10);
-        this.maxAirJumps = this.setConfigItem('maxAirJumps', 1);
+        this.movement = new PlayerMovement(this, this.physics);
+        this.animation = new PlayerAnimation(this, this.animationManager);
+        this.hud = new PlayerHUD(this);
     }
 
     initStyles() {
@@ -94,24 +54,6 @@ export default class Player {
         element.style.zIndex = 2;
         const configElement = this.element.querySelector(".config");
         if (configElement) this.element.querySelector(".config").style.display = "none";
-    }
-
-    setConfigItem(configItem, default_value) {
-        if (!this.configElement) {
-            console.warn(
-                `No player config element found for ${configItem}, using default value: ${default_value}`,
-            );
-            return default_value;
-        }
-        const configItemElement = this.configElement.querySelector(`.${configItem}`);
-        if (configItemElement) {
-            return Number(configItemElement.innerHTML);
-        } else {
-            console.warn(
-                `No config element found for ${configItem}, using default value: ${default_value}`,
-            );
-            return default_value;
-        }
     }
 
     start() {
@@ -154,7 +96,6 @@ export default class Player {
     }
 
     setCheckpoint(respawnX, respawnY, checkpoint_screen) {
-        // Figure out how this one will actually work
         this.respawnScreen = checkpoint_screen;
         this.respawnX = respawnX;
         this.respawnY = respawnY;
@@ -165,31 +106,12 @@ export default class Player {
     }
 
     update() {
-        this.processInput();
-        this.physics.applyPhysics(this, this.collision.state);
-        this.collision.applyCollisions(this, this.collisionObjects);
-        this.processCollisions();
-        // console.log(this.interactableObjects);
+        this.movement.update();
         this.interactionBox.update();
-        this.applyAnimations();
-        // Set the position of the player's HTML element
+        this.animation.update();
         this.element.style.left = `${this.x}px`;
         this.element.style.top = `${this.y}px`;
-        // debugLog({
-        //     x: this.x,
-        //     y: this.y,
-        //     velocityX: this.velocityX,
-        //     velocityY: this.velocityY,
-        //     gravity: this.liveGravity,
-        //     grounded: this.grounded,
-        //     collisionState: this.collision.state,
-        // });
-        if (this.xPositionDisplay) {
-            this.xPositionDisplay.innerHTML = Math.round(this.x + this.element.getBoundingClientRect().width / 2);
-        }
-        if (this.yPositionDisplay) {
-            this.yPositionDisplay.innerHTML = Math.round(this.y + this.element.getBoundingClientRect().height / 2);
-        }
+        this.hud.update();
         if (gameInstance.debug) {
             this.element.style.outline = '3px solid red';
             this.element.style.outlineOffset = '-3px';
@@ -198,145 +120,14 @@ export default class Player {
         }
     }
 
-    processCollisions() {
-        if (this.collision.state.bottom > 0) {
-            if (!this.grounded) {
-                this.jumpInProgress = false;
-                this.airJumps = 0;
-            }
-            this.grounded = true;
-        }
-        if (this.collision.state.top == 0 && this.collision.state.bottom == 0) {
-            this.grounded = false;
-            if (this.velocityY > 0 && !this.jumpInProgress) {
-                this.coyoteTimeActive = true;
-                setTimeout(() => {
-                    this.coyoteTimeActive = false;
-                }, this.coyoteTime);
-            }
-        }
-        if ((this.collision.state.left > 0 || this.collision.state.right) && this.velocityY > 0) this.velocityY *= 0.5; 
-    }
-
-    processInput() {
-        if (gameInstance.keyState['SHIFT'] && this.grounded) {
-            this.physics.acceleration = this.sprintAcceleration;
-            this.physics.maxVelocity = this.sprintMaxVelocity;
-        } else if (!gameInstance.keyState['SHIFT'] && this.grounded) {
-            this.physics.acceleration = this.acceleration;
-            this.physics.maxVelocity = this.maxVelocity;
-        }
-
-        // Movement calculations here
-        if (gameInstance.keyState['A']) {
-            this.lookLeft();
-            this.physics.move(this, -this.physics.acceleration, 0);
-        }
-        if (gameInstance.keyState['D']) {
-            this.lookRight();
-            this.physics.move(this, this.physics.acceleration, 0);
-        }
-        if (gameInstance.keyState['S']) this.velocityY += this.physics.acceleration;
-        // Similar for other directions
-        if (gameInstance.keyState['W'] || gameInstance.keyState['SPACE']) {
-            this.jump();
-        } else {
-            this.jumpProcessed = false; // Reset the flag when 'W' is not pressed
-            if (!this.grounded && this.velocityY < 0) {
-                this.physics.gravity = this.fallingGravity;
-            } else {
-                this.physics.gravity = this.gravity;
-            }
-        }
-        if (gameInstance.keyState['R']) {
-            this.respawnAtCheckpoint();
-        }
-    }
-
-    jump() {
-        if (!this.jumpProcessed && anyTrue(
-            [
-                this.grounded,
-                this.airJumps < this.maxAirJumps,
-                this.collision.state.left > 0,
-                this.collision.state.right > 0,
-                this.coyoteTimeActive,
-            ]
-        )
-        ) {
-            this.jumpProcessed = true;
-            this.jumpInProgress = true;
-            if (!this.grounded && !(this.collision.state.left > 0 || this.collision.state.right > 0 || this.coyoteTimeActive)) {
-                this.airJumps += 1;
-            }
-            if (this.collision.state.left > 0) {
-                this.velocityX += 12;
-            } else if (this.collision.state.right > 0) {
-                this.velocityX -= 12;
-            }
-            this.velocityY = -this.jumpForce;
-        } else if (this.airJumps >= this.maxAirJumps && !this.grounded) {
-            setTimeout(() => {
-                if (this.grounded) {
-                    this.jump();
-                }
-            }, this.preJumpAllowance);
-        }
-    }
-
-    applyAnimations() {
-        if (Math.abs(this.velocityX) > 0 && gameInstance.keyState['SHIFT']) this.animationManager.changeAnimation('run');
-        else if (Math.abs(this.velocityX) > 0 && (gameInstance.keyState['A'] || gameInstance.keyState['D'])) this.animationManager.changeAnimation('walk');
-        else if (this.grounded) this.animationManager.changeAnimation('idle');
-        else this.animationManager.changeAnimation('jump');
-    }
-
-    lookRight() {
-        this.element.style.transform = 'rotateY(180deg)';
-        if (this.interactionBox.interactionIndicatorElement) {
-            this.interactionBox.interactionIndicatorElement.style.transform = "translate(-50%, -100%) rotateY(180deg)";
-        }
-    }
-
-    lookLeft() {
-        this.element.style.transform = 'rotateY(0deg)';
-        if (this.interactionBox.interactionIndicatorElement) {
-            this.interactionBox.interactionIndicatorElement.style.transform = "translate(-50%, -100%) rotateY(0deg)";
-        }
-    }
-
-    facingRight() {
-        return this.element.style.transform === 'rotateY(180deg)';
-    }
-
     setSolidObjects(solidObjects) {
         this.collisionObjects = solidObjects;
     }
 
-    // Figuring out how to handle interactable objects
     setInteractableObjects(interactableObjects) {
         interactableObjects.forEach(interactableObject => {
             console.log();
         });
         this.interactionBox.interactables = interactableObjects;
     }
-
-    // I don't think this is in use anymore
-    // resolveInteractableObject(interactableObject) {
-    //     let classList = interactableObject.element.classList.value;
-    //     if (!classList.outline('interact')) {
-    //         console.error('Interactable object does not have the class "interact"');
-    //         return;
-    //     } else {
-    //         classList = classList.replace('interact', '').trim();
-    //     }
-    //     switch (classList) {
-    //         case "toggle":
-    //             return 
-    //             break;
-        
-    //         default:
-    //             break;
-    //     }
-    // }
 }

@@ -27,5 +27,4 @@ const teleportCheat = () => {
 
 window.teleportCheat = teleportCheat;
 window.game = gameInstance;
-window.player = gameInstance.player;
 window.level = gameInstance.level;
