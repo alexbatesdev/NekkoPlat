@@ -104,6 +104,21 @@ export class CollisionDetection {
         return collisionCount;
     }
 
+    isGrounded(object, collisionObjects) {
+        const playerRect = object.element.getBoundingClientRect();
+        const probeRect = {
+            left: playerRect.left,
+            right: playerRect.right,
+            top: playerRect.bottom,
+            bottom: playerRect.bottom + 1,
+        };
+        return collisionObjects.some(collisionObject => {
+            if (!collisionObject.enabled) return false;
+            if (!collisionObject.element.classList.contains('solid')) return false;
+            return intersects(probeRect, collisionObject.element.getBoundingClientRect());
+        });
+    }
+
     checkOutOfBounds(object) {
         const playerRect = object.element.getBoundingClientRect();
         const levelRect = gameInstance.level.element.getBoundingClientRect();

@@ -1,5 +1,5 @@
 import gameInstance from "./game.js";
-import { intersects, getCollisionOverlap, anyTrue, debugLog } from "./tools.js";
+import { anyTrue, debugLog } from "./tools.js";
 import GifAnimationManager from "./gifAnimationManager.js";
 import { Physics } from "./physics.js";
 import { CollisionDetection } from "./collisionDetector.js";
@@ -182,23 +182,24 @@ export default class Player {
     }
 
     processCollisions() {
-        if (this.collision.state.bottom > 0) {
-            if (!this.grounded) {
+        const wasGrounded = this.grounded;
+        this.grounded = this.collision.isGrounded(this, this.collisionObjects);
+
+        if (this.grounded) {
+            if (!wasGrounded) {
                 this.jumpInProgress = false;
                 this.airJumps = 0;
             }
-            this.grounded = true;
+        } else if (wasGrounded && this.velocityY > 0 && !this.jumpInProgress) {
+            this.coyoteTimeActive = true;
+            setTimeout(() => {
+                this.coyoteTimeActive = false;
+            }, this.coyoteTime);
         }
-        if (this.collision.state.top == 0 && this.collision.state.bottom == 0) {
-            this.grounded = false;
-            if (this.velocityY > 0 && !this.jumpInProgress) {
-                this.coyoteTimeActive = true;
-                setTimeout(() => {
-                    this.coyoteTimeActive = false;
-                }, this.coyoteTime);
-            }
+
+        if ((this.collision.state.left > 0 || this.collision.state.right > 0) && this.velocityY > 0) {
+            this.velocityY *= 0.5;
         }
-        if ((this.collision.state.left > 0 || this.collision.state.right) && this.velocityY > 0) this.velocityY *= 0.5; 
     }
 
     processInput() {
