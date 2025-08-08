@@ -140,7 +140,7 @@ export class CollisionDetection {
                     surfaceY = slopeRect.bottom - (slopeRect.height * xRatio);
             }
             const playerBottom = playerRect.bottom;
-            if (playerBottom > surfaceY && (playerBottom - object.velocityY) <= surfaceY) {
+            if (playerBottom >= surfaceY && playerRect.top <= surfaceY) {
                 const overlap = playerBottom - surfaceY;
                 object.y -= overlap;
                 object.velocityY = 0;
