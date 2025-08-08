@@ -59,6 +59,10 @@ export default class Player {
         //   Interaction
         this.interactionBox = new InteractionBox(this);
 
+        // Cached DOM references
+        this.xPositionDisplay = document.getElementById('xPositionDisplay');
+        this.yPositionDisplay = document.getElementById('yPositionDisplay');
+
         // This lets the HTML as well as the console access the player object
         window.player = this;
     }
@@ -93,11 +97,19 @@ export default class Player {
     }
 
     setConfigItem(configItem, default_value) {
+        if (!this.configElement) {
+            console.warn(
+                `No player config element found for ${configItem}, using default value: ${default_value}`,
+            );
+            return default_value;
+        }
         const configItemElement = this.configElement.querySelector(`.${configItem}`);
         if (configItemElement) {
             return Number(configItemElement.innerHTML);
         } else {
-            console.warn("No config element found for " + configItem + ", using default value: " + default_value);
+            console.warn(
+                `No config element found for ${configItem}, using default value: ${default_value}`,
+            );
             return default_value;
         }
     }
@@ -172,8 +184,12 @@ export default class Player {
         //     grounded: this.grounded,
         //     collisionState: this.collision.state,
         // });
-        document.getElementById('xPositionDisplay').innerHTML = Math.round(this.x + this.element.getBoundingClientRect().width / 2);
-        document.getElementById('yPositionDisplay').innerHTML = Math.round(this.y + this.element.getBoundingClientRect().height / 2);
+        if (this.xPositionDisplay) {
+            this.xPositionDisplay.innerHTML = Math.round(this.x + this.element.getBoundingClientRect().width / 2);
+        }
+        if (this.yPositionDisplay) {
+            this.yPositionDisplay.innerHTML = Math.round(this.y + this.element.getBoundingClientRect().height / 2);
+        }
         if (gameInstance.debug) {
             this.element.style.outline = '3px solid red';
             this.element.style.outlineOffset = '-3px';
