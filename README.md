@@ -44,8 +44,6 @@ A browser-based platformer engine built with plain JavaScript, HTML and CSS. Lev
     <span class="preJumpAllowance">10</span>
     <span class="jumpForce">25</span>
     <span class="coyoteTime">100</span>
-    <span class="slideOnSlopes">1</span>
-    <span class="slopeSlideThreshold">0</span>
   </span>
 </div>
 ```
@@ -86,16 +84,6 @@ Example sloped surface:
 ```html
 <div class="object solid slope" data-slope="up-right"
      style="width:200px;height:200px;clip-path:polygon(0% 100%,100% 100%,100% 0%);"></div>
-```
-
-The engine uses the element's bounding box and `data-slope` direction to compute collisions and sliding.
-
-Sliding speed is derived from the slope's angle: steeper ramps apply more of the player's gravity along the surface. You can dis
-able sliding or require a minimum angle by adding these optional entries to the player's `.config`:
-
-```html
-<span class="slideOnSlopes">1</span>        <!-- 0 disables sliding entirely -->
-<span class="slopeSlideThreshold">10</span> <!-- degrees before sliding begins -->
 ```
 
 Example toggle/receiver pair:
