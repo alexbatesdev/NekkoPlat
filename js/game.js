@@ -91,19 +91,30 @@ class Game {
     }
 
     start() {
+        this.lastTime = performance.now();
+        this.accumulator = 0;
+        this.fixedDelta = 1 / 60; // 60 FPS simulation step
         requestAnimationFrame(this.update.bind(this));
         this.initKeyStateListeners();
         this.player.start();
     }
 
-    update() {
-        this.processInput();
-        if (!this.paused) {
-            this.player.update(this.keyState);
-            this.level.update();
-            this.camera.update();
-        }
+    update(timestamp) {
+        const now = timestamp || performance.now();
+        let frameTime = (now - this.lastTime) / 1000; // convert to seconds
+        if (frameTime > 0.25) frameTime = 0.25; // avoid spiral of death
+        this.lastTime = now;
+        this.accumulator += frameTime;
 
+        while (this.accumulator >= this.fixedDelta) {
+            this.processInput();
+            if (!this.paused) {
+                this.player.update();
+                this.level.update();
+                this.camera.update();
+            }
+            this.accumulator -= this.fixedDelta;
+        }
 
         requestAnimationFrame(this.update.bind(this));
     }
