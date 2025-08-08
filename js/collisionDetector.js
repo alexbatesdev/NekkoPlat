@@ -145,12 +145,15 @@ export class CollisionDetection {
                 object.y -= overlap;
                 object.velocityY = 0;
                 this.state.bottom = overlap;
-                const angle = Math.atan(slopeRect.height / slopeRect.width);
-                let slideDir = 0;
-                if (["up-left", "down-right"].includes(type)) slideDir = 1;
-                else if (["up-right", "down-left"].includes(type)) slideDir = -1;
-                object.velocityX += Math.sin(angle) * object.physics.gravity * slideDir;
                 collisionCount++;
+                const angleRad = Math.atan(slopeRect.height / slopeRect.width);
+                const angleDeg = angleRad * (180 / Math.PI);
+                if (object.physics.slideOnSlopes && angleDeg > object.physics.slopeSlideThreshold) {
+                    let slideDir = 0;
+                    if (["up-left", "down-right"].includes(type)) slideDir = 1;
+                    else if (["up-right", "down-left"].includes(type)) slideDir = -1;
+                    object.velocityX += Math.sin(angleRad) * object.physics.gravity * slideDir;
+                }
             }
         });
         return collisionCount;

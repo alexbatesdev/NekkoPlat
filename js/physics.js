@@ -5,6 +5,8 @@ export class Physics {
         this.maxVelocity = 10;
         this.acceleration = 0.7;
         this.friction = 0.93;
+        this.slideOnSlopes = true;
+        this.slopeSlideThreshold = 0; // degrees
     }
 
     applyPhysics(object, collisionState) {
