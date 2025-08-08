@@ -30,6 +30,7 @@ export default class Camera {
         this.minOffset = this.offsetBounds;
         this.lookahead = 0.05;
         this.initStyles();
+        this.initFilters();
     }
 
     positionOverlay() {

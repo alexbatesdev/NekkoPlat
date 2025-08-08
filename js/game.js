@@ -6,12 +6,8 @@ class Game {
     constructor() {
         this.player = null;
         this.level = null;
-        this.camera = new Camera();
+        this.camera = null;
         this.pauseElement = document.getElementById('pause');
-        if (this.pauseElement) {
-            this.camera.overlayElement.appendChild(this.pauseElement);
-            this.initPauseElement();
-        }
 
         this.debug = false;
         this.paused = false;
@@ -91,6 +87,11 @@ class Game {
     }
 
     start() {
+        this.camera = new Camera();
+        if (this.pauseElement) {
+            this.camera.overlayElement.appendChild(this.pauseElement);
+            this.initPauseElement();
+        }
         requestAnimationFrame(this.update.bind(this));
         this.initKeyStateListeners();
         this.player.start();
