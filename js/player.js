@@ -323,23 +323,4 @@ export default class Player {
         });
         this.interactionBox.interactables = interactableObjects;
     }
-
-    // I don't think this is in use anymore
-    // resolveInteractableObject(interactableObject) {
-    //     let classList = interactableObject.element.classList.value;
-    //     if (!classList.outline('interact')) {
-    //         console.error('Interactable object does not have the class "interact"');
-    //         return;
-    //     } else {
-    //         classList = classList.replace('interact', '').trim();
-    //     }
-    //     switch (classList) {
-    //         case "toggle":
-    //             return 
-    //             break;
-        
-    //         default:
-    //             break;
-    //     }
-    // }
 }
