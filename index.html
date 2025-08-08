@@ -1,168 +1,198 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <!-- anti caching measures -->
+    <meta http-equiv="cache-control" content="max-age=0" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="-1" />
+    <meta http-equiv="expires" content="Tue, 01 Jan 1980 11:00:00 GMT" />
+    <meta http-equiv="pragma" content="no-cache" />
 
-<head>
-  <!-- anti caching measures -->
-  <meta http-equiv="cache-control" content="max-age=0">
-  <meta http-equiv="cache-control" content="no-cache">
-  <meta http-equiv="expires" content="-1">
-  <meta http-equiv="expires" content="Tue, 01 Jan 1980 11:00:00 GMT">
-  <meta http-equiv="pragma" content="no-cache">
+    <!-- Google font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap"
+      rel="stylesheet"
+    />
 
-  <!-- Google font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap"
-    rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/custom-fonts.css" />
+    <link rel="stylesheet" href="./css/pixel-corners.css" />
+    <script type="module" src="./js/platformer.js" defer></script>
+    <link rel="stylesheet" href="./css/index.css" />
+    <link rel="stylesheet" href="./css/hexBackground.css" />
+    <link rel="stylesheet" href="./css/global.css" />
+    <script src="./js/hexBackground.js" defer></script>
+    <title>Piinro's Platformer</title>
+  </head>
 
+  <body class="hexBackground">
+    <span class="criss debug"></span>
+    <span class="cross debug"></span>
 
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="./css/custom-fonts.css">
-  <link rel="stylesheet" href="./css/pixel-corners.css">
-  <script type="module" src="./js/platformer.js" defer></script>
-  <link rel="stylesheet" href="./css/index.css">
-  <link rel="stylesheet" href="./css/hexBackground.css">
-  <link rel="stylesheet" href="./css/global.css">
-  <script src="./js/hexBackground.js" defer></script>
-  <title>Piinro's Platformer</title>
-</head>
-
-<body class="hexBackground">
-  <span class="criss debug"></span>
-  <span class="cross debug"></span>
-
-  <div id="viewport">
-    <div class="level contain grid-3x1" id="level-one">
-      <div class="screen">
-        <div class="cat" id="player">
-          <div class="interaction-indicator question-indicator">?</div>
-          <div id="interactionBox"></div>
-          <span class="config">
-            <span class="maxVelocity">8</span>
-            <span class="sprintMaxVelocity">13</span>
-            <span class="acceleration">0.7</span>
-            <span class="sprintAcceleration">1.3</span>
-            <span class="maxAirJumps">1</span>
-            <span class="gravity">0.9</span>
-            <span class="fallingGravity">3</span>
-            <span class="preJumpAllowance">10</span>
-            <span class="jumpForce">25</span>
-            <span class="coyoteTime">100</span>
-          </span>
-          <div class="animation-container gif">
-            <img class="idle" src="./img/cat_stand.gif" alt="A cat standing there menacingly">
-            <img class="walk" src="./img/cat_walk.gif" alt="A cat walking">
-            <img class="run" src="./img/cat_run.gif" alt="A cat running">
-            <img class="jump" src="./img/cat_jump.gif" alt="A cat jumping">
-            <img class="wait" src="./img/cat_fall_asleep.gif" alt="A cat falling asleep">
+    <div id="viewport">
+      <div class="level contain grid-3x1" id="level-one">
+        <div class="screen">
+          <div class="cat" id="player">
+            <div class="interaction-indicator question-indicator">?</div>
+            <div id="interactionBox"></div>
+            <span class="config">
+              <span class="maxVelocity">8</span>
+              <span class="sprintMaxVelocity">13</span>
+              <span class="acceleration">0.7</span>
+              <span class="sprintAcceleration">1.3</span>
+              <span class="maxAirJumps">1</span>
+              <span class="gravity">0.9</span>
+              <span class="fallingGravity">3</span>
+              <span class="preJumpAllowance">10</span>
+              <span class="jumpForce">25</span>
+              <span class="coyoteTime">100</span>
+            </span>
+            <div class="animation-container gif">
+              <img
+                class="idle"
+                src="./img/cat_stand.gif"
+                alt="A cat standing there menacingly"
+              />
+              <img class="walk" src="./img/cat_walk.gif" alt="A cat walking" />
+              <img class="run" src="./img/cat_run.gif" alt="A cat running" />
+              <img class="jump" src="./img/cat_jump.gif" alt="A cat jumping" />
+              <img
+                class="wait"
+                src="./img/cat_fall_asleep.gif"
+                alt="A cat falling asleep"
+              />
+            </div>
           </div>
-        </div>
-        <div class="object solid floor grass-green" id="floor-1"></div>
+          <div class="object solid floor grass-green" id="floor-1"></div>
 
-        <div class="sign pixel-corners" id="sign-1">
-          Welcome to the platformer version of my website! <br />
-          Use WASD to move, Shift to sprint, and E to interact with objects, ESC to pause, and 3 for the debug
-          menu. <br />
-          Right now it's missing a lot, but I plan to make this the primary way to view my site!<br />
-          Thank you for checking out my project! <br />
-        </div>
-
-        <div class="object-label debug">
-          Room 1
-        </div>
-        <div class="object rock plax z-2 rock-2"></div>
-        <div class="object rock rock-3"></div>
-        <div class="object rock plax rock-1"></div>
-      </div>
-      <div class="screen">
-        <div class="object-label debug">
-          Room 2
-        </div>
-        <div class="object solid floor grass-green" id="floor-2"></div>
-        <img src="./img/debug.jpg" class="debug" style="height: 600px; border: solid 1px red;" srcset="">
-
-        <div class="object solid grass-green" id="solidObject-2"></div>
-        <div class="object solid grass-green" id="solidObject-3"></div>
-        <div class="sign pixel-corners" id="sign-2">
-          Use W or Space to jump, and hold to jump higher! <br />
-          You can also double jump! <br />
-          You can also also wall jump! <br />
-          Your double jump resets when you touch the ground, but not walls <br />
-        </div>
-        <div class="object rock plax z-1 rock-4"></div>
-      </div>
-      <div class="screen">
-        <div class="object-label debug">
-          Room 3
-        </div>
-        <div class="object rock plax z-1 rock-5"></div>
-        <div class="object rock plax z-3 rock-5"></div>
-        <div class="object rock plax z-5 rock-5"></div>
-        <div class="object rock plax z-7 rock-5"></div>
-
-        <h1 class="debug sign pixel-corners" id="debug-sign">That door in the background leads to a debug room! (click it)</h1>
-        <div class="door object interactable clickable plax z-7" id="door-2" onClick="window.location.href='./html/platformer.html?spawn_x=3427px&spawn_y=1026px'"></div>
-        
-        <div class="object rock plax z-1 rock-6"></div>
-        <div class="object rock plax z-3 rock-6"></div>
-        <div class="object rock plax z-5 rock-6"></div>
-        <div class="object rock plax z-7 rock-6"></div>
-
-
-        <div class="sign pixel-corners" id="sign-3">
-          Use E when you see the question mark above your head to interact with objects! <br />
-          This can be used to toggle switches, enter doors, or trigger any other javascript onclick code I attach to an
-          interactable!
-          <br />
-          Also if you hover over something and your cursor turns into a hand, you can click it to interact with it!
-        </div>
-
-        <div id="toggle-1" class="object interactable toggle">
-          <div class="on">
-            <span class="broadcast channel-toggle_one">crt</span>
-            <p>
-              CRT Filter ON
-            </p>
+          <div class="sign pixel-corners" id="sign-1">
+            Welcome to the platformer version of my website! <br />
+            Use WASD to move, Shift to sprint, and E to interact with objects,
+            ESC to pause, and 3 for the debug menu. <br />
+            Right now it's missing a lot, but I plan to make this the primary
+            way to view my site!<br />
+            Thank you for checking out my project! <br />
           </div>
-          <div class="off">
-            <span class="broadcast channel-toggle_one">none</span>
-            <p>
-              CRT Filter OFF
-            </p>
-          </div>
+
+          <div class="object-label debug">Room 1</div>
+          <div class="object rock plax z-2 rock-2"></div>
+          <div class="object rock rock-3"></div>
+          <div class="object rock plax rock-1"></div>
         </div>
+        <div class="screen">
+          <div class="object-label debug">Room 2</div>
+          <div
+            class="object solid slope"
+            data-slope="up-right"
+            style="
+              width: 300px;
+              height: 200px;
+              clip-path: polygon(0% 100%, 100% 100%, 100% 0%);
+              position: absolute;
+              bottom: 0px;
+            "
+          ></div>
 
-        <div class="door object interactable" id="door-1" onClick="window.location.href='./html/hub.html?spawn_x=602px&spawn_y=501px'"></div>
+          <div class="object solid floor grass-green" id="floor-2"></div>
+          <img
+            src="./img/debug.jpg"
+            class="debug"
+            style="height: 600px; border: solid 1px red"
+            srcset=""
+          />
 
+          <div class="object solid grass-green" id="solidObject-2"></div>
+          <div class="object solid grass-green" id="solidObject-3"></div>
+          <div class="sign pixel-corners" id="sign-2">
+            Use W or Space to jump, and hold to jump higher! <br />
+            You can also double jump! <br />
+            You can also also wall jump! <br />
+            Your double jump resets when you touch the ground, but not walls
+            <br />
+          </div>
+          <div class="object rock plax z-1 rock-4"></div>
+        </div>
+        <div class="screen">
+          <div class="object-label debug">Room 3</div>
+          <div class="object rock plax z-1 rock-5"></div>
+          <div class="object rock plax z-3 rock-5"></div>
+          <div class="object rock plax z-5 rock-5"></div>
+          <div class="object rock plax z-7 rock-5"></div>
 
-        <div class="object solid floor grass-green"></div>
+          <h1 class="debug sign pixel-corners" id="debug-sign">
+            That door in the background leads to a debug room! (click it)
+          </h1>
+          <div
+            class="door object interactable clickable plax z-7"
+            id="door-2"
+            onClick="window.location.href='./html/platformer.html?spawn_x=3427px&spawn_y=1026px'"
+          ></div>
+
+          <div class="object rock plax z-1 rock-6"></div>
+          <div class="object rock plax z-3 rock-6"></div>
+          <div class="object rock plax z-5 rock-6"></div>
+          <div class="object rock plax z-7 rock-6"></div>
+
+          <div class="sign pixel-corners" id="sign-3">
+            Use E when you see the question mark above your head to interact
+            with objects! <br />
+            This can be used to toggle switches, enter doors, or trigger any
+            other javascript onclick code I attach to an interactable!
+            <br />
+            Also if you hover over something and your cursor turns into a hand,
+            you can click it to interact with it!
+          </div>
+
+          <div id="toggle-1" class="object interactable toggle">
+            <div class="on">
+              <span class="broadcast channel-toggle_one">crt</span>
+              <p>CRT Filter ON</p>
+            </div>
+            <div class="off">
+              <span class="broadcast channel-toggle_one">none</span>
+              <p>CRT Filter OFF</p>
+            </div>
+          </div>
+
+          <div
+            class="door object interactable"
+            id="door-1"
+            onClick="window.location.href='./html/hub.html?spawn_x=602px&spawn_y=501px'"
+          ></div>
+
+          <div class="object solid floor grass-green"></div>
+        </div>
       </div>
     </div>
-  </div>
-  <!-- Need to make these elements optional (pause) in the javascript to avoid errors! -->
-  <div id="pause">
-    <span class="filter blur"></span>
-    <span class="filter dark"></span>
-    <div class="pause-text">
-      <h1>Paused</h1>
-      <p>Press <span class="key">ESC</span> to resume</p>
-    </div>
-  </div>
-  <!-- Need to make these elements (overlay) optional in the javascript to avoid errors! -->
-  <div id="overlay">
-    <div id="reciever-3" class="reciever">
-      <span class="broadcast channel-toggle_one"></span>
-      <div class="signal-none">
-        <!-- <span class="filter dark"></span> -->
-      </div>
-      <div class="signal-crt">
-        <span class="filter crt"></span>
+    <!-- Need to make these elements optional (pause) in the javascript to avoid errors! -->
+    <div id="pause">
+      <span class="filter blur"></span>
+      <span class="filter dark"></span>
+      <div class="pause-text">
+        <h1>Paused</h1>
+        <p>Press <span class="key">ESC</span> to resume</p>
       </div>
     </div>
-    <div class="debug">
-      <h1 class="positionDisplay">X: <span id="xPositionDisplay">x</span> Y: <span id="yPositionDisplay">y</span>
-      </h1>
+    <!-- Need to make these elements (overlay) optional in the javascript to avoid errors! -->
+    <div id="overlay">
+      <div id="reciever-3" class="reciever">
+        <span class="broadcast channel-toggle_one"></span>
+        <div class="signal-none">
+          <!-- <span class="filter dark"></span> -->
+        </div>
+        <div class="signal-crt">
+          <span class="filter crt"></span>
+        </div>
+      </div>
+      <div class="debug">
+        <h1 class="positionDisplay">
+          X: <span id="xPositionDisplay">x</span> Y:
+          <span id="yPositionDisplay">y</span>
+        </h1>
+      </div>
     </div>
-  </div>
-</body>
+  </body>
+</html>

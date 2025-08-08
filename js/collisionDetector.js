@@ -16,6 +16,7 @@ export class CollisionDetection {
         this.checkTriggerCollisions(object, collisionObjects);
         let horizontal_collision_count = this.checkHorizontalCollisions(object, collisionObjects);
         let vertical_collision_count = this.checkVerticalCollisions(object, collisionObjects);
+        let slope_collision_count = this.checkSlopeCollisions(object, collisionObjects);
         if (horizontal_collision_count <= 0) {
             this.state = {
                 left: 0,
@@ -24,7 +25,7 @@ export class CollisionDetection {
                 bottom: this.state.bottom,
             }
         }
-        if (vertical_collision_count <= 0) {
+        if (vertical_collision_count <= 0 && slope_collision_count <= 0) {
             this.state = {
                 left: this.state.left,
                 right: this.state.right,
@@ -32,7 +33,7 @@ export class CollisionDetection {
                 bottom: 0,
             }
         }
-        if (vertical_collision_count == 0 && horizontal_collision_count == 0) {
+        if (vertical_collision_count == 0 && horizontal_collision_count == 0 && slope_collision_count == 0) {
             this.state = {
                 left: 0,
                 right: 0,
@@ -61,6 +62,7 @@ export class CollisionDetection {
         collisionObjects.forEach(collisionObject => {
             if (!collisionObject.enabled) return;
             if (collisionObject.element.classList.contains('trigger')) return;
+            if (collisionObject.element.classList.contains('slope')) return;
             const collisionRect = collisionObject.element.getBoundingClientRect();
             if (intersects(playerRect, collisionRect)) {
                 const collision = getCollisionOverlap(playerRect, collisionRect);
@@ -87,6 +89,7 @@ export class CollisionDetection {
         collisionObjects.forEach(collisionObject => {
             if (!collisionObject.enabled) return;
             if (collisionObject.element.classList.contains('trigger')) return;
+            if (collisionObject.element.classList.contains('slope')) return;
             const collisionRect = collisionObject.element.getBoundingClientRect();
             if (intersects(playerRect, collisionRect)) {
                 const collision = getCollisionOverlap(playerRect, collisionRect);
@@ -107,6 +110,47 @@ export class CollisionDetection {
         return collisionCount;
     }
 
+    checkSlopeCollisions(object, collisionObjects) {
+        const playerRect = object.element.getBoundingClientRect();
+        let collisionCount = 0;
+        collisionObjects.forEach(collisionObject => {
+            if (!collisionObject.enabled) return;
+            if (!collisionObject.element.classList.contains('slope')) return;
+            const slopeRect = collisionObject.element.getBoundingClientRect();
+            if (!intersects(playerRect, slopeRect)) return;
+            const type = collisionObject.element.dataset.slope || 'up-right';
+            const centerX = playerRect.left + (playerRect.width / 2);
+            const xRatio = (centerX - slopeRect.left) / slopeRect.width;
+            if (xRatio < 0 || xRatio > 1) return;
+            let surfaceY = 0;
+            switch (type) {
+                case 'up-right':
+                    surfaceY = slopeRect.bottom - (slopeRect.height * xRatio);
+                    break;
+                case 'up-left':
+                    surfaceY = slopeRect.bottom - (slopeRect.height * (1 - xRatio));
+                    break;
+                case 'down-right':
+                    surfaceY = slopeRect.top + (slopeRect.height * xRatio);
+                    break;
+                case 'down-left':
+                    surfaceY = slopeRect.top + (slopeRect.height * (1 - xRatio));
+                    break;
+                default:
+                    surfaceY = slopeRect.bottom - (slopeRect.height * xRatio);
+            }
+            const playerBottom = playerRect.bottom;
+            if (playerBottom >= surfaceY && playerRect.top <= surfaceY) {
+                const overlap = playerBottom - surfaceY;
+                object.y -= overlap;
+                object.velocityY = 0;
+                this.state.bottom = overlap;
+                collisionCount++;
+            }
+        });
+        return collisionCount;
+    }
+
     isGrounded(object, collisionObjects) {
         const playerRect = object.element.getBoundingClientRect();
         const probeRect = {
@@ -117,8 +161,9 @@ export class CollisionDetection {
         };
         return collisionObjects.some(collisionObject => {
             if (!collisionObject.enabled) return false;
-            if (!collisionObject.element.classList.contains('solid')) return false;
-            return intersects(probeRect, collisionObject.element.getBoundingClientRect());
+            const el = collisionObject.element;
+            if (!(el.classList.contains('solid') || el.classList.contains('slope'))) return false;
+            return intersects(probeRect, el.getBoundingClientRect());
         });
     }
 

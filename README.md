@@ -77,6 +77,14 @@ Defines in‑level object types:
 - `TriggerArea`: runs its `onclick` when the player enters.
 - `InteractableObject` and `InteractableToggle`: elements that react to player interaction and can broadcast signals.
 - `Reciever`: shows different child elements based on received signals.
+- `Slope`: ramp geometry. Combine classes `object`, `solid` and `slope` and set `data-slope` to `up-right`, `up-left`, `down-right` or `down-left`.
+
+Example sloped surface:
+
+```html
+<div class="object solid slope" data-slope="up-right"
+     style="width:200px;height:200px;clip-path:polygon(0% 100%,100% 100%,100% 0%);"></div>
+```
 
 Example toggle/receiver pair:
 
@@ -128,7 +136,6 @@ The engine uses no external build tools or packages and runs entirely in the bro
 
 ## Known Limitations
 - Collision detection is axis‑aligned and may allow tunnelling at very high speeds.
-- Parallax and filter effects require manual HTML/CSS configuration; there is no runtime editor.
 - APIs are unstable and subject to change as the project evolves.
 
 ## License
