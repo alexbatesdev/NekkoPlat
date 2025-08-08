@@ -157,6 +157,7 @@ export class Reciever extends LevelObject{
             })
         });
         this.stateManager = new MultiStateManager(element, this.signals, this.signals[0]);
+        this.stateManager.listenToBroadcast(this.broadcastChannel);
     }
 
     update() {
@@ -165,7 +166,6 @@ export class Reciever extends LevelObject{
         } else {
             this.element.style.outline = 'none';
         }
-        this.stateManager.syncStateToBroadcast(this.broadcastChannel);
     }
 
 }
