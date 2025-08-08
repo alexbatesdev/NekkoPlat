@@ -32,6 +32,8 @@ export default class Player {
         this.coyoteTime = null;
         this.preJumpAllowance = null;
         this.maxAirJumps = null;
+        this.slideOnSlopes = null;
+        this.slopeSlideThreshold = null;
         this.initConfig();
         // Character state variables
         //   Position/Respawn
@@ -86,6 +88,10 @@ export default class Player {
         this.coyoteTime = this.setConfigItem('coyoteTime', 100);
         this.preJumpAllowance = this.setConfigItem('preJumpAllowance', 10);
         this.maxAirJumps = this.setConfigItem('maxAirJumps', 1);
+        this.slideOnSlopes = this.setConfigItem('slideOnSlopes', 1) == 1;
+        this.physics.slideOnSlopes = this.slideOnSlopes;
+        this.slopeSlideThreshold = this.setConfigItem('slopeSlideThreshold', 0);
+        this.physics.slopeSlideThreshold = this.slopeSlideThreshold;
     }
 
     initStyles() {
