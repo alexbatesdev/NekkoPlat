@@ -6,6 +6,7 @@ class Game {
     constructor() {
         this.player = null;
         this.level = null;
+        this.camera = null;
 
         this.debug = false;
         this.paused = false;
@@ -28,12 +29,8 @@ class Game {
             ESCAPE: false
         };
 
-        this.camera = new Camera(this.player, this.keyState, () => this.debug);
-        this.pauseElement = document.getElementById('pause');
-        if (this.pauseElement) {
-            this.camera.overlayElement.appendChild(this.pauseElement);
-            this.initPauseElement();
-        }
+
+        this.pauseElement = null;
 
         this.signalManager = new BroadcastManager();
 
@@ -63,7 +60,6 @@ class Game {
 
     setPlayer(player) {
         this.player = player;
-        this.camera.setPlayer(player);
     }
 
     getPlayer() {
@@ -93,7 +89,22 @@ class Game {
         });
     }
 
+    initCamera() {
+        this.camera = new Camera();
+        this.camera.setPlayer(this.player);
+    }
+
+    initPauseScreen() {
+        this.pauseElement = document.getElementById('pause');
+        if (this.pauseElement) {
+            this.camera.overlayElement.appendChild(this.pauseElement);
+            this.initPauseElement();
+        }
+    }
+
     start() {
+        this.initCamera();
+        this.initPauseScreen();
         this.lastTime = performance.now();
         this.accumulator = 0;
         this.fixedDelta = 1 / 60; // 60 FPS simulation step
