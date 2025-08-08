@@ -138,7 +138,6 @@ The engine uses no external build tools or packages and runs entirely in the bro
 
 ## Known Limitations
 - Collision detection is axis‑aligned and may allow tunnelling at very high speeds.
-- Parallax and filter effects require manual HTML/CSS configuration; there is no runtime editor.
 - APIs are unstable and subject to change as the project evolves.
 
 ## License
