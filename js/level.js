@@ -82,27 +82,27 @@ export default class Level {
     }
 
     initScreenGrid() {
-        const classes = this.element.classList;
-        let doDefault = true;
-        for (let i = 0; i < classes.length; i++) {
-            // This needs to be more nuanced, as it will match any class with an x in it 🐢💭
-            if (classes[i].includes('x')) {
-                doDefault = false;
-                const gridValues = classes[i].split('x');
-                this.columns = gridValues[0];
-                this.rows = gridValues[1];
+        const gridClass = Array.from(this.element.classList).find(className => /^grid-\d+x\d+$/.test(className));
+
+        if (gridClass) {
+            const match = gridClass.match(/^grid-(\d+)x(\d+)$/);
+            if (match) {
+                this.columns = parseInt(match[1], 10);
+                this.rows = parseInt(match[2], 10);
                 this.element.style.display = 'grid';
                 this.element.style.position = 'relative';
                 this.element.style.gridTemplateColumns = `repeat(${this.columns}, var(--screen-width))`;
                 this.element.style.gridTemplateRows = `repeat(${this.rows}, var(--screen-height))`;
                 this.element.style.width = "max-content";
+                return;
+            } else {
+                console.warn(`Invalid grid class "${gridClass}"`);
             }
         }
-        if (doDefault) {
-            console.warn("No grid dimensions specified, using linear grid layout");
-            this.element.style.gridTemplateColumns = `repeat(${this.screens.length}, var(--screen-width))`;
-            this.element.style.gridTemplateRows = `var(--screen-height)`;
-        }
+
+        console.warn("No grid dimensions specified, using linear grid layout");
+        this.element.style.gridTemplateColumns = `repeat(${this.screens.length}, var(--screen-width))`;
+        this.element.style.gridTemplateRows = `var(--screen-height)`;
     }
 
     initScreens() {
