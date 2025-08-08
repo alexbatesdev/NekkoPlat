@@ -15,7 +15,7 @@ A browser-based platformer engine built with plain JavaScript, HTML and CSS. Lev
 
 ```html
 <div id="viewport">
-  <div class="level" id="level-one">
+  <div class="level grid-1x1" id="level-one">
     <div class="screen">
       <div id="player">
         <div id="interactionBox"></div>
@@ -48,6 +48,7 @@ A browser-based platformer engine built with plain JavaScript, HTML and CSS. Lev
 </div>
 ```
 
+* Grid dimensions are defined on the `.level` element via a `grid-colsxrows` class.
 * Out-of-bounds behavior is controlled by classes on the `.level` element such as `contain`, `respawn` or `wrap` with optional direction suffixes (e.g. `wrap-vert`).
 * Player spawn can be set via URL query parameters `?spawn_x=` and `?spawn_y=`.
 * Filters and camera behavior are controlled with classes on `#viewport` (e.g. `no-follow`, `scroll-bar`).

@@ -1,5 +1,5 @@
 import gameInstance from "./game.js";
-import { intersects, getCollisionOverlap, anyTrue, debugLog } from "./tools.js";
+import { anyTrue, debugLog } from "./tools.js";
 import GifAnimationManager from "./gifAnimationManager.js";
 import { Physics } from "./physics.js";
 import { CollisionDetection } from "./collisionDetector.js";
@@ -165,25 +165,27 @@ export default class Player {
     }
 
     update() {
+
         this.processInput();
         this.physics.applyPhysics(this, this.collision.state);
-        this.collision.applyCollisions(this, this.collisionObjects);
+
+        const steps = Math.ceil(Math.max(Math.abs(this.velocityX), Math.abs(this.velocityY)));
+        const iterations = Math.max(1, steps);
+        for (let i = 0; i < iterations; i++) {
+            this.x += this.velocityX / iterations;
+            this.y += this.velocityY / iterations;
+            this.element.style.left = `${this.x}px`;
+            this.element.style.top = `${this.y}px`;
+            this.collision.applyCollisions(this, this.collisionObjects);
+            if (this.velocityX === 0 && this.velocityY === 0) break;
+        }
+
         this.processCollisions();
-        // console.log(this.interactableObjects);
         this.interactionBox.update();
         this.applyAnimations();
         // Set the position of the player's HTML element
-        this.element.style.left = `${this.x}px`;
-        this.element.style.top = `${this.y}px`;
-        // debugLog({
-        //     x: this.x,
-        //     y: this.y,
-        //     velocityX: this.velocityX,
-        //     velocityY: this.velocityY,
-        //     gravity: this.liveGravity,
-        //     grounded: this.grounded,
-        //     collisionState: this.collision.state,
-        // });
+        // this.element.style.left = `${this.x}px`;
+        // this.element.style.top = `${this.y}px`;
         if (this.xPositionDisplay) {
             this.xPositionDisplay.innerHTML = Math.round(this.x + this.element.getBoundingClientRect().width / 2);
         }
@@ -199,23 +201,24 @@ export default class Player {
     }
 
     processCollisions() {
-        if (this.collision.state.bottom > 0) {
-            if (!this.grounded) {
+        const wasGrounded = this.grounded;
+        this.grounded = this.collision.isGrounded(this, this.collisionObjects);
+
+        if (this.grounded) {
+            if (!wasGrounded) {
                 this.jumpInProgress = false;
                 this.airJumps = 0;
             }
-            this.grounded = true;
+        } else if (wasGrounded && this.velocityY > 0 && !this.jumpInProgress) {
+            this.coyoteTimeActive = true;
+            setTimeout(() => {
+                this.coyoteTimeActive = false;
+            }, this.coyoteTime);
         }
-        if (this.collision.state.top == 0 && this.collision.state.bottom == 0) {
-            this.grounded = false;
-            if (this.velocityY > 0 && !this.jumpInProgress) {
-                this.coyoteTimeActive = true;
-                setTimeout(() => {
-                    this.coyoteTimeActive = false;
-                }, this.coyoteTime);
-            }
+
+        if ((this.collision.state.left > 0 || this.collision.state.right > 0) && this.velocityY > 0) {
+            this.velocityY *= 0.5;
         }
-        if ((this.collision.state.left > 0 || this.collision.state.right) && this.velocityY > 0) this.velocityY *= 0.5; 
     }
 
     processInput() {
@@ -236,7 +239,7 @@ export default class Player {
             this.lookRight();
             this.physics.move(this, this.physics.acceleration, 0);
         }
-        if (gameInstance.keyState['S']) this.velocityY += this.physics.acceleration;
+        if (gameInstance.keyState['S']) this.physics.move(this, 0, this.physics.acceleration);
         // Similar for other directions
         if (gameInstance.keyState['W'] || gameInstance.keyState['SPACE']) {
             this.jump();
