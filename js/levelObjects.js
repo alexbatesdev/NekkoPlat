@@ -334,7 +334,13 @@ export const ItemPickupMixin = Base => class extends Base {
     pickup() {
         this.enabled = false;
         this.element.click();
-        const itemElement = this.element.querySelector('.item')
+
+        const templateId = this.element.dataset.template;
+        const template = document.getElementById(templateId);
+        if (!template) return;
+        const fragment = template.content.cloneNode(true);
+        const itemElement = fragment.querySelector('.item');
+
         let itemName = "";
         // extract item name from name-ITEMNAME class
         for (let i = 0; i < itemElement.classList.length; i++) {
@@ -342,7 +348,8 @@ export const ItemPickupMixin = Base => class extends Base {
                 itemName = itemElement.classList[i].replace('name-', '');
             }
         }
-        const onClick = itemElement.onclick
+
+        const onClick = itemElement.onclick;
         // convert onClick to a string
         let onClickString;
         if (onClick) {
@@ -351,17 +358,16 @@ export const ItemPickupMixin = Base => class extends Base {
             onClickString = onClickString.replace('function', '');
             onClickString = onClickString.replace(/\(.*?\)/, '');
         }
-        const inspectElement = itemElement.querySelector('.inspectElement')
-        const iconElement = itemElement.querySelector('.iconElement')
-        const description = itemElement.querySelector('.description').innerHTML
-        const count = parseInt(itemElement.querySelector('.count').innerHTML)
-        const item = new InventoryItem(itemName, this.element.id, description, count, iconElement, inspectElement, onClickString);
+
+        const description = itemElement.querySelector('.description').innerHTML;
+        const count = parseInt(itemElement.querySelector('.count').innerHTML);
+        const item = new InventoryItem(itemName, this.element.id, description, count, templateId, onClickString);
         this.element.remove();
         if (this.element.classList.contains('instant-use')) {
             item.triggerOnClick();
             return;
         }
-        player.inventory.addItem(item)
+        player.inventory.addItem(item);
     }
 };
 ItemPickupMixin.tags = ['collision', 'trigger', 'interactable'];

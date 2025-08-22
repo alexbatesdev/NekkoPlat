@@ -2,11 +2,13 @@ import gameInstance from "./game.js";
 import Player from "./player.js";
 import Level from "./level.js";
 import { hasSubstringInClassList } from "./tools.js";
+import { loadItemTemplates } from "./itemTemplates.js";
 // Animation Implementation Discussion
 // https://chatgpt.com/c/d6c3427f-edfa-4d17-bb39-a9a15b01fda5
 // Usage
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadItemTemplates();
     const playerElement = document.getElementById('player');
     gameInstance.setPlayer(new Player(playerElement));
     gameInstance.setLevel(new Level("level-one"));

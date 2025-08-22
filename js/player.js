@@ -4,7 +4,8 @@ import GifAnimationManager from "./gifAnimationManager.js";
 import { Physics } from "./physics.js";
 import { CollisionDetection } from "./collisionDetector.js";
 import InteractionBox from "./interactionBox.js";
-import Inventory, { InventoryItem } from "./inventory.js";
+import Inventory from "./inventory.js";
+import HUD from "./hud.js";
 
 export default class Player {
     constructor(element) {
@@ -61,6 +62,7 @@ export default class Player {
         this.interactionBox = new InteractionBox(this);
         // Inventory
         this.inventory = new Inventory();
+        this.HUD = new HUD(this.inventory);
         // This lets the HTML as well as the console access the player object
         window.player = this;
     }

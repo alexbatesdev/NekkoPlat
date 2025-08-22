@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Item Definitions</title>
+    <link rel="stylesheet" href="./css/global.css" />
+  </head>
+  <body>
+    <h1>Item Definitions</h1>
+
+    <template id="item-shroom">
+      <div class="item name-shroom" onclick="console.log('used mushroom')">
+        <div class="iconElement shroom-icon"></div>
+        <span class="inspectElement mushroom-inspect">
+          <h2>This is the dev mushroom</h2>
+          <p>Click the button below to toggle the broadcast on or off</p>
+          <button
+            onclick="
+                  console.log('awooga')
+                  const broadcastValue = game.signalManager.checkBroadcast('toggle_two');
+                  if (broadcastValue === 'on') {
+                    game.signalManager.broadcastSignal('toggle_two', 'off');
+                  } else {
+                    game.signalManager.broadcastSignal('toggle_two', 'on');
+                  }
+                "
+          >
+            Toggle Broadcast
+          </button>
+        </span>
+        <span class="description">
+          A mushroom that a plumber told you would increase your size
+        </span>
+        <span class="count">1</span>
+      </div>
+    </template>
+
+    <div id="item-demo" class="item-demo"></div>
+
+    <script type="module">
+      import { renderItemDemos } from './js/itemTemplates.js';
+      renderItemDemos(document.getElementById('item-demo'));
+    </script>
+  </body>
+</html>

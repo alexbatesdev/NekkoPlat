@@ -1,11 +1,21 @@
-import gameInstance from "./game.js";
-
 export default class Inventory {
   constructor() {
     this.pickupIDs = [];
     this.itemsList = [];
     this.syncToInventory();
-    this.HUD = new HUD(this);
+    this.eventTarget = new EventTarget();
+  }
+
+  on(eventName, listener) {
+    this.eventTarget.addEventListener(eventName, listener);
+  }
+
+  off(eventName, listener) {
+    this.eventTarget.removeEventListener(eventName, listener);
+  }
+
+  emit(eventName, detail) {
+    this.eventTarget.dispatchEvent(new CustomEvent(eventName, { detail }));
   }
 
   // Sync itemsList with localstorage
@@ -31,8 +41,6 @@ export default class Inventory {
 
   // Add item to the inventory
   addItem(item) {
-    item.inspectElement = item.inspectElement.outerHTML;
-    item.iconElement = item.iconElement.outerHTML;
     // Check if item is already in the inventory
     const existingItem = this.itemsList.find((i) => i.name === item.name);
     if (existingItem) {
@@ -40,16 +48,13 @@ export default class Inventory {
       existingItem.pickupIDs.push(item.pickupID);
       // Remove duplicate pickupIDs
       existingItem.pickupIDs = [...new Set(existingItem.pickupIDs)];
-      // Update the HUD count for the item
-      this.HUD.updateCountForItem(item.name);
+      this.emit('itemAdded', { item: existingItem });
     } else {
       const pickupID = item.pickupID;
       delete item.pickupID;
       item.pickupIDs = [pickupID];
       this.itemsList.push(item);
-      // Update the HUD count for the item
-      this.HUD.updateCountForItem(item.name);
-      this.HUD.setIcons();
+      this.emit('itemAdded', { item });
     }
     console.log(this.itemsList);
     // Sync localstorage with itemsList
@@ -66,6 +71,7 @@ export default class Inventory {
       }
       // Sync localstorage with itemsList
       this.syncToLocalStorage();
+      this.emit('itemRemoved', { item });
     }
   }
   // Remove item from the inventory by pickupID
@@ -79,6 +85,7 @@ export default class Inventory {
       }
       // Sync localstorage with itemsList
       this.syncToLocalStorage();
+      this.emit('itemRemoved', { item });
     }
   }
 
@@ -109,7 +116,11 @@ export default class Inventory {
   getItemIcon(name) {
     const item = this.itemsList.find((i) => i.name === name);
     if (item) {
-      return item.iconElement;
+      const template = document.getElementById(item.templateId);
+      if (template) {
+        const icon = template.content.querySelector('.iconElement');
+        return icon ? icon.outerHTML : null;
+      }
     }
     return null;
   }
@@ -123,11 +134,11 @@ export default class Inventory {
       item.name = newItem.name;
       item.description = newItem.description;
       item.count = newItem.count;
-      item.inspectElement = newItem.inspectElement.outerHTML;
-      item.iconElement = newItem.iconElement.outerHTML;
+      item.templateId = newItem.templateId;
       item.onclick = newItem.onclick;
       // Sync localstorage with itemsList
       this.syncToLocalStorage();
+      this.emit('itemModified', { item });
     }
   }
 }
@@ -138,8 +149,7 @@ export class InventoryItem {
     pickupID,
     description,
     count,
-    iconElement,
-    inspectElement,
+    templateId,
     onclick,
     tags = []
   ) {
@@ -153,10 +163,8 @@ export class InventoryItem {
     this.description = description;
     // The count of the item in the inventory
     this.count = count;
-    // The element that will be used to display the item in the inventory
-    this.iconElement = iconElement;
-    // The element that will be used if you want to inspect the item in the inventory
-    this.inspectElement = inspectElement;
+    // Reference to the template defining the item's markup
+    this.templateId = templateId;
     // The code to be executed when the item is triggered
     this.onclick = onclick;
     // tags will be used to modify behavior of the item
@@ -172,257 +180,5 @@ export class InventoryItem {
       .trim();
     const func = new Function(body);
     func.call(this);
-  }
-}
-
-export class HUD {
-  constructor(player_inventory) {
-    this.inventory = player_inventory;
-    this.HUD = {};
-    this.initialize();
-  }
-
-  initialize() {
-    this.mapHudElements();
-    this.syncCounts();
-    this.setIcons();
-  }
-
-  mapHudElements() {
-    let elements = document.querySelectorAll(".hud-item");
-    let itemsList = [];
-    let hudElements = {};
-    for (let i = 0; i < elements.length; i++) {
-      const element = elements[i];
-      for (let j = 0; j < element.classList.length; j++) {
-        const className = element.classList[j];
-        if (className.startsWith("hud-") && className !== "hud-item") {
-          const tag = className.split("-")[1];
-          itemsList.push(tag);
-        }
-        if (className.startsWith("hud-") && className !== "hud-item") {
-          const tag = className.replace("hud-", "");
-          hudElements[tag] = element;
-        }
-      }
-    }
-    for (let i = 0; i < itemsList.length; i++) {
-      const item = itemsList[i];
-      for (let j = 0; j < Object.keys(hudElements).length; j++) {
-        const element = hudElements[Object.keys(hudElements)[j]];
-        for (let k = 0; k < element.classList.length; k++) {
-          const className = element.classList[k];
-          if (className.includes(item)) {
-            if (this.HUD[item] === undefined) {
-              this.HUD[item] = [element];
-            } else {
-              this.HUD[item].push(element);
-            }
-          }
-        }
-      }
-      // clear duplicates from this.HUD[item]
-      if (this.HUD[item] !== undefined) {
-        this.HUD[item] = [...new Set(this.HUD[item])];
-      }
-    }
-  }
-
-  setIcons() {
-    for (let i = 0; i < Object.keys(this.HUD).length; i++) {
-      const item = Object.keys(this.HUD)[i];
-      const elements = this.HUD[item];
-      for (let j = 0; j < elements.length; j++) {
-        const element = elements[j];
-        const itemObj = this.inventory.getItemByName(item);
-        for (let k = 0; k < element.classList.length; k++) {
-          const className = element.classList[k];
-          if (className.includes("-icon")) {
-            if (itemObj) {
-              element.innerHTML = itemObj.iconElement;
-            } else {
-              element.innerHTML = "";
-            }
-          }
-        }
-      }
-    }
-  }
-
-  syncCounts() {
-    for (let i = 0; i < Object.keys(this.HUD).length; i++) {
-      const item = Object.keys(this.HUD)[i];
-      const elements = this.HUD[item];
-      for (let j = 0; j < elements.length; j++) {
-        const element = elements[j];
-        const itemObj = this.inventory.getItemByName(item);
-        for (let k = 0; k < element.classList.length; k++) {
-          const className = element.classList[k];
-          if (className.includes("-count")) {
-            if (itemObj) {
-              element.innerHTML = itemObj.count;
-            } else {
-              element.innerHTML = "";
-            }
-          }
-        }
-      }
-    }
-  }
-
-  updateCountForItem(name) {
-    const item = this.inventory.getItemByName(name);
-    if (item) {
-      for (let i = 0; i < Object.keys(this.HUD).length; i++) {
-        const itemName = Object.keys(this.HUD)[i];
-        if (itemName === name) {
-          const elements = this.HUD[itemName];
-          for (let j = 0; j < elements.length; j++) {
-            const element = elements[j];
-            for (let k = 0; k < element.classList.length; k++) {
-              const className = element.classList[k];
-              if (className.includes("-count")) {
-                element.innerHTML = item.count;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  // Sync the inventory menu with the itemsList
-  syncInventoryMenu() {
-    const inventoryMenu = document.getElementById("inventory-menu");
-    const itemList = inventoryMenu.querySelector(".item-list");
-    const itemListPatternElement = inventoryMenu.querySelector(".list-pattern");
-    const itemListPattern =
-      itemListPatternElement.querySelector(".item-wrapper");
-
-    // Create a copy of the itemListPattern to use as a template
-    const itemListPatternTemplate = itemListPattern.cloneNode(true);
-    // Clear the itemList
-    itemList.innerHTML = "";
-    itemList.appendChild(itemListPatternElement);
-    if (!gameInstance.debug) {
-      itemListPatternElement.style.display = "none";
-    }
-
-    for (let i = 0; i < this.inventory.itemsList.length; i++) {
-      const item = this.inventory.itemsList[i];
-      const itemElement = itemListPatternTemplate.cloneNode(true);
-      const itemIcon = itemElement.querySelector(".item-icon");
-      const itemName = itemElement.querySelector(".item-name");
-      const itemCount = itemElement.querySelector(".item-count");
-      const itemDescription = itemElement.querySelector(".item-description");
-
-      // Replace the itemElement onClick with a method that displays the element's "inspectElement" in a window on screen
-
-      // Set the item icon, name, count, and description if not undefined
-      if (itemIcon && item.iconElement) {
-        itemIcon.innerHTML = item.iconElement;
-        if (itemIcon.title == "item-description") {
-          itemIcon.title = item.description || "No description available";
-        } else if (itemIcon.title == "item-name") {
-          itemIcon.title = item.name || "No name available";
-        } else if (itemIcon.title == "item-count") {
-          itemIcon.title = item.count || "No count available";
-        }
-      }
-      if (itemName) {
-        itemName.innerHTML = item.name;
-        if (itemName.title == "item-description") {
-          itemName.title = item.description || "No description available";
-        } else if (itemName.title == "item-name") {
-          itemName.title = item.name || "No name available";
-        } else if (itemName.title == "item-count") {
-          itemName.title = item.count || "No count available";
-        }
-      }
-      if (itemCount) {
-        itemCount.innerHTML = item.count;
-        if (itemCount.title == "item-description") {
-          itemCount.title = item.description || "No description available";
-        } else if (itemCount.title == "item-name") {
-          itemCount.title = item.name || "No name available";
-        } else if (itemCount.title == "item-count") {
-          itemCount.title = item.count || "No count available";
-        }
-      }
-      if (itemDescription) {
-        itemDescription.innerHTML =
-          item.description || "No description available";
-        if (itemDescription.title == "item-description") {
-          itemDescription.title =
-            item.description || "No description available";
-        } else if (itemDescription.title == "item-name") {
-          itemDescription.title = item.name || "No name available";
-        } else if (itemDescription.title == "item-count") {
-          itemDescription.title = item.count || "No count available";
-        }
-      }
-
-      const useButton = itemElement.querySelector(".use-button");
-      if (useButton) {
-        useButton.onclick = () => {
-          if (item.onclick) {
-            // Extract the function body from the string
-            const body = item.onclick
-              .substring(
-                item.onclick.indexOf("{") + 1,
-                item.onclick.lastIndexOf("}")
-              )
-              .trim();
-            const func = new Function(body);
-            func.call(item); // 'item' as 'this'
-          }
-        };
-      } else {
-        itemElement.onclick = () => {
-          if (item.onclick) {
-            const body = item.onclick
-              .substring(
-                item.onclick.indexOf("{") + 1,
-                item.onclick.lastIndexOf("}")
-              )
-              .trim();
-            const func = new Function(body);
-            func.call(item);
-          }
-        };
-      }
-
-      const inspectButton = itemElement.querySelector(".inspect-button");
-      if (inspectButton) {
-        inspectButton.onclick = () => {
-          console.log("Inspecting item:", item.name);
-          // Create a new window to display the inspectElement
-          const inspectWindow = document.createElement("div");
-          inspectWindow.className = "inspect-window";
-          inspectWindow.innerHTML = item.inspectElement;
-          inspectWindow.title = "click to close";
-          document.body.appendChild(inspectWindow);
-
-          const removeFromDocument = (event) => {
-            if (event.key === "Escape") {
-              document.body.removeChild(inspectWindow);
-              document.removeEventListener("keydown", removeFromDocument);
-            }
-          };
-
-          // Close the inspect window when clicked
-          inspectWindow.onclick = (event) => {
-            if (event.target === inspectWindow) {
-              document.body.removeChild(inspectWindow);
-              document.removeEventListener("keydown", removeFromDocument);
-            }
-          };
-          // Close the inspect window when Escape is pressed
-          document.addEventListener("keydown", removeFromDocument);
-        };
-      }
-
-      itemList.appendChild(itemElement);
-    }
   }
 }
