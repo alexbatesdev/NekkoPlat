@@ -65,6 +65,41 @@ export class SolidObject extends LevelObject{
     }
 }
 
+export class MovingPlatform extends SolidObject {
+    constructor(element) {
+        super(element);
+        const pos = this.getCurrentTranslation();
+        this.prevX = pos.x;
+        this.prevY = pos.y;
+    }
+
+    getCurrentTranslation() {
+        const style = window.getComputedStyle(this.element);
+        const transform = style.transform;
+        if (transform && transform !== "none") {
+            const matrix = new DOMMatrixReadOnly(transform);
+            return { x: matrix.m41, y: matrix.m42 };
+        }
+        return { x: 0, y: 0 };
+    }
+
+    update() {
+        super.update();
+        const pos = this.getCurrentTranslation();
+        const deltaX = pos.x - this.prevX;
+        const deltaY = pos.y - this.prevY;
+        this.prevX = pos.x;
+        this.prevY = pos.y;
+        const player = gameInstance.player;
+        if (player.grounded && player.groundedObject === this) {
+            player.x += deltaX;
+            player.y += deltaY;
+            player.element.style.left = player.x + "px";
+            player.element.style.top = player.y + "px";
+        }
+    }
+}
+
 export class TriggerArea extends LevelObject {
     constructor(element) {
         super(element);

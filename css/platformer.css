@@ -1085,3 +1085,11 @@ a {
     top: 225px;
     left: 980px
 }
+@keyframes platform-move-example {
+    from { transform: translateX(0); }
+    to { transform: translateX(200px); }
+}
+
+.moving-platform {
+    animation: platform-move-example 3s ease-in-out infinite alternate;
+}
