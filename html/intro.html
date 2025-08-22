@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- anti caching measures -->
+    <meta http-equiv="cache-control" content="max-age=0">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="-1">
+    <meta http-equiv="expires" content="Tue, 01 Jan 1980 11:00:00 GMT">
+    <meta http-equiv="pragma" content="no-cache">
+
+    <!-- Google font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/custom-fonts.css">
+    <link rel="stylesheet" href="../css/pixel-corners.css">
+    <script type="module" src="../js/platformer.js" defer></script>
+    <link rel="stylesheet" href="../css/platformer.css">
+    <link rel="stylesheet" href="../css/global.css">
+    <title>Intro Level</title>
+</head>
+
+<body>
+    <span class="criss debug"></span>
+    <span class="cross debug"></span>
+
+    <div class="tv" id="viewport">
+        <div class="level contain grid-3x1" id="level-one">
+            <!-- Movement screen -->
+            <div class="screen">
+                <div class="cat" id="player">
+                    <div class="interaction-indicator question-indicator">?</div>
+                    <div id="interactionBox"></div>
+                    <span class="config">
+                        <span class="maxVelocity">8</span>
+                        <span class="sprintMaxVelocity">13</span>
+                        <span class="acceleration">0.7</span>
+                        <span class="sprintAcceleration">1.3</span>
+                        <span class="maxAirJumps">1</span>
+                        <span class="gravity">0.9</span>
+                        <span class="fallingGravity">3</span>
+                        <span class="preJumpAllowance">10</span>
+                        <span class="jumpForce">25</span>
+                        <span class="coyoteTime">100</span>
+                    </span>
+                    <div class="animation-container gif">
+                        <img class="idle" src="../img/cat_stand.gif" alt="A cat standing there menacingly">
+                        <img class="walk" src="../img/cat_walk.gif" alt="A cat walking">
+                        <img class="run" src="../img/cat_run.gif" alt="A cat running">
+                        <img class="jump" src="../img/cat_jump.gif" alt="A cat jumping">
+                        <img class="wait" src="../img/cat_fall_asleep.gif" alt="A cat falling asleep">
+                    </div>
+                </div>
+                <div class="object solid floor" style="--height:60px;"></div>
+                <div class="sign pixel-corners" id="sign-move" style="position:absolute;top:20%;left:10%;width:300px;">
+                    Use <span class="key">WASD</span> to move and hold <span class="key">Shift</span> to sprint.
+                </div>
+            </div>
+            <!-- Jumping screen -->
+            <div class="screen">
+                <div class="object solid floor" style="--height:60px;"></div>
+                <div class="object solid" id="platform-1" style="position:absolute;width:200px;height:40px;left:350px;bottom:150px;background-color:#777;"></div>
+                <div class="sign pixel-corners" id="sign-jump" style="position:absolute;top:20%;left:10%;width:320px;">
+                    Press <span class="key">W</span> or <span class="key">Space</span> to jump. Hold for a higher jump and try a double jump!
+                </div>
+            </div>
+            <!-- Interaction screen -->
+            <div class="screen">
+                <div class="object solid floor" style="--height:60px;"></div>
+                <div id="toggle-tutorial" class="object interactable toggle" style="position:absolute;left:300px;bottom:60px;">
+                    <div class="on"><span class="broadcast channel-door">open</span><p>Switch ON</p></div>
+                    <div class="off"><span class="broadcast channel-door">close</span><p>Switch OFF</p></div>
+                </div>
+                <div id="reciever-door" class="object reciever" style="position:absolute;left:520px;bottom:60px;">
+                    <span class="broadcast channel-door"></span>
+                    <div class="signal-open on"><p>Door is open</p></div>
+                    <div class="signal-close off"><p>Door is closed</p></div>
+                </div>
+                <div id="door-tutorial" class="door object interactable" onclick="if(game.signalManager.checkBroadcast('channel-door')==='open'){window.location.href='fun.html';}" style="position:absolute;left:520px;bottom:60px;"></div>
+                <div class="sign pixel-corners" id="sign-interact" style="position:absolute;top:20%;left:10%;width:340px;">
+                    Press <span class="key">E</span> near the switch or door to interact. Flip the switch to open the door.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="pause">
+        <span class="filter blur"></span>
+        <span class="filter dark"></span>
+        <div class="pause-text">
+            <h1>Paused</h1>
+            <p>Press <span class="key">ESC</span> to resume</p>
+        </div>
+    </div>
+    <div id="overlay">
+        <div id="reciever-3" class="reciever">
+            <span class="broadcast channel-toggle_one"></span>
+            <div class="signal-none"></div>
+            <div class="signal-crt"><span class="filter crt"></span></div>
+        </div>
+        <div class="debug">
+            <h1 class="positionDisplay">X: <span id="xPositionDisplay">x</span> Y: <span id="yPositionDisplay">y</span></h1>
+        </div>
+    </div>
+    <div class="tv-stump"><div class="tv-base"></div></div>
+</body>
+
+</html>
