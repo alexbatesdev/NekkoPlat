@@ -24,7 +24,9 @@
     <link rel="stylesheet" href="./css/index.css" />
     <link rel="stylesheet" href="./css/hexBackground.css" />
     <link rel="stylesheet" href="./css/global.css" />
+    <link rel="stylesheet" href="./css/dialogue.css" />
     <script src="./js/hexBackground.js" defer></script>
+    <script type="module" src="./js/dialogue.js" defer></script>
     <title>Piinro's Platformer</title>
   </head>
 
@@ -75,6 +77,47 @@
             Right now it's missing a lot, but I plan to make this the primary
             way to view my site!<br />
             Thank you for checking out my project! <br />
+          </div>
+
+          <div
+            id="npc-1"
+            class="object interactable clickable npc"
+            style="width: 50px; height: 50px; background: url('./img/cat_stand.gif') no-repeat center/contain;"
+            data-dialog-start="intro"
+            onclick="dialogue.start(this)"
+          >
+            <template id="intro" data-style="narrator" data-advance="word">
+              <p>You stand at a crossroads. Where do you go?</p>
+              <button class="choice" data-next="forest">Enter the forest</button>
+              <button class="choice" data-next="town">Head to town</button>
+              <button class="choice" data-next="camp">Set up camp</button>
+            </template>
+            <template id="forest" data-style="npc" data-advance="character">
+              <p>The forest is dark and quiet.</p>
+              <button class="choice" data-next="forestEnd">Press on</button>
+              <button class="choice" data-next="intro">Retreat to the crossroads</button>
+            </template>
+            <template id="town" data-style="npc" data-advance="character">
+              <p>The town is bustling with traders.</p>
+              <button class="choice" data-next="townEnd">Talk to the locals</button>
+              <button class="choice" data-next="intro">Leave for the crossroads</button>
+            </template>
+            <template id="camp" data-style="narrator" data-advance="instant">
+              <p>You rest at the camp. Dawn approaches.</p>
+              <button class="choice" data-next="intro">Break camp</button>
+            </template>
+            <template id="forestEnd" data-style="npc" data-advance="instant">
+              <p>
+                You discover hidden treasure deep in the woods. The adventure
+                ends!
+              </p>
+            </template>
+            <template id="townEnd" data-style="npc" data-advance="instant">
+              <p>
+                You settle into town life, finding a new home among its people.
+                The adventure ends!
+              </p>
+            </template>
           </div>
 
           <div class="object-label debug">Room 1</div>
@@ -192,6 +235,13 @@
           X: <span id="xPositionDisplay">x</span> Y:
           <span id="yPositionDisplay">y</span>
         </h1>
+      </div>
+    </div>
+
+    <div id="dialogue-container">
+      <div id="dialogue-box" class="narrator">
+        <div id="dialogue-content"></div>
+        <div id="dialogue-choices"></div>
       </div>
     </div>
   </body>

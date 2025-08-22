@@ -1,0 +1,40 @@
+#dialogue-container {
+  position: fixed;
+  bottom: 5%;
+  left: 10%;
+  width: 80%;
+  display: none;
+  z-index: 1000;
+}
+#dialogue-box {
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 1rem;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+#dialogue-box.narrator {
+  background: #222;
+  font-style: italic;
+}
+#dialogue-box.npc {
+  background: #003;
+  border: 2px solid #55f;
+}
+#dialogue-content {
+  min-height: 60px;
+}
+#dialogue-choices button,
+#dialogue-choices a {
+  display: block;
+  margin-top: 0.5rem;
+  background: #555;
+  color: #fff;
+  padding: 0.25rem 0.5rem;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+#dialogue-choices button:hover,
+#dialogue-choices a:hover {
+  background: #777;
+}
