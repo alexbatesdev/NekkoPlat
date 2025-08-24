@@ -159,12 +159,17 @@ export class CollisionDetection {
             top: playerRect.bottom,
             bottom: playerRect.bottom + 1,
         };
-        return collisionObjects.some(collisionObject => {
+        let groundedObj = null;
+        const grounded = collisionObjects.some(collisionObject => {
             if (!collisionObject.enabled) return false;
             const el = collisionObject.element;
             if (!(el.classList.contains('solid') || el.classList.contains('slope'))) return false;
-            return intersects(probeRect, el.getBoundingClientRect());
+            const hit = intersects(probeRect, el.getBoundingClientRect());
+            if (hit) groundedObj = collisionObject;
+            return hit;
         });
+        object.groundedObject = groundedObj;
+        return grounded;
     }
 
     checkOutOfBounds(object) {

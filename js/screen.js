@@ -88,6 +88,9 @@ export default class Screen {
             this.getObjectsByTypes('reciever').forEach(reciever => {
                 reciever.update();
             });
+            this.getObjectsByTypes('solid').forEach(solid => {
+                if (typeof solid.update === 'function') solid.update();
+            });
         }
         this.getObjectsByTypes('plax').forEach(parallaxObject => {
             parallaxObject.update();
