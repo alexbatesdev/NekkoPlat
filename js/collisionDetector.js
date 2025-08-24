@@ -119,10 +119,20 @@ export class CollisionDetection {
             if (el.classList.contains('slope')) return;
             const collisionRect = el.getBoundingClientRect();
             if (intersects(playerRect, collisionRect)) {
-                const collision = getCollisionOverlap(playerRect, collisionRect);
                 const dirClass = Array.from(el.classList).find(cls => cls.startsWith('oneway-'));
                 const dir = dirClass ? dirClass.split('-')[1] : null;
                 const isOneWay = dir !== null;
+
+                // Skip horizontal resolution when approaching the pass-through side
+                if (isOneWay && (dir === 'up' || dir === 'down')) {
+                    const approachingFromBelow = dir === 'up' && playerRect.top >= collisionRect.top;
+                    const approachingFromAbove = dir === 'down' && playerRect.bottom <= collisionRect.bottom;
+                    if (approachingFromBelow || approachingFromAbove) {
+                        return;
+                    }
+                }
+
+                const collision = getCollisionOverlap(playerRect, collisionRect);
                 if (collision.left > 0) {
                     if (isOneWay && dir === 'right') {
                         if (object.velocityX <= 0) {
