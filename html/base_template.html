@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../css/reset.css" />
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/custom-fonts.css" />
+    <script type="module" src="../js/platformer.js" defer></script>
+    <title>Piinro's Platformer</title>
+  </head>
+
+  <body style="overflow: hidden">
+    <div id="viewport" style="outline: red 1px solid; outline-offset: -1px">
+      <div class="level contain grid-1x1" id="level-one">
+        <div
+          class="screen"
+          style="
+            background: #fff;
+            background-image: linear-gradient(
+                to right,
+                #e0e0e0 1px,
+                transparent 1px
+              ),
+              linear-gradient(to bottom, #e0e0e0 1px, transparent 1px);
+            background-size: 50px 50px;
+          "
+        >
+          <div style="width: 50px; height: 50px" id="player">
+            <div class="interaction-indicator question-indicator">?</div>
+            <div id="interactionBox" style="height: 120%; width: 75px"></div>
+            <span class="config">
+              <span class="maxVelocity">8</span>
+              <span class="sprintMaxVelocity">13</span>
+              <span class="acceleration">0.7</span>
+              <span class="sprintAcceleration">1.3</span>
+              <span class="maxAirJumps">1</span>
+              <span class="gravity">0.9</span>
+              <span class="fallingGravity">3</span>
+              <span class="preJumpAllowance">10</span>
+              <span class="jumpForce">25</span>
+              <span class="coyoteTime">100</span>
+            </span>
+            <div class="animation-container gif">
+              <img
+                class="idle"
+                src="../img/cat_stand.gif"
+                alt="A cat standing there menacingly"
+              />
+              <img class="walk" src="../img/cat_walk.gif" alt="A cat walking" />
+              <img class="run" src="../img/cat_run.gif" alt="A cat running" />
+              <img class="jump" src="../img/cat_jump.gif" alt="A cat jumping" />
+              <img
+                class="wait"
+                src="../img/cat_fall_asleep.gif"
+                alt="A cat falling asleep"
+              />
+            </div>
+          </div>
+          <div
+            class="object solid"
+            style="width: 100%; height: 50px; background-color: grey; bottom: 0"
+          ></div>
+
+          <div class="object-label debug">Room 1</div>
+        </div>
+      </div>
+    </div>
+    <!-- Need to make these elements optional (pause) in the javascript to avoid errors! -->
+    <div id="pause">
+      <div>
+        <h1>Paused</h1>
+        <p>Press ESC to resume</p>
+      </div>
+    </div>
+    <!-- Need to make these elements (overlay) optional in the javascript to avoid errors! -->
+    <div id="overlay">
+      <div class="debug">
+        <h1 class="positionDisplay">
+          X: <span id="xPositionDisplay">x</span> Y:
+          <span id="yPositionDisplay">y</span>
+        </h1>
+      </div>
+    </div>
+  </body>
+</html>

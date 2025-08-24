@@ -282,6 +282,11 @@ position: relative or absolute
     height: var(--screen-height);
 }
 
+.cat {
+    width: 50px;
+    height: 50px;
+}
+
 .tv {
     top: 50%;
     left: 50%;

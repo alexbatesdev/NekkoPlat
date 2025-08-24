@@ -1,3 +1,11 @@
+:root {
+    --screen-width: 100vw;
+    --screen-height: 100vh;
+    --debug: hidden;
+    --player-spawn-x: 50px;
+    --player-spawn-y: calc(100% - 100px);
+}
+
 .debug {
     visibility: var(--debug);
 }
@@ -7,11 +15,6 @@
     width
     height
 */
-
-.cat {
-    width: 50px;
-    height: 50px;
-}
 
 .animation-container > img {
     image-rendering: pixelated;
@@ -24,4 +27,55 @@
     position: absolute;
     border-top-left-radius: 50px;
     border-top-right-radius: 50px;
+}
+
+/* 
+Necessary styles
+width
+height
+position: relative or absolute
+
+*/
+#viewport {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+}
+
+#viewport > * {
+    pointer-events: auto;
+}
+
+/*
+
+Object needs
+position: absolute
+
+*/
+.object {
+    position: absolute;
+}
+
+.screen {
+    pointer-events: none;
+}
+
+.screen > * {
+    pointer-events: auto;
+}
+
+#interactionBox {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 100;
+}
+
+.hidden {
+    visibility: hidden !important;
+}
+
+.no-display {
+    display: none !important;
 }
