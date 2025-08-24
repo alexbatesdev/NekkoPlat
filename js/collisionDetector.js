@@ -61,22 +61,48 @@ export class CollisionDetection {
         let collisionCount = 0;
         collisionObjects.forEach(collisionObject => {
             if (!collisionObject.enabled) return;
-            if (collisionObject.element.classList.contains('trigger')) return;
-            if (collisionObject.element.classList.contains('slope')) return;
-            const collisionRect = collisionObject.element.getBoundingClientRect();
+            const el = collisionObject.element;
+            if (el.classList.contains('trigger')) return;
+            if (el.classList.contains('slope')) return;
+            const collisionRect = el.getBoundingClientRect();
             if (intersects(playerRect, collisionRect)) {
                 const collision = getCollisionOverlap(playerRect, collisionRect);
-                if (collision.bottom > 0 && collisionObject.element.classList.contains('solid')) {
-                    collisionCount++;
-                    this.state.bottom = collision.bottom;
-                    object.y -= collision.bottom;
-                    object.velocityY = 0;
+                const dirClass = Array.from(el.classList).find(cls => cls.startsWith('oneway-'));
+                const dir = dirClass ? dirClass.split('-')[1] : null;
+                const isOneWay = dir !== null;
+                if (collision.bottom > 0) {
+                    if (isOneWay && dir === 'up') {
+                        if (object.velocityY >= 0) {
+                            collisionCount++;
+                            this.state.bottom = collision.bottom;
+                            object.y -= collision.bottom;
+                            object.velocityY = 0;
+                        }
+                    } else if (!isOneWay || dir !== 'down') {
+                        if (el.classList.contains('solid')) {
+                            collisionCount++;
+                            this.state.bottom = collision.bottom;
+                            object.y -= collision.bottom;
+                            object.velocityY = 0;
+                        }
+                    }
                 }
-                if (collision.top > 0 && collisionObject.element.classList.contains('solid')) {
-                    collisionCount++;
-                    this.state.top = collision.top;
-                    object.y += collision.top;
-                    object.velocityY = 0;
+                if (collision.top > 0) {
+                    if (isOneWay && dir === 'down') {
+                        if (object.velocityY <= 0) {
+                            collisionCount++;
+                            this.state.top = collision.top;
+                            object.y += collision.top;
+                            object.velocityY = 0;
+                        }
+                    } else if (!isOneWay || dir !== 'up') {
+                        if (el.classList.contains('solid')) {
+                            collisionCount++;
+                            this.state.top = collision.top;
+                            object.y += collision.top;
+                            object.velocityY = 0;
+                        }
+                    }
                 }
             }
         });
@@ -88,22 +114,48 @@ export class CollisionDetection {
         let collisionCount = 0;
         collisionObjects.forEach(collisionObject => {
             if (!collisionObject.enabled) return;
-            if (collisionObject.element.classList.contains('trigger')) return;
-            if (collisionObject.element.classList.contains('slope')) return;
-            const collisionRect = collisionObject.element.getBoundingClientRect();
+            const el = collisionObject.element;
+            if (el.classList.contains('trigger')) return;
+            if (el.classList.contains('slope')) return;
+            const collisionRect = el.getBoundingClientRect();
             if (intersects(playerRect, collisionRect)) {
                 const collision = getCollisionOverlap(playerRect, collisionRect);
-                if (collision.left > 0 && collisionObject.element.classList.contains('solid')) {
-                    this.state.left = collision.left;
-                    object.x += collision.left;
-                    object.velocityX = 0;
-                    collisionCount++;
+                const dirClass = Array.from(el.classList).find(cls => cls.startsWith('oneway-'));
+                const dir = dirClass ? dirClass.split('-')[1] : null;
+                const isOneWay = dir !== null;
+                if (collision.left > 0) {
+                    if (isOneWay && dir === 'right') {
+                        if (object.velocityX <= 0) {
+                            this.state.left = collision.left;
+                            object.x += collision.left;
+                            object.velocityX = 0;
+                            collisionCount++;
+                        }
+                    } else if (!isOneWay || dir !== 'left') {
+                        if (el.classList.contains('solid')) {
+                            this.state.left = collision.left;
+                            object.x += collision.left;
+                            object.velocityX = 0;
+                            collisionCount++;
+                        }
+                    }
                 }
-                if (collision.right > 0 && collisionObject.element.classList.contains('solid')) {
-                    collisionCount++;
-                    this.state.right = collision.right;
-                    object.x -= collision.right;
-                    object.velocityX = 0;
+                if (collision.right > 0) {
+                    if (isOneWay && dir === 'left') {
+                        if (object.velocityX >= 0) {
+                            collisionCount++;
+                            this.state.right = collision.right;
+                            object.x -= collision.right;
+                            object.velocityX = 0;
+                        }
+                    } else if (!isOneWay || dir !== 'right') {
+                        if (el.classList.contains('solid')) {
+                            collisionCount++;
+                            this.state.right = collision.right;
+                            object.x -= collision.right;
+                            object.velocityX = 0;
+                        }
+                    }
                 }
             }
         });
