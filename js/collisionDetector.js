@@ -171,3 +171,53 @@ export class CollisionDetection {
         object.groundedObject = groundedObj;
         return grounded;
     }
+
+    checkOutOfBounds(object) {
+        const playerRect = object.element.getBoundingClientRect();
+        const levelRect = gameInstance.level.element.getBoundingClientRect();
+        const outOfBoundEffect = gameInstance.level.outOfBoundEffect;
+        if (playerRect.left < levelRect.left) {
+            debugLog("Out of bounds left");
+            if (outOfBoundEffect.left == "contain") {
+                object.x -= playerRect.left - levelRect.left;
+            } else if (outOfBoundEffect.left == "respawn") {
+                this.respawnAtCheckpoint();
+            } else if (outOfBoundEffect.left == "wrap") {
+                object.x = levelRect.width - (playerRect.width * 1.25);
+                gameInstance.camera.snapToPlayer();
+            }
+        } else if (playerRect.right > levelRect.right) {
+            debugLog("Out of bounds right");
+            if (outOfBoundEffect.right == "contain") {
+                object.x -= playerRect.right - levelRect.right;
+            } else if (outOfBoundEffect.right == "respawn") {
+                this.respawnAtCheckpoint();
+            } else if (outOfBoundEffect.right == "wrap") {
+                object.x = 0 + (playerRect.width / 4)
+                gameInstance.camera.snapToPlayer();
+            }
+        }
+        if (playerRect.top < levelRect.top) {
+            debugLog("Out of bounds top");
+            if (outOfBoundEffect.top == "contain") {
+                object.y -= playerRect.top - levelRect.top;
+            } else if (outOfBoundEffect.top == "respawn") {
+                this.respawnAtCheckpoint();
+            } else if (outOfBoundEffect.top == "wrap") {
+                object.y = levelRect.height - (playerRect.height + 1);
+                gameInstance.camera.snapToPlayer();
+            }
+        } else if (playerRect.bottom > levelRect.bottom) {
+            debugLog("Out of bounds bottom");
+            if (outOfBoundEffect.bottom == "contain") {
+                object.y -= playerRect.height - (levelRect.bottom - playerRect.top);
+            } else if (outOfBoundEffect.bottom == "respawn") {
+                this.respawnAtCheckpoint();
+            } else if (outOfBoundEffect.bottom == "wrap") {
+                object.y = 0;
+                gameInstance.camera.snapToPlayer();
+            }
+
+        }
+    }
+}
