@@ -13,23 +13,10 @@ export class CollisionDetection {
 
     applyCollisions(object, collisionObjects) {
         this.checkOutOfBounds(object);
-        // Ensure DOM position reflects any out-of-bounds adjustments
-        object.element.style.left = `${object.x}px`;
-        object.element.style.top = `${object.y}px`;
         this.checkTriggerCollisions(object, collisionObjects);
-        // Resolve vertical movement before horizontal to avoid corner sliding
-        let vertical_collision_count = this.checkVerticalCollisions(object, collisionObjects);
-        // Update DOM position after vertical resolution
-        object.element.style.left = `${object.x}px`;
-        object.element.style.top = `${object.y}px`;
         let horizontal_collision_count = this.checkHorizontalCollisions(object, collisionObjects);
-        // Update again before slope checks so they use corrected position
-        object.element.style.left = `${object.x}px`;
-        object.element.style.top = `${object.y}px`;
+        let vertical_collision_count = this.checkVerticalCollisions(object, collisionObjects);
         let slope_collision_count = this.checkSlopeCollisions(object, collisionObjects);
-        // Final update to reflect any slope adjustments
-        object.element.style.left = `${object.x}px`;
-        object.element.style.top = `${object.y}px`;
         if (horizontal_collision_count <= 0) {
             this.state = {
                 left: 0,
