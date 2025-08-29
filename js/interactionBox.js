@@ -34,9 +34,9 @@ export default class InteractionBox {
             if (top || right || bottom || left) {
                 intersects = true;
             }
-            if ((top || right || bottom || left) && gameInstance.getKeyState('E') && !this.interacting) {
+            if ((top || right || bottom || left) && gameInstance.inputManager.isActionActive('interact') && !this.interacting) {
                 interactions.push(interactable);
-            } 
+            }
         }
         if (interactions.length > 0) {
             this.interacting = true;
@@ -44,8 +44,8 @@ export default class InteractionBox {
                 if (!interactable.enabled) return;
                 interactable.interact();
             });
-        } 
-        if (!gameInstance.getKeyState('E') && this.interacting) {
+        }
+        if (!gameInstance.inputManager.isActionActive('interact') && this.interacting) {
             this.interacting = false;
         }
         if (!this.interactionIndicatorElement) {

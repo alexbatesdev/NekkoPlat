@@ -219,36 +219,39 @@ export default class Player {
     }
 
     processInput() {
-        if (gameInstance.keyState['SHIFT'] && this.grounded) {
+        const input = gameInstance.inputManager;
+        const sprint = input.isActionActive('sprint');
+
+        if (sprint && this.grounded) {
             this.physics.acceleration = this.sprintAcceleration;
             this.physics.maxVelocity = this.sprintMaxVelocity;
-        } else if (!gameInstance.keyState['SHIFT'] && this.grounded) {
+        } else if (!sprint && this.grounded) {
             this.physics.acceleration = this.acceleration;
             this.physics.maxVelocity = this.maxVelocity;
         }
 
         // Movement calculations here
-        if (gameInstance.keyState['A']) {
+        if (input.isActionActive('moveLeft')) {
             this.lookLeft();
             this.physics.move(this, -this.physics.acceleration, 0);
         }
-        if (gameInstance.keyState['D']) {
+        if (input.isActionActive('moveRight')) {
             this.lookRight();
             this.physics.move(this, this.physics.acceleration, 0);
         }
-        if (gameInstance.keyState['S']) this.velocityY += this.physics.acceleration;
+        if (input.isActionActive('moveDown')) this.velocityY += this.physics.acceleration;
         // Similar for other directions
-        if (gameInstance.keyState['W'] || gameInstance.keyState['SPACE']) {
+        if (input.isActionActive('jump')) {
             this.jump();
         } else {
-            this.jumpProcessed = false; // Reset the flag when 'W' is not pressed
+            this.jumpProcessed = false; // Reset the flag when jump is not pressed
             if (!this.grounded && this.velocityY < 0) {
                 this.physics.gravity = this.fallingGravity;
             } else {
                 this.physics.gravity = this.gravity;
             }
         }
-        if (gameInstance.keyState['R']) {
+        if (input.isActionActive('respawn')) {
             this.respawnAtCheckpoint();
         }
     }
@@ -285,8 +288,10 @@ export default class Player {
     }
 
     applyAnimations() {
-        if (Math.abs(this.velocityX) > 0 && gameInstance.keyState['SHIFT']) this.animationManager.changeAnimation('run');
-        else if (Math.abs(this.velocityX) > 0 && (gameInstance.keyState['A'] || gameInstance.keyState['D'])) this.animationManager.changeAnimation('walk');
+        const input = gameInstance.inputManager;
+        const sprint = input.isActionActive('sprint');
+        if (Math.abs(this.velocityX) > 0 && sprint) this.animationManager.changeAnimation('run');
+        else if (Math.abs(this.velocityX) > 0 && (input.isActionActive('moveLeft') || input.isActionActive('moveRight'))) this.animationManager.changeAnimation('walk');
         else if (this.grounded) this.animationManager.changeAnimation('idle');
         else this.animationManager.changeAnimation('jump');
     }

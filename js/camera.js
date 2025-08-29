@@ -94,20 +94,25 @@ export default class Camera {
     }
 
     processInput() {
-        if (gameInstance.keyState['ARROWUP']) {
+        if (gameInstance.inputManager.isActionActive('cameraUp')) {
             this.offsetY += 0.01;
         }
-        if (gameInstance.keyState['ARROWDOWN']) {
+        if (gameInstance.inputManager.isActionActive('cameraDown')) {
             this.offsetY -= 0.01;
         }
-        if (gameInstance.keyState['ARROWLEFT']) {
+        if (gameInstance.inputManager.isActionActive('cameraLeft')) {
             this.offsetX += 0.01;
         }
-        if (gameInstance.keyState['ARROWRIGHT']) {
+        if (gameInstance.inputManager.isActionActive('cameraRight')) {
             this.offsetX -= 0.01;
         }
 
-        if (!gameInstance.keyState['ARROWUP'] && !gameInstance.keyState['ARROWDOWN'] && !gameInstance.keyState['ARROWLEFT'] && !gameInstance.keyState['ARROWRIGHT']) {
+        if (
+            !gameInstance.inputManager.isActionActive('cameraUp') &&
+            !gameInstance.inputManager.isActionActive('cameraDown') &&
+            !gameInstance.inputManager.isActionActive('cameraLeft') &&
+            !gameInstance.inputManager.isActionActive('cameraRight')
+        ) {
             this.applyCenterDrift();
         }
     }
