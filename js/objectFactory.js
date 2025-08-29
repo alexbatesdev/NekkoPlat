@@ -1,4 +1,4 @@
-import { SolidObject, InteractableObject, InteractableToggle, Reciever, LevelObject, TriggerArea } from "./levelObjects.js";
+import { SolidObject, InteractableObject, InteractableToggle, Reciever, LevelObject, TriggerArea, OneWaySolidObject } from "./levelObjects.js";
 
 const objectFactory = {
     solid: SolidObject,
@@ -11,6 +11,10 @@ const objectFactory = {
 
 export function createObject(element) {
     const classes = Array.from(element.classList);
+    const oneWayClass = classes.find(cls => cls.startsWith('oneway-'));
+    if (oneWayClass && classes.includes('solid')) {
+        return { type: 'solid', instance: new OneWaySolidObject(element) };
+    }
     let type = classes.find(cls => objectFactory[cls]);
 
     if (type === 'interactable' && classes.includes('toggle')) {

@@ -78,12 +78,25 @@ Defines in‑level object types:
 - `InteractableObject` and `InteractableToggle`: elements that react to player interaction and can broadcast signals.
 - `Reciever`: shows different child elements based on received signals.
 - `Slope`: ramp geometry. Combine classes `object`, `solid` and `slope` and set `data-slope` to `up-right`, `up-left`, `down-right` or `down-left`.
+ - `OneWaySolid`: blocks movement from one side. Use classes `object solid oneway-DIR` where `DIR` is `up`, `down`, `left` or `right`. Add `dropthrough` to an `oneway-up` element to allow falling through by holding `S` and pressing a jump key.
 
 Example sloped surface:
 
 ```html
 <div class="object solid slope" data-slope="up-right"
      style="width:200px;height:200px;clip-path:polygon(0% 100%,100% 100%,100% 0%);"></div>
+```
+
+Example one-way platform:
+
+```html
+<div class="object solid oneway-up" style="width:100px;height:20px;"></div>
+```
+
+Example drop-through platform:
+
+```html
+<div class="object solid oneway-up dropthrough" style="width:100px;height:20px;"></div>
 ```
 
 Example toggle/receiver pair:

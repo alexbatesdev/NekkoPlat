@@ -65,6 +65,15 @@ export class SolidObject extends LevelObject{
     }
 }
 
+export class OneWaySolidObject extends SolidObject {
+        constructor(element) {
+            super(element);
+            const dirClass = Array.from(element.classList).find(cls => cls.startsWith('oneway-'));
+            this.direction = dirClass ? dirClass.split('-')[1] : 'up';
+            this.dropthrough = element.classList.contains('dropthrough');
+        }
+    }
+
 export class TriggerArea extends LevelObject {
     constructor(element) {
         super(element);
