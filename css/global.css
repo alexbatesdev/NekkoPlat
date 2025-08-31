@@ -2,8 +2,8 @@
     --screen-width: 100vw;
     --screen-height: 100vh;
     --debug: hidden;
-    --player-spawn-x: 50px;
-    --player-spawn-y: calc(100% - 100px);
+    --player-spawn-x: 50vw;
+    --player-spawn-y: calc(100vh - 100px);
 }
 
 .debug {

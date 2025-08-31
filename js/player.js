@@ -124,22 +124,56 @@ export default class Player {
     spawn() {
         const spawn_x_query_param = new URLSearchParams(window.location.search).get('spawn_x');
         const spawn_y_query_param = new URLSearchParams(window.location.search).get('spawn_y');
-
-        const playerSpawnXRelativeToScreen = spawn_x_query_param == null ? getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-x') : spawn_x_query_param;
-        const playerSpawnYRelativeToScreen = spawn_y_query_param == null ? getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-y') : spawn_y_query_param;
+        const playerSpawnXRelativeToScreen = spawn_x_query_param ? spawn_x_query_param : getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-x');
+        const playerSpawnYRelativeToScreen = spawn_y_query_param ? spawn_y_query_param : getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-y');
+        console.log(`Player spawn from CSS: (${playerSpawnXRelativeToScreen}, ${playerSpawnYRelativeToScreen})`);
         const screenRect = this.respawnScreen.getBoundingClientRect();
         const width = this.element.getBoundingClientRect().width;
         const height = this.element.getBoundingClientRect().height;
 
-        let xValue = parseFloat(playerSpawnXRelativeToScreen);
-        if (playerSpawnXRelativeToScreen.includes('%')) {
-            xValue = screenRect.width * (xValue / 100);
-        }
-        let yValue = parseFloat(playerSpawnYRelativeToScreen);
-        if (playerSpawnYRelativeToScreen.includes('%')) {
-            yValue = screenRect.height * (yValue / 100);
+        function evalCalc(expr, axis) {
+            // Replace percentages, px, vw, vh with pixel values
+            return expr
+                .replace(/([\d.]+)%/g, (m, p1) => {
+                    return axis === 'x' ? (screenRect.width * (parseFloat(p1) / 100)) : (screenRect.height * (parseFloat(p1) / 100));
+                })
+                .replace(/([\d.]+)vw/g, (m, p1) => window.innerWidth * (parseFloat(p1) / 100))
+                .replace(/([\d.]+)vh/g, (m, p1) => window.innerHeight * (parseFloat(p1) / 100))
+                .replace(/([\d.]+)px/g, (m, p1) => parseFloat(p1));
         }
 
+        function safeEval(expr) {
+            // Only allow numbers, +, -, *, /, (, ) and .
+            if (!/^[-+*/().\d\s]+$/.test(expr)) return NaN;
+            try {
+                return Function('return (' + expr + ')')();
+            } catch {
+                return NaN;
+            }
+        }
+
+        function parseValue(val, axis) {
+            val = val.trim();
+            if (val.startsWith('calc(')) {
+                let inner = val.slice(5, -1);
+                console.log(`Evaluating calc(${inner})`);
+                let replaced = evalCalc(inner, axis);
+                console.log(`Evaluating calc(${inner}) as ${replaced}`);
+                return safeEval(replaced);
+            } else if (val.includes('%')) {
+                let num = parseFloat(val);
+                return axis === 'x' ? (screenRect.width * (num / 100)) : (screenRect.height * (num / 100));
+            } else if (val.includes('px')) {
+                return parseFloat(val);
+            } else {
+                return parseFloat(val);
+            }
+        }
+
+        let xValue = parseValue(playerSpawnXRelativeToScreen, 'x');
+        let yValue = parseValue(playerSpawnYRelativeToScreen, 'y');
+
+        console.log(`Spawning player at (${xValue}, ${yValue}) relative to screen`);
         this.x = xValue - (width / 2);
         this.y = yValue - (height / 2);
         this.updateTransform();
@@ -188,6 +222,7 @@ export default class Player {
             this.x += this.velocityX / iterations;
             this.y += this.velocityY / iterations;
             this.updateTransform();
+            // console.log(this.element);
             this.collision.applyCollisions(this, this.collisionObjects);
             this.updateTransform();
             if (this.velocityX === 0 && this.velocityY === 0) break;
@@ -329,6 +364,7 @@ export default class Player {
 
     updateTransform() {
         const rotation = this.isFacingRight ? 'rotateY(180deg)' : 'rotateY(0deg)';
+        // console.log(`translate(${this.x}px, ${this.y}px) ${rotation}`)
         this.element.style.transform = `translate(${this.x}px, ${this.y}px) ${rotation}`;
     }
 
