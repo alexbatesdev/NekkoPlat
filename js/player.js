@@ -290,9 +290,9 @@ export default class Player {
         }
         if (gameInstance.keyState['S']) this.physics.move(this, 0, this.physics.acceleration);
         // Similar for other directions
-        if (gameInstance.keyState['S'] && (gameInstance.keyState['W'] || gameInstance.keyState['SPACE'])) {
+        if (gameInstance.keyState['S'] && (gameInstance.keyState['W'] || gameInstance.keyState['SPACE'])) { 
             this.collisionObjects.forEach(obj => {
-                if (obj instanceof OneWaySolidObject && obj.dropthrough && obj.direction === 'up') {
+                if (obj.element.classList.value.split(" ").filter(className => className.startsWith('oneway-')).length > 0 && obj.dropthrough && obj.direction === 'up') {
                     const rect = obj.element.getBoundingClientRect();
                     const playerRect = this.element.getBoundingClientRect();
                     if (playerRect.bottom <= rect.top + 1 && playerRect.bottom >= rect.top - 5) {
