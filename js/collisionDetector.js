@@ -171,3 +171,17 @@ export class CollisionDetection {
         object.groundedObject = groundedObj;
         return grounded;
     }
+
+    checkOutOfBounds(object) {
+        const playerRect = object.element.getBoundingClientRect();
+        const viewportRect = document.getElementById('viewport').getBoundingClientRect();
+        const outOfBounds = {
+            left: playerRect.left < viewportRect.left,
+            right: playerRect.right > viewportRect.right,
+            top: playerRect.top < viewportRect.top,
+            bottom: playerRect.bottom > viewportRect.bottom,
+        };
+        return outOfBounds;
+
+    }
+}
