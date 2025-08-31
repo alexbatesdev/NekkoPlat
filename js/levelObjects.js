@@ -154,46 +154,6 @@ export class OneWaySolidObject extends SolidObject {
   }
 }
 
-export class MovingPlatform extends SolidObject {
-    constructor(element) {
-        super(element);
-        this.prevRect = this.element.getBoundingClientRect();
-        this.dragging = false;
-        this.dragOffsetX = 0;
-        this.dragOffsetY = 0;
-        this.element.addEventListener('pointerdown', (e) => {
-            this.dragging = true;
-            this.dragOffsetX = e.clientX - this.element.offsetLeft;
-            this.dragOffsetY = e.clientY - this.element.offsetTop;
-            this.element.setPointerCapture(e.pointerId);
-        });
-        this.element.addEventListener('pointerup', (e) => {
-            this.dragging = false;
-            this.element.releasePointerCapture(e.pointerId);
-        });
-        this.element.addEventListener('pointermove', (e) => {
-            if (!this.dragging) return;
-            this.element.style.left = `${e.clientX - this.dragOffsetX}px`;
-            this.element.style.top = `${e.clientY - this.dragOffsetY}px`;
-        });
-    }
-
-    update() {
-        super.update();
-        const rect = this.element.getBoundingClientRect();
-        const deltaX = rect.left - this.prevRect.left;
-        const deltaY = rect.top - this.prevRect.top;
-        this.prevRect = rect;
-        const player = gameInstance.player;
-        if (player.grounded && player.groundedObject === this) {
-            player.x += deltaX;
-            player.y += deltaY;
-            player.element.style.left = player.x + "px";
-            player.element.style.top = player.y + "px";
-        }
-    }
-}
-
 export class SaggingPlatform extends MovingPlatform {
     constructor(element) {
         super(element);
