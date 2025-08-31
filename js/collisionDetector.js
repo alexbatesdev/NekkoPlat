@@ -13,6 +13,7 @@ export class CollisionDetection {
 
     applyCollisions(object, collisionObjects) {
         this.checkOutOfBounds(object);
+        object.updateTransform?.();
         this.checkTriggerCollisions(object, collisionObjects);
         let horizontal_collision_count = this.checkHorizontalCollisions(object, collisionObjects);
         let vertical_collision_count = this.checkVerticalCollisions(object, collisionObjects);
@@ -57,13 +58,13 @@ export class CollisionDetection {
     }
 
     checkVerticalCollisions(object, collisionObjects) {
-        const playerRect = object.element.getBoundingClientRect();
         let collisionCount = 0;
         collisionObjects.forEach(collisionObject => {
             if (!collisionObject.enabled) return;
             const el = collisionObject.element;
             if (el.classList.contains('trigger')) return;
             if (el.classList.contains('slope')) return;
+            const playerRect = object.element.getBoundingClientRect();
             const collisionRect = el.getBoundingClientRect();
             if (intersects(playerRect, collisionRect)) {
                 const collision = getCollisionOverlap(playerRect, collisionRect);
@@ -77,6 +78,7 @@ export class CollisionDetection {
                             this.state.bottom = collision.bottom;
                             object.y -= collision.bottom;
                             object.velocityY = 0;
+                            object.updateTransform?.();
                         }
                     } else if (!isOneWay || dir !== 'down') {
                         if (el.classList.contains('solid')) {
@@ -84,6 +86,7 @@ export class CollisionDetection {
                             this.state.bottom = collision.bottom;
                             object.y -= collision.bottom;
                             object.velocityY = 0;
+                            object.updateTransform?.();
                         }
                     }
                 }
@@ -94,6 +97,7 @@ export class CollisionDetection {
                             this.state.top = collision.top;
                             object.y += collision.top;
                             object.velocityY = 0;
+                            object.updateTransform?.();
                         }
                     } else if (!isOneWay || dir !== 'up') {
                         if (el.classList.contains('solid')) {
@@ -101,6 +105,7 @@ export class CollisionDetection {
                             this.state.top = collision.top;
                             object.y += collision.top;
                             object.velocityY = 0;
+                            object.updateTransform?.();
                         }
                     }
                 }
@@ -110,13 +115,13 @@ export class CollisionDetection {
     }
 
     checkHorizontalCollisions(object, collisionObjects) {
-        const playerRect = object.element.getBoundingClientRect();
         let collisionCount = 0;
         collisionObjects.forEach(collisionObject => {
             if (!collisionObject.enabled) return;
             const el = collisionObject.element;
             if (el.classList.contains('trigger')) return;
             if (el.classList.contains('slope')) return;
+            const playerRect = object.element.getBoundingClientRect();
             const collisionRect = el.getBoundingClientRect();
             if (intersects(playerRect, collisionRect)) {
                 const dirClass = Array.from(el.classList).find(cls => cls.startsWith('oneway-'));
@@ -139,6 +144,7 @@ export class CollisionDetection {
                             this.state.left = collision.left;
                             object.x += collision.left;
                             object.velocityX = 0;
+                            object.updateTransform?.();
                             collisionCount++;
                         }
                     } else if (!isOneWay || dir !== 'left') {
@@ -146,6 +152,7 @@ export class CollisionDetection {
                             this.state.left = collision.left;
                             object.x += collision.left;
                             object.velocityX = 0;
+                            object.updateTransform?.();
                             collisionCount++;
                         }
                     }
@@ -153,17 +160,19 @@ export class CollisionDetection {
                 if (collision.right > 0) {
                     if (isOneWay && dir === 'left') {
                         if (object.velocityX >= 0) {
-                            collisionCount++;
                             this.state.right = collision.right;
                             object.x -= collision.right;
                             object.velocityX = 0;
+                            object.updateTransform?.();
+                            collisionCount++;
                         }
                     } else if (!isOneWay || dir !== 'right') {
                         if (el.classList.contains('solid')) {
-                            collisionCount++;
                             this.state.right = collision.right;
                             object.x -= collision.right;
                             object.velocityX = 0;
+                            object.updateTransform?.();
+                            collisionCount++;
                         }
                     }
                 }
@@ -173,11 +182,11 @@ export class CollisionDetection {
     }
 
     checkSlopeCollisions(object, collisionObjects) {
-        const playerRect = object.element.getBoundingClientRect();
         let collisionCount = 0;
         collisionObjects.forEach(collisionObject => {
             if (!collisionObject.enabled) return;
             if (!collisionObject.element.classList.contains('slope')) return;
+            const playerRect = object.element.getBoundingClientRect();
             const slopeRect = collisionObject.element.getBoundingClientRect();
             if (!intersects(playerRect, slopeRect)) return;
             const type = collisionObject.element.dataset.slope || 'up-right';
@@ -207,6 +216,7 @@ export class CollisionDetection {
                 object.y -= overlap;
                 object.velocityY = 0;
                 this.state.bottom = overlap;
+                object.updateTransform?.();
                 collisionCount++;
             }
         });
@@ -242,42 +252,50 @@ export class CollisionDetection {
             debugLog("Out of bounds left");
             if (outOfBoundEffect.left == "contain") {
                 object.x -= playerRect.left - levelRect.left;
+                object.updateTransform?.();
             } else if (outOfBoundEffect.left == "respawn") {
                 this.respawnAtCheckpoint();
             } else if (outOfBoundEffect.left == "wrap") {
                 object.x = levelRect.width - (playerRect.width * 1.25);
                 gameInstance.camera.snapToPlayer();
+                object.updateTransform?.();
             }
         } else if (playerRect.right > levelRect.right) {
             debugLog("Out of bounds right");
             if (outOfBoundEffect.right == "contain") {
                 object.x -= playerRect.right - levelRect.right;
+                object.updateTransform?.();
             } else if (outOfBoundEffect.right == "respawn") {
                 this.respawnAtCheckpoint();
             } else if (outOfBoundEffect.right == "wrap") {
                 object.x = 0 + (playerRect.width / 4)
                 gameInstance.camera.snapToPlayer();
+                object.updateTransform?.();
             }
         }
         if (playerRect.top < levelRect.top) {
             debugLog("Out of bounds top");
             if (outOfBoundEffect.top == "contain") {
                 object.y -= playerRect.top - levelRect.top;
+                object.updateTransform?.();
             } else if (outOfBoundEffect.top == "respawn") {
                 this.respawnAtCheckpoint();
             } else if (outOfBoundEffect.top == "wrap") {
                 object.y = levelRect.height - (playerRect.height + 1);
                 gameInstance.camera.snapToPlayer();
+                object.updateTransform?.();
             }
         } else if (playerRect.bottom > levelRect.bottom) {
             debugLog("Out of bounds bottom");
             if (outOfBoundEffect.bottom == "contain") {
                 object.y -= playerRect.height - (levelRect.bottom - playerRect.top);
+                object.updateTransform?.();
             } else if (outOfBoundEffect.bottom == "respawn") {
                 this.respawnAtCheckpoint();
             } else if (outOfBoundEffect.bottom == "wrap") {
                 object.y = 0;
                 gameInstance.camera.snapToPlayer();
+                object.updateTransform?.();
             }
 
         }

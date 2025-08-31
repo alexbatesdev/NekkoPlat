@@ -59,6 +59,7 @@ export default class Player {
         this.currentAnimation = 'idle';
         //   Interaction
         this.interactionBox = new InteractionBox(this);
+        this.isFacingRight = false;
 
         // Cached DOM references
         this.xPositionDisplay = document.getElementById('xPositionDisplay');
@@ -126,12 +127,22 @@ export default class Player {
 
         const playerSpawnXRelativeToScreen = spawn_x_query_param == null ? getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-x') : spawn_x_query_param;
         const playerSpawnYRelativeToScreen = spawn_y_query_param == null ? getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-y') : spawn_y_query_param;
-        const screenXposition = this.respawnScreen.getBoundingClientRect().x;
-        const screenYposition = this.respawnScreen.getBoundingClientRect().y;
-        this.element.style.left = playerSpawnXRelativeToScreen;
-        this.element.style.top = playerSpawnYRelativeToScreen;
-        this.x = (this.element.getBoundingClientRect().x - screenXposition) - (this.element.getBoundingClientRect().width / 2);
-        this.y = (this.element.getBoundingClientRect().y - screenYposition) - (this.element.getBoundingClientRect().height / 2);
+        const screenRect = this.respawnScreen.getBoundingClientRect();
+        const width = this.element.getBoundingClientRect().width;
+        const height = this.element.getBoundingClientRect().height;
+
+        let xValue = parseFloat(playerSpawnXRelativeToScreen);
+        if (playerSpawnXRelativeToScreen.includes('%')) {
+            xValue = screenRect.width * (xValue / 100);
+        }
+        let yValue = parseFloat(playerSpawnYRelativeToScreen);
+        if (playerSpawnYRelativeToScreen.includes('%')) {
+            yValue = screenRect.height * (yValue / 100);
+        }
+
+        this.x = xValue - (width / 2);
+        this.y = yValue - (height / 2);
+        this.updateTransform();
     }
 
     spawnAt(playerSpawnXRelativeToScreen, playerSpawnYRelativeToScreen, screen) {
@@ -148,6 +159,7 @@ export default class Player {
         debugLog(screensToTheTop);
         this.x = (playerSpawnXRelativeToScreen) + (screensToTheLeft * screen.getBoundingClientRect().width) - (this.element.getBoundingClientRect().width / 2);
         this.y = (playerSpawnYRelativeToScreen) + (screensToTheTop * screen.getBoundingClientRect().height) - (this.element.getBoundingClientRect().height / 2);
+        this.updateTransform();
     }
 
     setCheckpointScreen(checkpoint_screen) {
@@ -175,18 +187,15 @@ export default class Player {
         for (let i = 0; i < iterations; i++) {
             this.x += this.velocityX / iterations;
             this.y += this.velocityY / iterations;
-            this.element.style.left = `${this.x}px`;
-            this.element.style.top = `${this.y}px`;
+            this.updateTransform();
             this.collision.applyCollisions(this, this.collisionObjects);
+            this.updateTransform();
             if (this.velocityX === 0 && this.velocityY === 0) break;
         }
 
         this.processCollisions();
         this.interactionBox.update();
         this.applyAnimations();
-        // Set the position of the player's HTML element
-        // this.element.style.left = `${this.x}px`;
-        // this.element.style.top = `${this.y}px`;
         if (this.xPositionDisplay) {
             this.xPositionDisplay.innerHTML = Math.round(this.x + this.element.getBoundingClientRect().width / 2);
         }
@@ -299,21 +308,28 @@ export default class Player {
     }
 
     lookRight() {
-        this.element.style.transform = 'rotateY(180deg)';
+        this.isFacingRight = true;
+        this.updateTransform();
         if (this.interactionBox.interactionIndicatorElement) {
             this.interactionBox.interactionIndicatorElement.style.transform = "translate(-50%, -100%) rotateY(180deg)";
         }
     }
 
     lookLeft() {
-        this.element.style.transform = 'rotateY(0deg)';
+        this.isFacingRight = false;
+        this.updateTransform();
         if (this.interactionBox.interactionIndicatorElement) {
             this.interactionBox.interactionIndicatorElement.style.transform = "translate(-50%, -100%) rotateY(0deg)";
         }
     }
 
     facingRight() {
-        return this.element.style.transform === 'rotateY(180deg)';
+        return this.isFacingRight;
+    }
+
+    updateTransform() {
+        const rotation = this.isFacingRight ? 'rotateY(180deg)' : 'rotateY(0deg)';
+        this.element.style.transform = `translate(${this.x}px, ${this.y}px) ${rotation}`;
     }
 
     setSolidObjects(solidObjects) {

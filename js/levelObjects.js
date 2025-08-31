@@ -94,8 +94,7 @@ export class MovingPlatform extends SolidObject {
         if (player.grounded && player.groundedObject === this) {
             player.x += deltaX;
             player.y += deltaY;
-            player.element.style.left = player.x + "px";
-            player.element.style.top = player.y + "px";
+            player.updateTransform();
         }
     }
 }
