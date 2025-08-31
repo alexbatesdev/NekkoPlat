@@ -64,6 +64,7 @@ export class CollisionDetection {
             const el = collisionObject.element;
             if (el.classList.contains('trigger')) return;
             if (el.classList.contains('slope')) return;
+            const playerRect = object.element.getBoundingClientRect();
             const collisionRect = el.getBoundingClientRect();
             if (intersects(playerRect, collisionRect)) {
                 const collision = getCollisionOverlap(playerRect, collisionRect);
@@ -118,6 +119,7 @@ export class CollisionDetection {
             const el = collisionObject.element;
             if (el.classList.contains('trigger')) return;
             if (el.classList.contains('slope')) return;
+            const playerRect = object.element.getBoundingClientRect();
             const collisionRect = el.getBoundingClientRect();
             if (intersects(playerRect, collisionRect)) {
                 const dirClass = Array.from(el.classList).find(cls => cls.startsWith('oneway-'));
@@ -134,9 +136,6 @@ export class CollisionDetection {
                 }
 
                 const collision = getCollisionOverlap(playerRect, collisionRect);
-                const dirClass = Array.from(el.classList).find(cls => cls.startsWith('oneway-'));
-                const dir = dirClass ? dirClass.split('-')[1] : null;
-                const isOneWay = dir !== null;
                 if (collision.left > 0) {
                     if (isOneWay && dir === 'right') {
                         if (object.velocityX <= 0) {
