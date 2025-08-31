@@ -40,7 +40,7 @@ export default class Screen {
 
     getObjectsByTypes(...types) {
         return this.objects
-            .filter(obj => types.includes(obj.type))
+            .filter(obj => types.some(type => obj.types.includes(type)))
             .map(obj => obj.instance);
     }
 
