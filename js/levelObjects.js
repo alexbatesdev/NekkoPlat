@@ -110,17 +110,6 @@ export class MovingPlatform extends SolidObject {
 }
 
 export class OneWaySolidObject extends SolidObject {
-  constructor(element) {
-    super(element);
-    const dirClass = Array.from(element.classList).find((cls) =>
-      cls.startsWith("oneway-")
-    );
-    this.direction = dirClass ? dirClass.split("-")[1] : "up";
-    this.dropthrough = element.classList.contains("dropthrough");
-  }
-}
-
-export class OneWaySolidObject extends SolidObject {
     constructor(element) {
         super(element);
         const dirClass = Array.from(element.classList).find(cls => cls.startsWith('oneway-'));
@@ -129,26 +118,27 @@ export class OneWaySolidObject extends SolidObject {
         this.dropTimer = 0;
     }
 
-    update(player) {
+    update() {
         super.update();
         if (this.dropTimer > 0) this.dropTimer--;
 
         const rect = this.element.getBoundingClientRect();
-        const playerRect = player.element.getBoundingClientRect();
+        const playerRect = gameInstance.player.element.getBoundingClientRect();
+        const MARGIN = 1;
 
         let shouldEnable = true;
         switch (this.direction) {
             case 'up':
-                shouldEnable = playerRect.bottom <= rect.top && this.dropTimer === 0;
+                shouldEnable = playerRect.bottom <= (rect.top + MARGIN) && this.dropTimer === 0;
                 break;
             case 'down':
-                shouldEnable = playerRect.top >= rect.bottom;
+                shouldEnable = playerRect.top >= (rect.bottom - MARGIN);
                 break;
             case 'left':
-                shouldEnable = playerRect.right <= rect.left;
+                shouldEnable = playerRect.right <= (rect.left + MARGIN);
                 break;
             case 'right':
-                shouldEnable = playerRect.left >= rect.right;
+                shouldEnable = playerRect.left >= (rect.right - MARGIN);
                 break;
         }
         this.enabled = shouldEnable;

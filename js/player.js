@@ -215,9 +215,6 @@ export default class Player {
 
     update() {
         this.processInput();
-        this.collisionObjects.forEach(obj => {
-            if (typeof obj.update === 'function') obj.update(this);
-        });
         this.physics.applyPhysics(this, this.collision.state);
 
         const steps = Math.ceil(Math.max(Math.abs(this.velocityX), Math.abs(this.velocityY)));
