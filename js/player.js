@@ -55,6 +55,7 @@ export default class Player {
         this.jumpInProgress = false;
         this.coyoteTimer = 0;
         this.coyoteTimeActive = false;
+        this.dropTimer = 0;
         //   Animation
         this.currentAnimation = 'idle';
         //   Interaction
@@ -212,8 +213,8 @@ export default class Player {
     }
 
     update() {
-
         this.processInput();
+        if (this.dropTimer > 0) this.dropTimer--;
         this.physics.applyPhysics(this, this.collision.state);
 
         const steps = Math.ceil(Math.max(Math.abs(this.velocityX), Math.abs(this.velocityY)));
@@ -289,7 +290,11 @@ export default class Player {
         }
         if (gameInstance.keyState['S']) this.physics.move(this, 0, this.physics.acceleration);
         // Similar for other directions
-        if (gameInstance.keyState['W'] || gameInstance.keyState['SPACE']) {
+        if (gameInstance.keyState['S'] && (gameInstance.keyState['W'] || gameInstance.keyState['SPACE'])) {
+            this.dropTimer = 10;
+            this.velocityY = Math.max(this.velocityY, 1);
+            this.jumpProcessed = true;
+        } else if (gameInstance.keyState['W'] || gameInstance.keyState['SPACE']) {
             this.jump();
         } else {
             this.jumpProcessed = false; // Reset the flag when 'W' is not pressed
