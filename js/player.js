@@ -4,6 +4,7 @@ import GifAnimationManager from "./gifAnimationManager.js";
 import { Physics } from "./physics.js";
 import { CollisionDetection } from "./collisionDetector.js";
 import InteractionBox from "./interactionBox.js";
+import { OneWaySolidObject } from "./levelObjects.js";
 
 export default class Player {
     constructor(element) {
@@ -165,8 +166,10 @@ export default class Player {
     }
 
     update() {
-
         this.processInput();
+        this.collisionObjects.forEach(obj => {
+            if (typeof obj.update === 'function') obj.update(this);
+        });
         this.physics.applyPhysics(this, this.collision.state);
 
         const steps = Math.ceil(Math.max(Math.abs(this.velocityX), Math.abs(this.velocityY)));
@@ -241,7 +244,19 @@ export default class Player {
         }
         if (gameInstance.keyState['S']) this.physics.move(this, 0, this.physics.acceleration);
         // Similar for other directions
-        if (gameInstance.keyState['W'] || gameInstance.keyState['SPACE']) {
+        if (gameInstance.keyState['S'] && (gameInstance.keyState['W'] || gameInstance.keyState['SPACE'])) {
+            this.collisionObjects.forEach(obj => {
+                if (obj instanceof OneWaySolidObject && obj.dropthrough && obj.direction === 'up') {
+                    const rect = obj.element.getBoundingClientRect();
+                    const playerRect = this.element.getBoundingClientRect();
+                    if (playerRect.bottom <= rect.top + 1 && playerRect.bottom >= rect.top - 5) {
+                        obj.dropTimer = 10;
+                    }
+                }
+            });
+            this.velocityY = Math.max(this.velocityY, 1);
+            this.jumpProcessed = true;
+        } else if (gameInstance.keyState['W'] || gameInstance.keyState['SPACE']) {
             this.jump();
         } else {
             this.jumpProcessed = false; // Reset the flag when 'W' is not pressed

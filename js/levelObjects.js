@@ -65,6 +65,41 @@ export class SolidObject extends LevelObject{
     }
 }
 
+export class OneWaySolidObject extends SolidObject {
+    constructor(element) {
+        super(element);
+        const dirClass = Array.from(element.classList).find(cls => cls.startsWith('oneway-'));
+        this.direction = dirClass ? dirClass.split('-')[1] : 'up';
+        this.dropthrough = element.classList.contains('dropthrough');
+        this.dropTimer = 0;
+    }
+
+    update(player) {
+        super.update();
+        if (this.dropTimer > 0) this.dropTimer--;
+
+        const rect = this.element.getBoundingClientRect();
+        const playerRect = player.element.getBoundingClientRect();
+
+        let shouldEnable = true;
+        switch (this.direction) {
+            case 'up':
+                shouldEnable = playerRect.bottom <= rect.top && this.dropTimer === 0;
+                break;
+            case 'down':
+                shouldEnable = playerRect.top >= rect.bottom;
+                break;
+            case 'left':
+                shouldEnable = playerRect.right <= rect.left;
+                break;
+            case 'right':
+                shouldEnable = playerRect.left >= rect.right;
+                break;
+        }
+        this.enabled = shouldEnable;
+    }
+}
+
 export class TriggerArea extends LevelObject {
     constructor(element) {
         super(element);
