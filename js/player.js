@@ -48,6 +48,7 @@ export default class Player {
         this.collisionObjects = [];
         this.collision = new CollisionDetection();
         this.grounded = false;
+        this.groundedObject = null;
         //   Jumping
         this.airJumps = 0;
         this.jumpProcessed = false;
@@ -203,6 +204,9 @@ export default class Player {
     processCollisions() {
         const wasGrounded = this.grounded;
         this.grounded = this.collision.isGrounded(this, this.collisionObjects);
+        if (!this.grounded) {
+            this.groundedObject = null;
+        }
 
         if (this.grounded) {
             if (!wasGrounded) {
