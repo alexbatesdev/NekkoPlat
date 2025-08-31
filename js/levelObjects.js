@@ -118,6 +118,7 @@ export class OneWaySolidObject extends SolidObject {
     this.direction = dirClass ? dirClass.split("-")[1] : "up";
     this.dropthrough = element.classList.contains("dropthrough");
     this.dropTimer = 0;
+    this.initialBackgroundColor = this.element.style.backgroundColor;
   }
 
   update() {
@@ -126,7 +127,7 @@ export class OneWaySolidObject extends SolidObject {
 
     const rect = this.element.getBoundingClientRect();
     const playerRect = gameInstance.player.element.getBoundingClientRect();
-    const MARGIN = 1;
+    const MARGIN = 2;
 
     let shouldEnable = true;
     switch (this.direction) {
@@ -145,6 +146,11 @@ export class OneWaySolidObject extends SolidObject {
         break;
     }
     this.enabled = shouldEnable;
+    if (gameInstance.debug) {
+      this.element.style.backgroundColor = this.enabled ? "rgba(0, 255, 0, 0.5)" : "rgba(255, 0, 0, 0.5)";
+    } else {
+      this.element.style.backgroundColor = this.initialBackgroundColor;
+    }
   }
 }
 
