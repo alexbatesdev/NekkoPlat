@@ -46,7 +46,6 @@ export class CollisionDetection {
     checkTriggerCollisions(object, collisionObjects) {
         const playerRect = object.element.getBoundingClientRect();
         collisionObjects.forEach(collisionObject => {
-            if (!collisionObject.enabled) return;
             const collisionRect = collisionObject.element.getBoundingClientRect();
             if (intersects(playerRect, collisionRect)) {
                 if (collisionObject.element.classList.contains('trigger')) {
@@ -60,7 +59,6 @@ export class CollisionDetection {
         const playerRect = object.element.getBoundingClientRect();
         let collisionCount = 0;
         collisionObjects.forEach(collisionObject => {
-            if (!collisionObject.enabled) return;
             if (collisionObject.element.classList.contains('trigger')) return;
             if (collisionObject.element.classList.contains('slope')) return;
             const collisionRect = collisionObject.element.getBoundingClientRect();
@@ -87,7 +85,6 @@ export class CollisionDetection {
         const playerRect = object.element.getBoundingClientRect();
         let collisionCount = 0;
         collisionObjects.forEach(collisionObject => {
-            if (!collisionObject.enabled) return;
             if (collisionObject.element.classList.contains('trigger')) return;
             if (collisionObject.element.classList.contains('slope')) return;
             const collisionRect = collisionObject.element.getBoundingClientRect();
@@ -114,7 +111,6 @@ export class CollisionDetection {
         const playerRect = object.element.getBoundingClientRect();
         let collisionCount = 0;
         collisionObjects.forEach(collisionObject => {
-            if (!collisionObject.enabled) return;
             if (!collisionObject.element.classList.contains('slope')) return;
             const slopeRect = collisionObject.element.getBoundingClientRect();
             if (!intersects(playerRect, slopeRect)) return;
@@ -160,7 +156,6 @@ export class CollisionDetection {
             bottom: playerRect.bottom + 1,
         };
         return collisionObjects.some(collisionObject => {
-            if (!collisionObject.enabled) return false;
             const el = collisionObject.element;
             if (!(el.classList.contains('solid') || el.classList.contains('slope'))) return false;
             return intersects(probeRect, el.getBoundingClientRect());
