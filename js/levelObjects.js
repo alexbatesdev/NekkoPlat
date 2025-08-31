@@ -127,22 +127,22 @@ export class OneWaySolidObject extends SolidObject {
 
     const rect = this.element.getBoundingClientRect();
     const playerRect = gameInstance.player.element.getBoundingClientRect();
-    const MARGIN = 2;
+    const rectCenterX = rect.left + rect.width / 2;
+    const rectCenterY = rect.top + rect.height / 2;
 
     let shouldEnable = true;
     switch (this.direction) {
       case "up":
-        shouldEnable =
-          playerRect.bottom <= rect.top + MARGIN && this.dropTimer === 0;
+        shouldEnable = playerRect.bottom <= rectCenterY && this.dropTimer === 0;
         break;
       case "down":
-        shouldEnable = playerRect.top >= rect.bottom - MARGIN;
+        shouldEnable = playerRect.top >= rectCenterY;
         break;
       case "left":
-        shouldEnable = playerRect.right <= rect.left + MARGIN;
+        shouldEnable = playerRect.right <= rectCenterX;
         break;
       case "right":
-        shouldEnable = playerRect.left >= rect.right - MARGIN;
+        shouldEnable = playerRect.left >= rectCenterX;
         break;
     }
     this.enabled = shouldEnable;
