@@ -92,6 +92,7 @@ class Game {
     initCamera() {
         this.camera = new Camera();
         this.camera.setPlayer(this.player);
+        this.camera.keyState = this.keyState;
     }
 
     initPauseScreen() {

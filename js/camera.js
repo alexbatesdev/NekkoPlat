@@ -37,8 +37,7 @@ export default class Camera {
     }
 
     positionOverlay() {
-        this.overlayElement.style.left = this.element.scrollLeft + 'px';
-        this.overlayElement.style.top = this.element.scrollTop + 'px';
+        this.overlayElement.style.transform = `translate(${this.element.scrollLeft}px, ${this.element.scrollTop}px)`;
     }
 
     initStyles() {
