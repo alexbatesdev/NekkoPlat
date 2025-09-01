@@ -1,3 +1,4 @@
+import gameInstance from "./game.js";
 import { Reciever } from "./levelObjects.js";
 
 export default class Camera {
@@ -111,6 +112,7 @@ export default class Camera {
     }
 
     processInput() {
+        if (!gameInstance.inputManager) return;
         if (gameInstance.inputManager.isActionActive('cameraUp')) {
             this.offsetY += 0.01;
         }
