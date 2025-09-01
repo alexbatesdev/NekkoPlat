@@ -1,8 +1,7 @@
-import gameInstance from "./game.js";
 import { Reciever } from "./levelObjects.js";
 
 export default class Camera {
-    constructor() {
+    constructor(player = null, keyState = null, debugProvider = () => false) {
         this.element = document.getElementById('viewport');
         this.overlayElement = document.getElementById('overlay');
         if (!this.overlayElement) {
@@ -30,11 +29,15 @@ export default class Camera {
         this.minOffset = this.offsetBounds;
         this.lookahead = 0.05;
         this.initStyles();
+
+        // References to game dependencies
+        this.player = player;
+        this.keyState = keyState;
+        this.debugProvider = debugProvider;
     }
 
     positionOverlay() {
-        this.overlayElement.style.left = this.element.scrollLeft + 'px';
-        this.overlayElement.style.top = this.element.scrollTop + 'px';
+        this.overlayElement.style.transform = `translate(${this.element.scrollLeft}px, ${this.element.scrollTop}px)`;
     }
 
     initStyles() {
@@ -59,13 +62,25 @@ export default class Camera {
 
     }
 
+    setPlayer(player) {
+        this.player = player;
+    }
+
+    setInput(keyState) {
+        this.keyState = keyState;
+    }
+
+    setDebugProvider(debugProvider) {
+        this.debugProvider = debugProvider;
+    }
+
     update() {
         if (this.followPlayer) this.trackPlayer();
         if (this.filterReciever) this.filterReciever.update();
         this.processInput();
         this.applyMaxOffset();
         this.positionOverlay();
-        if (gameInstance && gameInstance.debug) this.element.style.overflow = "auto";
+        if (this.debugProvider && this.debugProvider()) this.element.style.overflow = "auto";
         else {
             if (this.element.classList.contains('scroll-bar')) this.element.style.overflow = 'auto';
             else this.element.style.overflow = 'hidden';
@@ -73,10 +88,11 @@ export default class Camera {
     }
 
     trackPlayer() {
+        if (!this.player) return;
         let currentX = this.element.scrollLeft;
         let currentY = this.element.scrollTop;
-        this.targetX = (gameInstance.player.x + (gameInstance.player.element.getBoundingClientRect().width / 2)) - (this.element.getBoundingClientRect().width - 80) * this.offsetX;
-        this.targetY = (gameInstance.player.y + (gameInstance.player.element.getBoundingClientRect().height / 2)) - (this.element.getBoundingClientRect().height - 80) * this.offsetY;
+        this.targetX = (this.player.x + (this.player.element.getBoundingClientRect().width / 2)) - (this.element.getBoundingClientRect().width - 80) * this.offsetX;
+        this.targetY = (this.player.y + (this.player.element.getBoundingClientRect().height / 2)) - (this.element.getBoundingClientRect().height - 80) * this.offsetY;
 
         this.element.scrollTo(
             currentX + (this.targetX - currentX) * this.smoothing,
@@ -85,10 +101,11 @@ export default class Camera {
     }
 
     snapToPlayer() {
+        if (!this.player) return;
         this.followPlayer = false;
         this.element.scrollTo(
-            (gameInstance.player.x + (gameInstance.player.element.getBoundingClientRect().width / 2)) - (this.element.getBoundingClientRect().width - 80) * this.offsetX,
-            (gameInstance.player.y + (gameInstance.player.element.getBoundingClientRect().height / 2)) - (this.element.getBoundingClientRect().height - 80) * this.offsetY
+            (this.player.x + (this.player.element.getBoundingClientRect().width / 2)) - (this.element.getBoundingClientRect().width - 80) * this.offsetX,
+            (this.player.y + (this.player.element.getBoundingClientRect().height / 2)) - (this.element.getBoundingClientRect().height - 80) * this.offsetY
         );
         this.followPlayer = true;
     }
@@ -125,8 +142,9 @@ export default class Camera {
     }
 
     applyCenterDrift() {
-        if (this.offsetX != (this.restingOffsetX + (gameInstance.player.facingRight() ? -this.lookahead : this.lookahead))) {
-            if (this.offsetX > (this.restingOffsetX + (gameInstance.player.facingRight() ? -this.lookahead : this.lookahead))) {
+        if (!this.player) return;
+        if (this.offsetX != (this.restingOffsetX + (this.player.facingRight() ? -this.lookahead : this.lookahead))) {
+            if (this.offsetX > (this.restingOffsetX + (this.player.facingRight() ? -this.lookahead : this.lookahead))) {
                 this.offsetX -= 0.01;
             } else {
                 this.offsetX += 0.01;

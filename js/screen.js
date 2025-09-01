@@ -1,4 +1,4 @@
-import { SolidObject, InteractableObject, InteractableToggle, Reciever, LevelObject, TriggerArea } from "./levelObjects.js";
+import { createObject } from "./objectFactory.js";
 import { debugLog, intersects, isSubset } from "./tools.js";
 import gameInstance from "./game.js";
 
@@ -9,11 +9,7 @@ export default class Screen {
         this.x = x;
         this.y = y;
         this.element.classList.add(`screen-${x}-${y}`)
-        // I really feel I should have a single object list, not sure how to pivot to that easily
-        this.parallaxObjects = [];
-        this.collisionObjects = [];
-        this.interactableObjects = [];
-        this.recievers = [];
+        this.objects = [];
         this.initObjects();
         this.initStyles();
     }
@@ -22,9 +18,9 @@ export default class Screen {
         this.element.style.position = 'relative';
         if (gameInstance.debug) this.element.style.outline = '1px solid yellow';
         else this.element.style.outline = 'none';
-        for (let i = 0; i < this.collisionObjects.length; i++) {
-            this.collisionObjects[i].reinitStyles();
-        }
+        this.getObjectsByTypes('solid', 'trigger').forEach(obj => {
+            obj.reinitStyles();
+        });
     }
 
     initObjects() {
@@ -36,38 +32,16 @@ export default class Screen {
     }
 
     resolveObject(objectElement) {
-        const classList = objectElement.classList;
-        for (let i = 0; i < classList.length; i++) {
-            if (classList[i].includes('solid')) {
-                this.collisionObjects.push(new SolidObject(objectElement));
-            } else if (classList[i].includes('interactable')) {
-                this.interactableObjects.push(this.resolveInteractableObject(objectElement));
-            } else if (classList[i].includes('reciever')) {
-                this.recievers.push(new Reciever(objectElement));
-            } else if (classList[i].includes('trigger')) {
-                this.collisionObjects.push(new TriggerArea(objectElement));
-            } else if (classList[i].includes('plax')) {
-                console.log('Parallax object found');
-                for (let j = i; j < classList.length; j++) {
-                    if (classList[j].includes('z')) {
-                        const zIndex = classList[j].split('z')[1];
-                        objectElement.style.zIndex = zIndex;
-                        console.log('Parallax object found with z index', zIndex);
-                    }
-                }
-    
-                this.parallaxObjects.push(new LevelObject(objectElement));
-            }
+        const result = createObject(objectElement);
+        if (result) {
+            this.objects.push(result);
         }
     }
 
-    resolveInteractableObject(interactableElement) {
-        const classList = interactableElement.classList;
-        if (classList.contains('toggle')) {
-            return new InteractableToggle(interactableElement);
-        } else {
-            return new InteractableObject(interactableElement);
-        }
+    getObjectsByTypes(...types) {
+        return this.objects
+            .filter(obj => types.some(type => obj.types.includes(type)))
+            .map(obj => obj.instance);
     }
 
     checkIfPlayerInScreen() {
@@ -81,40 +55,43 @@ export default class Screen {
     }
 
     addAdjacentSolidObjectsToPlayer() {
-        if (!isSubset(this.collisionObjects, gameInstance.player.collisionObjects)) {
-            let solidObjectsToAdd = this.collisionObjects;
+        const currentCollisionObjects = this.getObjectsByTypes('solid', 'trigger');
+        if (!isSubset(currentCollisionObjects, gameInstance.player.collisionObjects)) {
+            let solidObjectsToAdd = currentCollisionObjects;
             if (this.x > 0) {
-                solidObjectsToAdd = solidObjectsToAdd.concat(this.level.getScreen(this.x - 1, this.y).collisionObjects);
+                solidObjectsToAdd = solidObjectsToAdd.concat(this.level.getScreen(this.x - 1, this.y).getObjectsByTypes('solid', 'trigger'));
             }
             if (this.y > 0) {
-                solidObjectsToAdd = solidObjectsToAdd.concat(this.level.getScreen(this.x, this.y - 1).collisionObjects);
+                solidObjectsToAdd = solidObjectsToAdd.concat(this.level.getScreen(this.x, this.y - 1).getObjectsByTypes('solid', 'trigger'));
             }
             if (this.x < this.level.columns - 1) {
-                solidObjectsToAdd = solidObjectsToAdd.concat(this.level.getScreen(this.x + 1, this.y).collisionObjects);
+                solidObjectsToAdd = solidObjectsToAdd.concat(this.level.getScreen(this.x + 1, this.y).getObjectsByTypes('solid', 'trigger'));
             }
             if (this.y < this.level.rows - 1) {
-                solidObjectsToAdd = solidObjectsToAdd.concat(this.level.getScreen(this.x, this.y + 1).collisionObjects);
+                solidObjectsToAdd = solidObjectsToAdd.concat(this.level.getScreen(this.x, this.y + 1).getObjectsByTypes('solid', 'trigger'));
             }
             gameInstance.player.setSolidObjects(solidObjectsToAdd);
         }
     }
 
     addAdjacentInteractableObjectsToPlayer() {
-        let interactableObjectsToAdd = this.interactableObjects;
-        debugLog(interactableObjectsToAdd);
+        let interactableObjectsToAdd = this.getObjectsByTypes('interactable', 'interactable-toggle');
         gameInstance.player.setInteractableObjects(interactableObjectsToAdd);
     }
 
     update() {
         if (this.checkIfPlayerInScreen()) {
-            this.interactableObjects.forEach(interactableObject => {
+            this.getObjectsByTypes('interactable', 'interactable-toggle').forEach(interactableObject => {
                 interactableObject.update();
             });
-            this.recievers.forEach(reciever => {
+            this.getObjectsByTypes('reciever').forEach(reciever => {
                 reciever.update();
             });
+            this.getObjectsByTypes('solid').forEach(solid => {
+                if (typeof solid.update === 'function') solid.update();
+            });
         }
-        this.parallaxObjects.forEach(parallaxObject => {
+        this.getObjectsByTypes('plax').forEach(parallaxObject => {
             parallaxObject.update();
         });
     }
