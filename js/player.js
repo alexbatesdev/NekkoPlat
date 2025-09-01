@@ -377,7 +377,6 @@ export default class Player {
 
     updateTransform() {
         const rotation = this.isFacingRight ? 'rotateY(180deg)' : 'rotateY(0deg)';
-        // console.log(`translate(${this.x}px, ${this.y}px) ${rotation}`)
         this.element.style.transform = `translate(${this.x}px, ${this.y}px) ${rotation}`;
     }
 
@@ -385,11 +384,7 @@ export default class Player {
         this.collisionObjects = solidObjects;
     }
 
-    // Figuring out how to handle interactable objects
     setInteractableObjects(interactableObjects) {
-        interactableObjects.forEach(interactableObject => {
-            console.log();
-        });
         this.interactionBox.interactables = interactableObjects;
     }
 }

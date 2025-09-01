@@ -75,7 +75,52 @@ export class SolidObject extends LevelObject {
   }
 }
 
-export class MovingPlatform extends SolidObject {
+export class OneWaySolidObject extends LevelObject {
+  constructor(element) {
+    super(element);
+    const dirClass = Array.from(element.classList).find((cls) =>
+      cls.startsWith("oneway-")
+    );
+    this.direction = dirClass ? dirClass.split("-")[1] : "up";
+    this.dropthrough = element.classList.contains("dropthrough");
+    this.dropTimer = 0;
+    this.initialBackgroundColor = this.element.style.backgroundColor;
+  }
+
+  update() {
+    super.update();
+    if (this.dropTimer > 0) this.dropTimer--;
+
+    const rect = this.element.getBoundingClientRect();
+    const playerRect = gameInstance.player.element.getBoundingClientRect();
+    const rectCenterX = rect.left + rect.width / 2;
+    const rectCenterY = rect.top + rect.height / 2;
+
+    let shouldEnable = true;
+    switch (this.direction) {
+      case "up":
+        shouldEnable = playerRect.bottom <= rectCenterY && this.dropTimer === 0 && gameInstance.player.velocityY >= 0;
+        break;
+      case "down":
+        shouldEnable = playerRect.top >= rectCenterY;
+        break;
+      case "left":
+        shouldEnable = playerRect.right <= rectCenterX;
+        break;
+      case "right":
+        shouldEnable = playerRect.left >= rectCenterX;
+        break;
+    }
+    this.enabled = shouldEnable;
+    if (gameInstance.debug) {
+      this.element.style.backgroundColor = this.enabled ? "rgba(0, 255, 0, 0.5)" : "rgba(255, 0, 0, 0.5)";
+    } else {
+      this.element.style.backgroundColor = this.initialBackgroundColor;
+    }
+  }
+}
+
+export class MovingPlatform extends LevelObject {
   constructor(element) {
     super(element);
     const pos = this.getCurrentTranslation();
@@ -109,92 +154,7 @@ export class MovingPlatform extends SolidObject {
   }
 }
 
-export class OneWaySolidObject extends SolidObject {
-  constructor(element) {
-    super(element);
-    const dirClass = Array.from(element.classList).find((cls) =>
-      cls.startsWith("oneway-")
-    );
-    this.direction = dirClass ? dirClass.split("-")[1] : "up";
-    this.dropthrough = element.classList.contains("dropthrough");
-    this.dropTimer = 0;
-    this.initialBackgroundColor = this.element.style.backgroundColor;
-  }
-
-  update() {
-    super.update();
-    if (this.dropTimer > 0) this.dropTimer--;
-
-    const rect = this.element.getBoundingClientRect();
-    const playerRect = gameInstance.player.element.getBoundingClientRect();
-    const rectCenterX = rect.left + rect.width / 2;
-    const rectCenterY = rect.top + rect.height / 2;
-
-    let shouldEnable = true;
-    switch (this.direction) {
-      case "up":
-        shouldEnable = playerRect.bottom <= rectCenterY && this.dropTimer === 0;
-        break;
-      case "down":
-        shouldEnable = playerRect.top >= rectCenterY;
-        break;
-      case "left":
-        shouldEnable = playerRect.right <= rectCenterX;
-        break;
-      case "right":
-        shouldEnable = playerRect.left >= rectCenterX;
-        break;
-    }
-    this.enabled = shouldEnable;
-    if (gameInstance.debug) {
-      this.element.style.backgroundColor = this.enabled ? "rgba(0, 255, 0, 0.5)" : "rgba(255, 0, 0, 0.5)";
-    } else {
-      this.element.style.backgroundColor = this.initialBackgroundColor;
-    }
-  }
-}
-
-export class MovingPlatform extends SolidObject {
-    constructor(element) {
-        super(element);
-        this.prevRect = this.element.getBoundingClientRect();
-        this.dragging = false;
-        this.dragOffsetX = 0;
-        this.dragOffsetY = 0;
-        this.element.addEventListener('pointerdown', (e) => {
-            this.dragging = true;
-            this.dragOffsetX = e.clientX - this.element.offsetLeft;
-            this.dragOffsetY = e.clientY - this.element.offsetTop;
-            this.element.setPointerCapture(e.pointerId);
-        });
-        this.element.addEventListener('pointerup', (e) => {
-            this.dragging = false;
-            this.element.releasePointerCapture(e.pointerId);
-        });
-        this.element.addEventListener('pointermove', (e) => {
-            if (!this.dragging) return;
-            this.element.style.left = `${e.clientX - this.dragOffsetX}px`;
-            this.element.style.top = `${e.clientY - this.dragOffsetY}px`;
-        });
-    }
-
-    update() {
-        super.update();
-        const rect = this.element.getBoundingClientRect();
-        const deltaX = rect.left - this.prevRect.left;
-        const deltaY = rect.top - this.prevRect.top;
-        this.prevRect = rect;
-        const player = gameInstance.player;
-        if (player.grounded && player.groundedObject === this) {
-            player.x += deltaX;
-            player.y += deltaY;
-            player.element.style.left = player.x + "px";
-            player.element.style.top = player.y + "px";
-        }
-    }
-}
-
-export class SaggingPlatform extends MovingPlatform {
+export class SaggingPlatform extends LevelObject {
     constructor(element) {
         super(element);
         this.sagAmount = 8;
