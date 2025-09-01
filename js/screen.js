@@ -76,7 +76,6 @@ export default class Screen {
 
     addAdjacentInteractableObjectsToPlayer() {
         let interactableObjectsToAdd = this.getObjectsByTypes('interactable', 'interactable-toggle');
-        debugLog(interactableObjectsToAdd);
         gameInstance.player.setInteractableObjects(interactableObjectsToAdd);
     }
 

@@ -128,7 +128,6 @@ export default class Player {
         const spawn_y_query_param = new URLSearchParams(window.location.search).get('spawn_y');
         const playerSpawnXRelativeToScreen = spawn_x_query_param ? spawn_x_query_param : getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-x');
         const playerSpawnYRelativeToScreen = spawn_y_query_param ? spawn_y_query_param : getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-y');
-        console.log(`Player spawn from CSS: (${playerSpawnXRelativeToScreen}, ${playerSpawnYRelativeToScreen})`);
         const screenRect = this.respawnScreen.getBoundingClientRect();
         const width = this.element.getBoundingClientRect().width;
         const height = this.element.getBoundingClientRect().height;
@@ -158,9 +157,7 @@ export default class Player {
             val = val.trim();
             if (val.startsWith('calc(')) {
                 let inner = val.slice(5, -1);
-                console.log(`Evaluating calc(${inner})`);
                 let replaced = evalCalc(inner, axis);
-                console.log(`Evaluating calc(${inner}) as ${replaced}`);
                 return safeEval(replaced);
             } else if (val.includes('%')) {
                 let num = parseFloat(val);
@@ -175,7 +172,7 @@ export default class Player {
         let xValue = parseValue(playerSpawnXRelativeToScreen, 'x');
         let yValue = parseValue(playerSpawnYRelativeToScreen, 'y');
 
-        console.log(`Spawning player at (${xValue}, ${yValue}) relative to screen`);
+        debugLog(`Spawning player at (${xValue}, ${yValue}) relative to screen`);
         this.x = xValue - (width / 2);
         this.y = yValue - (height / 2);
         this.updateTransform();
@@ -184,15 +181,12 @@ export default class Player {
     spawnAt(playerSpawnXRelativeToScreen, playerSpawnYRelativeToScreen, screen) {
         let screensToTheLeft = 0;
         let screensToTheTop = 0;
-        debugLog(screen);
         screen.classList.forEach(className => {
             if (className.includes("screen-")) {
                 screensToTheLeft = Number(className.split("-")[1]);
                 screensToTheTop = Number(className.split("-")[2]);
             }
         });
-        debugLog(screensToTheLeft);
-        debugLog(screensToTheTop);
         this.x = (playerSpawnXRelativeToScreen) + (screensToTheLeft * screen.getBoundingClientRect().width) - (this.element.getBoundingClientRect().width / 2);
         this.y = (playerSpawnYRelativeToScreen) + (screensToTheTop * screen.getBoundingClientRect().height) - (this.element.getBoundingClientRect().height / 2);
         this.updateTransform();
@@ -223,7 +217,6 @@ export default class Player {
             this.x += this.velocityX / iterations;
             this.y += this.velocityY / iterations;
             this.updateTransform();
-            // console.log(this.element);
             this.collision.applyCollisions(this, this.collisionObjects);
             this.updateTransform();
             if (this.velocityX === 0 && this.velocityY === 0) break;

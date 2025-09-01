@@ -1,4 +1,5 @@
 import { SolidObject, InteractableObject, InteractableToggle, Reciever, LevelObject, TriggerArea, MovingPlatform, SaggingPlatform, OneWaySolidObject } from "./levelObjects.js";
+import { debugLog } from "./tools.js";
 
 const objectFactory = {
     solid: SolidObject,
@@ -73,7 +74,7 @@ export function createObject(element) {
             updateMethods.forEach(fn => fn.call(this));
         };
     }
-    console.log(types)
+    debugLog(types);
 
     return { types, instance };
 }
