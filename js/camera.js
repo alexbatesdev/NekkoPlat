@@ -1,3 +1,4 @@
+import gameInstance from "./game.js";
 import { Reciever } from "./levelObjects.js";
 
 export default class Camera {
@@ -37,8 +38,7 @@ export default class Camera {
     }
 
     positionOverlay() {
-        this.overlayElement.style.left = this.element.scrollLeft + 'px';
-        this.overlayElement.style.top = this.element.scrollTop + 'px';
+        this.overlayElement.style.transform = `translate(${this.element.scrollLeft}px, ${this.element.scrollTop}px)`;
     }
 
     initStyles() {
@@ -112,21 +112,26 @@ export default class Camera {
     }
 
     processInput() {
-        if (!this.keyState) return;
-        if (this.keyState['ARROWUP']) {
+        if (!gameInstance || !gameInstance.inputManager) return;
+        if (gameInstance.inputManager.isActionActive('cameraUp')) {
             this.offsetY += 0.01;
         }
-        if (this.keyState['ARROWDOWN']) {
+        if (gameInstance.inputManager.isActionActive('cameraDown')) {
             this.offsetY -= 0.01;
         }
-        if (this.keyState['ARROWLEFT']) {
+        if (gameInstance.inputManager.isActionActive('cameraLeft')) {
             this.offsetX += 0.01;
         }
-        if (this.keyState['ARROWRIGHT']) {
+        if (gameInstance.inputManager.isActionActive('cameraRight')) {
             this.offsetX -= 0.01;
         }
 
-        if (!this.keyState['ARROWUP'] && !this.keyState['ARROWDOWN'] && !this.keyState['ARROWLEFT'] && !this.keyState['ARROWRIGHT']) {
+        if (
+            !gameInstance.inputManager.isActionActive('cameraUp') &&
+            !gameInstance.inputManager.isActionActive('cameraDown') &&
+            !gameInstance.inputManager.isActionActive('cameraLeft') &&
+            !gameInstance.inputManager.isActionActive('cameraRight')
+        ) {
             this.applyCenterDrift();
         }
     }

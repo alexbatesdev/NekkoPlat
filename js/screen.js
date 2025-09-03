@@ -40,7 +40,7 @@ export default class Screen {
 
     getObjectsByTypes(...types) {
         return this.objects
-            .filter(obj => types.includes(obj.type))
+            .filter(obj => types.some(type => obj.types.includes(type)))
             .map(obj => obj.instance);
     }
 
@@ -76,7 +76,6 @@ export default class Screen {
 
     addAdjacentInteractableObjectsToPlayer() {
         let interactableObjectsToAdd = this.getObjectsByTypes('interactable', 'interactable-toggle');
-        debugLog(interactableObjectsToAdd);
         gameInstance.player.setInteractableObjects(interactableObjectsToAdd);
     }
 
@@ -87,6 +86,9 @@ export default class Screen {
             });
             this.getObjectsByTypes('reciever').forEach(reciever => {
                 reciever.update();
+            });
+            this.getObjectsByTypes('solid').forEach(solid => {
+                if (typeof solid.update === 'function') solid.update();
             });
         }
         this.getObjectsByTypes('plax').forEach(parallaxObject => {
