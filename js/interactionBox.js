@@ -48,6 +48,9 @@ export default class InteractionBox {
         if (!gameInstance.getKeyState('E') && this.interacting) {
             this.interacting = false;
         }
+        if (!this.interactionIndicatorElement) {
+            return;
+        }
         if (intersects) {
             this.interactionIndicatorElement.style.visibility = 'visible';
         } else {

@@ -53,6 +53,19 @@ export class LevelObject {
 export class SolidObject extends LevelObject{
     constructor(element) {
         super(element);
+
+        if (
+            this.element.classList.contains('slope') &&
+            this.element.dataset.slope === 'function' &&
+            this.element.dataset.slopeFn
+        ) {
+            try {
+                this.slopeFn = new Function('x', `return ${this.element.dataset.slopeFn};`);
+            } catch (e) {
+                console.warn('Invalid slope function', e);
+                this.slopeFn = null;
+            }
+        }
     }
 
     reinitStyles() {
@@ -157,6 +170,7 @@ export class Reciever extends LevelObject{
             })
         });
         this.stateManager = new MultiStateManager(element, this.signals, this.signals[0]);
+        this.stateManager.listenToBroadcast(this.broadcastChannel);
     }
 
     update() {
@@ -165,7 +179,6 @@ export class Reciever extends LevelObject{
         } else {
             this.element.style.outline = 'none';
         }
-        this.stateManager.syncStateToBroadcast(this.broadcastChannel);
     }
 
 }

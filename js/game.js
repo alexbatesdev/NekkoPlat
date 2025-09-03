@@ -6,16 +6,12 @@ class Game {
     constructor() {
         this.player = null;
         this.level = null;
-        this.camera = new Camera();
-        this.pauseElement = document.getElementById('pause');
-        if (this.pauseElement) {
-            this.camera.overlayElement.appendChild(this.pauseElement);
-            this.initPauseElement();
-        }
+        this.camera = null;
 
         this.debug = false;
         this.paused = false;
         this.processedInput = false;
+
         // New input processor/keyState system
         // https://chatgpt.com/c/f5c9ad3a-6d67-40eb-b2a6-9dc3d5afcff0
         this.keyState = {
@@ -32,6 +28,9 @@ class Game {
             ARROWRIGHT: false,
             ESCAPE: false
         };
+
+
+        this.pauseElement = null;
 
         this.signalManager = new BroadcastManager();
 
@@ -90,20 +89,46 @@ class Game {
         });
     }
 
+    initCamera() {
+        this.camera = new Camera();
+        this.camera.setPlayer(this.player);
+    }
+
+    initPauseScreen() {
+        this.pauseElement = document.getElementById('pause');
+        if (this.pauseElement) {
+            this.camera.overlayElement.appendChild(this.pauseElement);
+            this.initPauseElement();
+        }
+    }
+
     start() {
+        this.initCamera();
+        this.initPauseScreen();
+        this.lastTime = performance.now();
+        this.accumulator = 0;
+        this.fixedDelta = 1 / 60; // 60 FPS simulation step
         requestAnimationFrame(this.update.bind(this));
         this.initKeyStateListeners();
         this.player.start();
     }
 
-    update() {
-        this.processInput();
-        if (!this.paused) {
-            this.player.update(this.keyState);
-            this.level.update();
-            this.camera.update();
-        }
+    update(timestamp) {
+        const now = timestamp || performance.now();
+        let frameTime = (now - this.lastTime) / 1000; // convert to seconds
+        if (frameTime > 0.25) frameTime = 0.25; // avoid spiral of death
+        this.lastTime = now;
+        this.accumulator += frameTime;
 
+        while (this.accumulator >= this.fixedDelta) {
+            this.processInput();
+            if (!this.paused) {
+                this.player.update();
+                this.level.update();
+                this.camera.update();
+            }
+            this.accumulator -= this.fixedDelta;
+        }
 
         requestAnimationFrame(this.update.bind(this));
     }

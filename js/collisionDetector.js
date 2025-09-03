@@ -16,6 +16,7 @@ export class CollisionDetection {
         this.checkTriggerCollisions(object, collisionObjects);
         let horizontal_collision_count = this.checkHorizontalCollisions(object, collisionObjects);
         let vertical_collision_count = this.checkVerticalCollisions(object, collisionObjects);
+        let slope_collision_count = this.checkSlopeCollisions(object, collisionObjects);
         if (horizontal_collision_count <= 0) {
             this.state = {
                 left: 0,
@@ -24,7 +25,7 @@ export class CollisionDetection {
                 bottom: this.state.bottom,
             }
         }
-        if (vertical_collision_count <= 0) {
+        if (vertical_collision_count <= 0 && slope_collision_count <= 0) {
             this.state = {
                 left: this.state.left,
                 right: this.state.right,
@@ -32,7 +33,7 @@ export class CollisionDetection {
                 bottom: 0,
             }
         }
-        if (vertical_collision_count == 0 && horizontal_collision_count == 0) {
+        if (vertical_collision_count == 0 && horizontal_collision_count == 0 && slope_collision_count == 0) {
             this.state = {
                 left: 0,
                 right: 0,
@@ -46,7 +47,8 @@ export class CollisionDetection {
         const playerRect = object.element.getBoundingClientRect();
         collisionObjects.forEach(collisionObject => {
             if (!collisionObject.enabled) return;
-            if (intersects(playerRect, collisionObject.element.getBoundingClientRect())) {
+            const collisionRect = collisionObject.element.getBoundingClientRect();
+            if (intersects(playerRect, collisionRect)) {
                 if (collisionObject.element.classList.contains('trigger')) {
                     collisionObject.trigger();
                 }
@@ -60,78 +62,147 @@ export class CollisionDetection {
         collisionObjects.forEach(collisionObject => {
             if (!collisionObject.enabled) return;
             if (collisionObject.element.classList.contains('trigger')) return;
-            for (let i = 0.25; i < 1; i += 0.25) {
-                let playerRectNext = {
-                    left: playerRect.left + 20,
-                    right: playerRect.right - 20,
-                    top: playerRect.top + (object.velocityY * i),
-                    bottom: playerRect.bottom + ((object.velocityY - object.physics.gravity) * i),
-                    x: playerRect.x,
-                    y: playerRect.y,
-                    width: playerRect.width,
-                    height: playerRect.height,
-                }
-                if (intersects(playerRectNext, collisionObject.element.getBoundingClientRect())) {
-                    if (collisionObject.element.classList.contains('solid')) {
-                        object.velocityY = 0;
-                    }
-                }
-            }
-            if (intersects(playerRect, collisionObject.element.getBoundingClientRect())) {
-                const collision = getCollisionOverlap(playerRect, collisionObject.element.getBoundingClientRect());
+            if (collisionObject.element.classList.contains('slope')) return;
+            const collisionRect = collisionObject.element.getBoundingClientRect();
+            if (intersects(playerRect, collisionRect)) {
+                const collision = getCollisionOverlap(playerRect, collisionRect);
                 if (collision.bottom > 0 && collisionObject.element.classList.contains('solid')) {
                     collisionCount++;
                     this.state.bottom = collision.bottom;
                     object.y -= collision.bottom;
+                    object.velocityY = 0;
                 }
                 if (collision.top > 0 && collisionObject.element.classList.contains('solid')) {
                     collisionCount++;
                     this.state.top = collision.top;
                     object.y += collision.top;
+                    object.velocityY = 0;
                 }
             }
         });
         return collisionCount;
     }
-    
+
     checkHorizontalCollisions(object, collisionObjects) {
         const playerRect = object.element.getBoundingClientRect();
         let collisionCount = 0;
         collisionObjects.forEach(collisionObject => {
             if (!collisionObject.enabled) return;
             if (collisionObject.element.classList.contains('trigger')) return;
-            for (let i = 0.25; i < 1; i += 0.25) {
-                let playerRectNext = {
-                    left: playerRect.left + (object.velocityX * i),
-                    right: playerRect.right + (object.velocityX * i),
-                    top: playerRect.top,
-                    bottom: playerRect.bottom - 25,
-                    x: playerRect.x,
-                    y: playerRect.y,
-                    width: playerRect.width,
-                    height: playerRect.height,
-                }
-                if (intersects(playerRectNext, collisionObject.element.getBoundingClientRect())) {
-                    if (collisionObject.element.classList.contains('solid')) {
-                        object.velocityX = 0;
-                    }
-                }
-            }
-            if (intersects(playerRect, collisionObject.element.getBoundingClientRect())) {
-                const collision = getCollisionOverlap(playerRect, collisionObject.element.getBoundingClientRect());
+            if (collisionObject.element.classList.contains('slope')) return;
+            const collisionRect = collisionObject.element.getBoundingClientRect();
+            if (intersects(playerRect, collisionRect)) {
+                const collision = getCollisionOverlap(playerRect, collisionRect);
                 if (collision.left > 0 && collisionObject.element.classList.contains('solid')) {
                     this.state.left = collision.left;
                     object.x += collision.left;
+                    object.velocityX = 0;
                     collisionCount++;
                 }
                 if (collision.right > 0 && collisionObject.element.classList.contains('solid')) {
                     collisionCount++;
                     this.state.right = collision.right;
                     object.x -= collision.right;
+                    object.velocityX = 0;
                 }
             }
         });
         return collisionCount;
+    }
+
+    checkSlopeCollisions(object, collisionObjects) {
+        const playerRect = object.element.getBoundingClientRect();
+        let collisionCount = 0;
+        collisionObjects.forEach(collisionObject => {
+            if (!collisionObject.enabled) return;
+            if (!collisionObject.element.classList.contains('slope')) return;
+            const slopeRect = collisionObject.element.getBoundingClientRect();
+            if (!intersects(playerRect, slopeRect)) return;
+            const type = collisionObject.element.dataset.slope || 'up-right';
+            const centerX = playerRect.left + (playerRect.width / 2);
+            const xRatio = (centerX - slopeRect.left) / slopeRect.width;
+            if (xRatio < 0 || xRatio > 1) return;
+            let surfaceY = 0;
+            let angleRad = 0;
+            let slideDir = 0;
+            if (type === 'function' && collisionObject.slopeFn) {
+                const fn = collisionObject.slopeFn;
+                const clamp = v => Math.min(1, Math.max(0, v));
+                const yNorm = clamp(fn(xRatio));
+                surfaceY = slopeRect.bottom - (slopeRect.height * yNorm);
+                const delta = 0.001;
+                const y1 = clamp(fn(Math.min(1, xRatio + delta)));
+                const y0 = clamp(fn(Math.max(0, xRatio - delta)));
+                const derivative = (y1 - y0) / (delta * 2);
+                const slope = derivative * (slopeRect.height / slopeRect.width);
+                angleRad = Math.atan(Math.abs(slope));
+                if (slope < 0) slideDir = 1;
+                else if (slope > 0) slideDir = -1;
+            } else {
+                switch (type) {
+                    case 'up-right':
+                        surfaceY = slopeRect.bottom - (slopeRect.height * xRatio);
+                        slideDir = -1;
+                        break;
+                    case 'up-left':
+                        surfaceY = slopeRect.bottom - (slopeRect.height * (1 - xRatio));
+                        slideDir = 1;
+                        break;
+                    case 'down-right':
+                        surfaceY = slopeRect.top + (slopeRect.height * xRatio);
+                        slideDir = 1;
+                        break;
+                    case 'down-left':
+                        surfaceY = slopeRect.top + (slopeRect.height * (1 - xRatio));
+                        slideDir = -1;
+                        break;
+                    default:
+                        surfaceY = slopeRect.bottom - (slopeRect.height * xRatio);
+                        slideDir = -1;
+                }
+                angleRad = Math.atan(slopeRect.height / slopeRect.width);
+                const style = window.getComputedStyle(collisionObject.element);
+                const transform = style.transform || style.webkitTransform;
+                if (transform && transform !== 'none') {
+                    const match = transform.match(/matrix\(([^)]+)\)/);
+                    if (match) {
+                        const values = match[1].split(',').map(parseFloat);
+                        if (values.length >= 2) {
+                            angleRad = Math.atan2(values[1], values[0]);
+                        }
+                    }
+                }
+            }
+            const playerBottom = playerRect.bottom;
+            if (playerBottom >= surfaceY && playerRect.top <= surfaceY) {
+                const overlap = playerBottom - surfaceY;
+                object.y -= overlap;
+                object.velocityY = 0;
+                this.state.bottom = overlap;
+                collisionCount++;
+                const angleDeg = Math.abs(angleRad * (180 / Math.PI));
+                if (object.physics.slideOnSlopes && angleDeg > object.physics.slopeSlideThreshold && slideDir !== 0) {
+                    object.velocityX += Math.sin(Math.abs(angleRad)) * object.physics.gravity * slideDir;
+                }
+            }
+        });
+        return collisionCount;
+    }
+
+    isGrounded(object, collisionObjects) {
+        const playerRect = object.element.getBoundingClientRect();
+        const probeRect = {
+            left: playerRect.left,
+            right: playerRect.right,
+            top: playerRect.bottom,
+            bottom: playerRect.bottom + 1,
+        };
+        return collisionObjects.some(collisionObject => {
+            if (!collisionObject.enabled) return false;
+            const el = collisionObject.element;
+            if (!(el.classList.contains('solid') || el.classList.contains('slope'))) return false;
+            return intersects(probeRect, el.getBoundingClientRect());
+        });
     }
 
     checkOutOfBounds(object) {
