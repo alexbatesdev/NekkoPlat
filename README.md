@@ -97,7 +97,7 @@ Curved slopes can be defined with a custom function. Set `data-slope="function"`
      style="width:200px;height:200px;"></div>
 ```
 
-The engine samples the function to determine the collision surface and numerically estimates its angle for sliding behavior.
+The engine samples the function to determine the collision surface and numerically estimates its angle for sliding behavior. It also shapes the element with a matching `clip-path` so the ramp's outline follows the function. Adjust the sampling resolution with `data-slope-samples` (default `20`) if you need smoother curves.
 
 Sliding speed is derived from the slope's angle: steeper ramps apply more of the player's gravity along the surface. You can dis
 able sliding or require a minimum angle by adding these optional entries to the player's `.config`:

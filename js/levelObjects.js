@@ -61,6 +61,17 @@ export class SolidObject extends LevelObject{
         ) {
             try {
                 this.slopeFn = new Function('x', `return ${this.element.dataset.slopeFn};`);
+
+                const sampleCount = parseInt(this.element.dataset.slopeSamples) || 20;
+                const points = ['0% 100%'];
+                for (let i = 0; i <= sampleCount; i++) {
+                    const x = i / sampleCount;
+                    const clamp = v => Math.min(1, Math.max(0, v));
+                    const y = clamp(this.slopeFn(x));
+                    points.push(`${x * 100}% ${(1 - y) * 100}%`);
+                }
+                points.push('100% 100%');
+                this.element.style.clipPath = `polygon(${points.join(',')})`;
             } catch (e) {
                 console.warn('Invalid slope function', e);
                 this.slopeFn = null;
