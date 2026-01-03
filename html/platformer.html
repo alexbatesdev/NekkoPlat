@@ -18,8 +18,8 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../css/custom-fonts.css">
-    <link rel="stylesheet" href="../css/pixel-corners.css">
+    <link rel="stylesheet" href="/css/custom-fonts.css">
+    <link rel="stylesheet" href="/css/pixel-corners.css">
     <script type="module" src="../js/platformer.js" defer></script>
     <link rel="stylesheet" href="../css/platformer.css">
     <link rel="stylesheet" href="../css/global.css">
@@ -31,7 +31,7 @@
     <span class="cross debug"></span>
 
     <div class="tv" id="viewport">
-        <div class="level wrap-vert contain-hori grid-3x3" id="level-one">
+        <div class="level 3x3 wrap-vert contain-hori" id="level-one">
             <div class="screen">
                 <div class="cat" id="player">
                     <div class="interaction-indicator question-indicator">?</div>
@@ -56,7 +56,30 @@
                         <img class="wait" src="../img/cat_fall_asleep.gif" alt="A cat falling asleep">
                     </div>
                 </div>
+                <!-- <div class="nekkoGAMETOY">
+                    <div class="nGT-title">Game Name</div>
+                    <div class="nGT-screen">
+                        <iframe src="https://augustberchelmann.com/mario/" frameborder="0"></iframe>
+                    </div>
+                    <div class="nGT-name">
+                        <span class="nGT-nekko">Nekko</span>
+                        <span class="nGT-GAMETOY">GAMETOY</span>
+                    </div>
+                    <div class="nGT-controls">
+                        <div class="nGT-dpad"></div>
+                        <div class="nGT-buttons">
+                            <div class="nGT-A"></div>
+                            <div class="nGT-B"></div>
+                        </div>
+                    </div>
+                    <div class="nGT-options">
+                        <div class="nGT-start"></div>
+                        <div class="nGT-select"></div>
+                    </div>
+                    <div class="nGT-speaker"></div>
+                </div> -->
                 <div class="object solid floor" id="floor-1"></div>
+                <!-- <div class="pipe" id="pipe-1"></div> -->
 
                 <div class="object solid" id="solidObject-1">
                     <div class="double-cap"></div>
@@ -140,10 +163,6 @@
                 <!-- <div class="solidObject" id="start-cap">
                     <div class="cap"></div>
                 </div> -->
-                <div class="object solid sag-platform sag-85 sag-time-3000 oneway-up dropthrough" id="sag-platform-1" style="width:100px;height:20px;top:200px;left:550px;background-color: greenyellow;"></div>
-                <div class="object solid oneway-up dropthrough" style="position: absolute;top: 70vh;left: 300px;width: 300px; height: 20px;background-color: green;"></div>
-                <div class="object solid moving-platform moving-platform-y oneway-up dropthrough" id="moving-platform-1" style="width:100px;height:20px;top:350px;left:20vw;background-color: yellow;"></div>
-                <div class="object solid moving-platform moving-platform-x oneway-up dropthrough" id="moving-platform-2" style="width:100px;height:20px;top:75vh;left:20vw;background-color: yellow;"></div>
             </div>
             <div class="screen">
                 <div class="object solid floor" id="floor-2"></div>
@@ -156,11 +175,10 @@
                 <img src="../img/explode.gif" alt="Explosion" id="img-7">
 
                 <div class="object trigger" onclick="{
-                    player.velocityX -= 0;
+                    player.velocityX -= 0.9;
                 }" id="trigger-1"></div>
                 <div class="object solid" id="solidObject-2"></div>
                 <div class="object solid" id="solidObject-3"></div>
-                <div class="object solid moving-platform" id="moving-platform-1" style="width:100px;height:20px;top:350px;left:400px;"></div>
 
             </div>
             <div class="screen">
@@ -196,7 +214,7 @@
                 <div class="object solid" id="solidObject-8"></div>
                 <div class="object solid" id="solidObject-13"></div>
 
-                <div class="door object interactable" id="door-1" onclick="window.location.href='./grassland.html'"></div>
+                <div class="door object interactable" id="door-1" onclick="window.location.href='../index.html'"></div>
 
                 <div class="object solid" id="end-cap"></div>
                 <div class="object solid floor"></div>

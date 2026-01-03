@@ -27,6 +27,9 @@ export class Physics {
         } else if (object.velocityX < -this.maxVelocity) {
             object.velocityX = -this.maxVelocity;
         }
+
+        object.x += object.velocityX;
+        object.y += object.velocityY;
     }
 
     move(object, xVelocity, yVelocity) {
