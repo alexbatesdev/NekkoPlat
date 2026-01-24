@@ -1088,8 +1088,9 @@ a {
 
 #door-1 {
     top: 225px;
-    left: 980px
+    left: 980px;
 }
+
 @keyframes platform-move-example-y {
     from { transform: translateY(0); }
     to { transform: translateY(200px); }
