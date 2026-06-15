@@ -1,6 +1,7 @@
 import gameInstance from "./game.js";
 import { debugLog } from "./tools.js";
 import ToggleManager, { MultiStateManager } from "./elementStateManagers.js";
+import { InventoryItem } from "./inventory.js";
 
 export class LevelObject {
   constructor(element) {
@@ -60,6 +61,7 @@ export class LevelObject {
     })`;
   }
 }
+
 export class SolidObject extends LevelObject {
   constructor(element) {
     super(element);
@@ -79,7 +81,7 @@ export class OneWaySolidObject extends LevelObject {
   constructor(element) {
     super(element);
     const dirClass = Array.from(element.classList).find((cls) =>
-      cls.startsWith("oneway-")
+      cls.startsWith("oneway-"),
     );
     this.direction = dirClass ? dirClass.split("-")[1] : "up";
     this.dropthrough = element.classList.contains("dropthrough");
@@ -99,7 +101,10 @@ export class OneWaySolidObject extends LevelObject {
     let shouldEnable = true;
     switch (this.direction) {
       case "up":
-        shouldEnable = playerRect.bottom <= rectCenterY && this.dropTimer === 0 && gameInstance.player.velocityY >= 0;
+        shouldEnable =
+          playerRect.bottom <= rectCenterY &&
+          this.dropTimer === 0 &&
+          gameInstance.player.velocityY >= 0;
         break;
       case "down":
         shouldEnable = playerRect.top >= rectCenterY;
@@ -113,7 +118,9 @@ export class OneWaySolidObject extends LevelObject {
     }
     this.enabled = shouldEnable;
     if (gameInstance.debug) {
-      this.element.style.backgroundColor = this.enabled ? "rgba(0, 255, 0, 0.5)" : "rgba(255, 0, 0, 0.5)";
+      this.element.style.backgroundColor = this.enabled
+        ? "rgba(0, 255, 0, 0.5)"
+        : "rgba(255, 0, 0, 0.5)";
     } else {
       this.element.style.backgroundColor = this.initialBackgroundColor;
     }
@@ -155,31 +162,31 @@ export class MovingPlatform extends LevelObject {
 }
 
 export class SaggingPlatform extends LevelObject {
-    constructor(element) {
-        super(element);
-        this.sagAmount = 8;
-        this.sagDuration = 200;
-        for (const cls of element.classList) {
-            if (cls.startsWith('sag-time-')) {
-                const duration = parseFloat(cls.slice(9));
-                if (!isNaN(duration)) this.sagDuration = duration;
-            } else if (cls.startsWith('sag-') && cls !== 'sag-platform') {
-                const amount = parseFloat(cls.slice(4));
-                if (!isNaN(amount)) this.sagAmount = amount;
-            }
-        }
-        this.element.style.transition = `transform ${this.sagDuration}ms ease`;
+  constructor(element) {
+    super(element);
+    this.sagAmount = 8;
+    this.sagDuration = 200;
+    for (const cls of element.classList) {
+      if (cls.startsWith("sag-time-")) {
+        const duration = parseFloat(cls.slice(9));
+        if (!isNaN(duration)) this.sagDuration = duration;
+      } else if (cls.startsWith("sag-") && cls !== "sag-platform") {
+        const amount = parseFloat(cls.slice(4));
+        if (!isNaN(amount)) this.sagAmount = amount;
+      }
     }
+    this.element.style.transition = `transform ${this.sagDuration}ms ease`;
+  }
 
-    update() {
-        const player = gameInstance.player;
-        if (player.grounded && player.groundedObject === this) {
-            this.element.style.transform = `translateY(${this.sagAmount}px)`;
-        } else {
-            this.element.style.transform = 'translateY(0px)';
-        }
-        super.update();
+  update() {
+    const player = gameInstance.player;
+    if (player.grounded && player.groundedObject === this) {
+      this.element.style.transform = `translateY(${this.sagAmount}px)`;
+    } else {
+      this.element.style.transform = "translateY(0px)";
     }
+    super.update();
+  }
 }
 
 export class TriggerArea extends LevelObject {
@@ -197,6 +204,10 @@ export class TriggerArea extends LevelObject {
       this.enabled = false;
       this.element.classList.add("disabled");
     }
+    // TODO: 🐢<(I am the TODO TURTLE)
+    // If this trigger can be triggered multiple times, we probably
+    // want a configurable cooldown to prevent it from triggering
+    // multiple times in one frame
     debugLog("Triggered");
     this.element.click();
   }
@@ -276,7 +287,7 @@ export class Reciever extends LevelObject {
     this.stateManager = new MultiStateManager(
       element,
       this.signals,
-      this.signals[0]
+      this.signals[0],
     );
     this.stateManager.listenToBroadcast(this.broadcastChannel);
   }
@@ -289,6 +300,169 @@ export class Reciever extends LevelObject {
     }
   }
 }
+
+export class ItemPickup extends LevelObject {
+  constructor(element) {
+    super(element);
+    this.element.onclick = () => this.pickup();
+
+    // Disable the pickup if it's already in the player's inventory and not meant to respawn
+    if (
+      !this.element.classList.contains("respawn") &&
+      gameInstance.player.inventory.pickupIDs.includes(this.element.id)
+    ) {
+      this.enabled = false;
+    }
+
+    // Hide the pickup if it's disabled and not meant to show a ghost
+    if (!this.enabled && !this.element.classList.contains("show-ghost")) {
+      this.element.style.opacity = "0";
+    }
+  }
+
+  pickup() {
+    if (!this.enabled) return;
+    this.enabled = false;
+    this.element.click();
+    
+    let itemName = "";
+    for (let i = 0; i < this.element.classList.length; i++) {
+      if (this.element.classList[i].includes("name-")) {
+        itemName = this.element.classList[i].replace("name-", "");
+      }
+    }
+    // TODO: 🐢
+    // This onClick extraction will need a different approach.
+    // The item pickup's onClick is used for the "pickup" action,
+    // meaning the actual item's onClick will need to be stored elsewhere
+    // I'm thinking I might want to rethink the item structure so that item
+    // definitions are separate from their in-game representations, 
+    // which would solve this problem and also make it easier to manage item data in general
+
+
+    // const onClick = this.element.onclick;
+    // let onClickString;
+    // if (onClick) {
+    //   onClickString = onClick.toString();
+    //   onClickString = onClickString.replace("function", "");
+    //   onClickString = onClickString.replace(/\(.*?\)/, "");
+    // }
+    const inspectElement = this.element.querySelector(".inspectElement");
+    const iconElement = this.element.querySelector(".iconElement");
+    const description = this.element.querySelector(".description").innerHTML;
+    const count = parseInt(this.element.querySelector(".count").innerHTML);
+    const item = new InventoryItem(
+      itemName,
+      this.element.id,
+      description,
+      count,
+      iconElement,
+      inspectElement,
+      // onClickString,
+    );
+    this.element.remove();
+    if (this.element.classList.contains("instant-use")) {
+      // item.triggerOnClick();
+      return;
+    }
+    gameInstance.player.inventory.addItem(item);
+  }
+}
+
+// export const ItemPickupMixin = Base => class extends Base {
+//     constructor() {
+//         super();
+//         this.element = null;
+//         this.isTrigger = false;
+//         this.isInteractable = false;
+//         this.isClickable = false;
+//     }
+
+//     initializeElement(element) {
+//         this.element = element;
+
+//         // Determine behavior based on class list
+//         this.isTrigger = this.element.classList.contains('on-touch');
+//         this.isInteractable = this.element.classList.contains('on-interact');
+//         this.isClickable = this.element.classList.contains('on-click');
+
+//         // Set pointer events and styles
+//         if (this.isClickable) {
+//             this.element.style.pointerEvents = 'auto';
+//             this.element.style.cursor = 'pointer';
+//             // this.element.addEventListener('pointerup', () => this.interact());
+//         } else {
+//             this.element.style.pointerEvents = 'none';
+//         }
+
+//         if (this.element.classList.contains('disabled')) {
+//             this.enabled = false;
+//             this.element.style.opacity = '0.5';
+//         }
+
+//         if (!this.element.classList.contains('respawn') && player.inventory.pickupIDs.includes(this.element.id)) {
+//             this.enabled = false;
+//             if (this.element.classList.contains('show-ghost')) {
+//                 this.element.style.opacity = '0.5';
+//             } else {
+//                 this.element.style.display = 'none';
+//             }
+//         }
+//     }
+
+//     reinitStyles() {
+//         if (gameInstance.debug) {
+//             this.element.style.outline = '3px solid green';
+//             this.element.style.outlineOffset = '-3px';
+//         } else {
+//             this.element.style.outline = 'none';
+//         }
+//     }
+
+//     trigger() {
+//         if (!this.enabled || !this.isTrigger) return;
+//         this.pickup();
+//     }
+
+//     interact() {
+//         if (!this.enabled || !this.isInteractable) return;
+//         this.pickup();
+//     }
+
+//     pickup() {
+//         this.enabled = false;
+//         this.element.click();
+//         const itemElement = this.element.querySelector('.item')
+//         let itemName = "";
+//         // extract item name from name-ITEMNAME class
+//         for (let i = 0; i < itemElement.classList.length; i++) {
+//             if (itemElement.classList[i].includes('name-')) {
+//                 itemName = itemElement.classList[i].replace('name-', '');
+//             }
+//         }
+//         const onClick = itemElement.onclick
+//         // convert onClick to a string
+//         let onClickString;
+//         if (onClick) {
+//             onClickString = onClick.toString();
+//             // remove the function keyword and the parameters
+//             onClickString = onClickString.replace('function', '');
+//             onClickString = onClickString.replace(/\(.*?\)/, '');
+//         }
+//         const inspectElement = itemElement.querySelector('.inspectElement')
+//         const iconElement = itemElement.querySelector('.iconElement')
+//         const description = itemElement.querySelector('.description').innerHTML
+//         const count = parseInt(itemElement.querySelector('.count').innerHTML)
+//         const item = new InventoryItem(itemName, this.element.id, description, count, iconElement, inspectElement, onClickString);
+//         this.element.remove();
+//         if (this.element.classList.contains('instant-use')) {
+//             item.triggerOnClick();
+//             return;
+//         }
+//         player.inventory.addItem(item)
+//     }
+// };
+// ItemPickupMixin.tags = ['collision', 'trigger', 'interactable'];
 
 // USE THIS AS A BASE FOR OTHER INTERACTABLE OBJECTS
 // Effect Area - an object that does something when the player enters it

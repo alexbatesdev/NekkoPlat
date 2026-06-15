@@ -1,4 +1,4 @@
-import { SolidObject, InteractableObject, InteractableToggle, Reciever, LevelObject, TriggerArea, MovingPlatform, SaggingPlatform, OneWaySolidObject } from "./levelObjects.js";
+import { SolidObject, InteractableObject, InteractableToggle, Reciever, LevelObject, TriggerArea, MovingPlatform, SaggingPlatform, OneWaySolidObject, ItemPickup } from "./levelObjects.js";
 import { debugLog } from "./tools.js";
 
 const objectFactory = {
@@ -10,7 +10,8 @@ const objectFactory = {
     plax: LevelObject,
     'moving-platform': MovingPlatform,
     'oneway': OneWaySolidObject,
-    'sag-platform': SaggingPlatform
+    'sag-platform': SaggingPlatform,
+    item: ItemPickup
 };
 
 export function createObject(element) {
@@ -18,6 +19,8 @@ export function createObject(element) {
 
     // Find all matching types
     let types = classes.filter(cls => objectFactory[cls]);
+
+    console.log(types)
 
     // Special handling for interactable-toggle
     if (types.includes('interactable') && classes.includes('toggle')) {

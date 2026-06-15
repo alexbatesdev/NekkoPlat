@@ -59,6 +59,10 @@ export class CollisionDetection {
 
   checkTriggerCollisions(object, collisionObjects) {
     const playerRect = object.element.getBoundingClientRect();
+    // TODO: 🐢
+    // If we can filter to just trigger objects without unnecessary iterations,
+    // that could be a performance boost, especially for levels with many objects.
+    // Not sure how we'd do that tho, it's not like it'd be a sql query like at work
     collisionObjects.forEach((collisionObject) => {
       const collisionRect = collisionObject.element.getBoundingClientRect();
       if (intersects(playerRect, collisionRect)) {
