@@ -1,5 +1,5 @@
 import gameInstance from "./game.js";
-import { intersects, getCollisionOverlap } from "./tools.js";
+import { intersects, getCollisionOverlap, debugLog } from "./tools.js";
 
 export class CollisionDetection {
   constructor() {

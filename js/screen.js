@@ -1,6 +1,3 @@
-import {
-    resolveLevelObject,
-} from "./levelObjects.js";
 import { createObject } from "./objectFactory.js";
 import { debugLog, intersects, isSubset } from "./tools.js";
 import gameInstance from "./game.js";
