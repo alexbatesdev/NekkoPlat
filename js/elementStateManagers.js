@@ -74,6 +74,21 @@ export default class ToggleManager {
     getState() {
         return this.toggledOn;
     }
+
+    listenToBroadcast(channel, onSignal = 'on', offSignal = 'off') {
+        gameInstance.signalManager.addListener(channel, (signal) => {
+            if (signal === onSignal && !this.toggledOn) {
+                this.toggledOn = true;
+                this.on_element.style.visibility = 'visible';
+                this.off_element.style.visibility = 'hidden';
+            }
+            if (signal === offSignal && this.toggledOn) {
+                this.toggledOn = false;
+                this.on_element.style.visibility = 'hidden';
+                this.off_element.style.visibility = 'visible';
+            }
+        });
+    }
 }
 
 export class MultiStateManager {
@@ -101,10 +116,11 @@ export class MultiStateManager {
         return this.currentState;
     }
 
-    syncStateToBroadcast(channel) {
-        const state = gameInstance.signalManager.checkBroadcast(channel);
-        if (this.currentState !== state) {
-            this.setState(state);
-        }
+    listenToBroadcast(channel) {
+        gameInstance.signalManager.addListener(channel, (signal) => {
+            if (signal) {
+                this.setState(signal);
+            }
+        });
     }
 }

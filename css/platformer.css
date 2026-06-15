@@ -282,6 +282,11 @@ position: relative or absolute
     height: var(--screen-height);
 }
 
+.cat {
+    width: 50px;
+    height: 50px;
+}
+
 .tv {
     top: 50%;
     left: 50%;
@@ -1083,5 +1088,23 @@ a {
 
 #door-1 {
     top: 225px;
-    left: 980px
+    left: 980px;
+}
+
+@keyframes platform-move-example-y {
+    from { transform: translateY(0); }
+    to { transform: translateY(200px); }
+}
+
+@keyframes platform-move-example-x {
+    from { transform: translateX(0); }
+    to { transform: translateX(200px); }
+}
+
+.moving-platform-y {
+    animation: platform-move-example-y 3s ease-in-out infinite alternate;
+}
+
+.moving-platform-x {
+    animation: platform-move-example-x 3s ease-in-out infinite alternate;
 }
