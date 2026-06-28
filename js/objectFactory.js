@@ -20,8 +20,6 @@ export function createObject(element) {
     // Find all matching types
     let types = classes.filter(cls => objectFactory[cls]);
 
-    console.log(types)
-
     // Special handling for interactable-toggle
     if (types.includes('interactable') && classes.includes('toggle')) {
         types = types.filter(t => t !== 'interactable');

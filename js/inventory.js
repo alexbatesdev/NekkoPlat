@@ -114,7 +114,7 @@ export default class Inventory {
     return null;
   }
 
-  // Get all items from the inventory with a specific tag
+  // TODO (?): Get all items from the inventory with a specific tag
 
   // Modify item in the inventory
   modifyItem(name, newItem) {
