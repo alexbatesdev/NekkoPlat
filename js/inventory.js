@@ -114,9 +114,6 @@ export default class Inventory {
     const item = this.itemsList.find((i) => i.name === name);
     if (item) {
       item.count -= count;
-      if (item.count <= 0) {
-        this.itemsList = this.itemsList.filter((i) => i.name !== name);
-      }
       // Sync localstorage with itemsList
       this.syncToLocalStorage();
       // Update the HUD count for the item
