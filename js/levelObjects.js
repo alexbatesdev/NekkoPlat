@@ -306,13 +306,25 @@ export class ItemPickup extends LevelObject {
     super(element);
     let onClick = this.element.onclick;
     // This onclick is the trigger for the item pickup
-    // This lets it mix with other interactables, triggers, etc. without breaking them
+    // This lets it mix with other interactables, triggers, etc. 
+    // without breaking them
     this.element.onclick = () => {
       this.element.onclick = onClick;
       this.pickup();
     }
 
-    // Disable the pickup if it's already in the player's inventory and not meant to respawn
+    // Since the onclick is used for picking up the item, 
+    // We need to make the item not clickable by default
+    // If the item is meant to be clickable, 
+    // it should have the "clickable" class
+    if (!this.element.classList.contains("clickable")) {
+      this.element.style.pointerEvents = "none";
+    } else {
+      this.element.style.cursor = "pointer";
+    }
+
+    // Disable the pickup if it's already in the player's 
+    // inventory and not meant to respawn
     if (
       !this.element.classList.contains("respawn") &&
       gameInstance.player.inventory.pickupIDs.includes(this.element.id)
