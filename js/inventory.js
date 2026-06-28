@@ -20,7 +20,9 @@ export default class Inventory {
       this.itemsList = [];
     } else {
       const storedItems = JSON.parse(localStorage.getItem("itemsList"));
-      this.itemsList = storedItems.map((itemData) => this.normalizeItem(itemData));
+      this.itemsList = storedItems.map((itemData) =>
+        this.normalizeItem(itemData),
+      );
       for (let i = 0; i < this.itemsList.length; i++) {
         const item = this.itemsList[i];
         const pickupIDs = Array.isArray(item.pickupIDs)
@@ -55,7 +57,7 @@ export default class Inventory {
       item.iconElement,
       item.inspectElement,
       item.onclick,
-      item.tags || []
+      item.tags || [],
     );
 
     this.attachInventory(normalizedItem);
@@ -79,16 +81,20 @@ export default class Inventory {
   addItem(item) {
     const normalizedItem = this.normalizeItem(item);
     normalizedItem.inspectElement =
-      normalizedItem.inspectElement && typeof normalizedItem.inspectElement === "object"
+      normalizedItem.inspectElement &&
+      typeof normalizedItem.inspectElement === "object"
         ? normalizedItem.inspectElement.outerHTML
         : normalizedItem.inspectElement;
     normalizedItem.iconElement =
-      normalizedItem.iconElement && typeof normalizedItem.iconElement === "object"
+      normalizedItem.iconElement &&
+      typeof normalizedItem.iconElement === "object"
         ? normalizedItem.iconElement.outerHTML
         : normalizedItem.iconElement;
 
     // Check if item is already in the inventory
-    const existingItem = this.itemsList.find((i) => i.name === normalizedItem.name);
+    const existingItem = this.itemsList.find(
+      (i) => i.name === normalizedItem.name,
+    );
     if (existingItem) {
       existingItem.count += normalizedItem.count;
       existingItem.pickupIDs.push(normalizedItem.pickupID);
@@ -199,7 +205,7 @@ export class InventoryItem {
     inspectElement,
     onclick,
     tags = [],
-    inventory = null
+    inventory = null,
   ) {
     if (
       name &&
@@ -474,36 +480,50 @@ export class HUD {
 
       const useButton = itemElement.querySelector(".use-button");
       if (useButton) {
-        useButton.onclick = () => {
-          if (item.onclick) {
-            // Extract the function body from the string
-            const body = item.onclick
-              .substring(
-                item.onclick.indexOf("{") + 1,
-                item.onclick.lastIndexOf("}")
-              )
-              .trim();
-            const func = new Function(body);
-            func.call(item); // 'item' as 'this'
-          }
-        };
+        if (item.count > 0) {
+          useButton.onclick = () => {
+            if (item.onclick) {
+              // Extract the function body from the string
+              const body = item.onclick
+                .substring(
+                  item.onclick.indexOf("{") + 1,
+                  item.onclick.lastIndexOf("}"),
+                )
+                .trim();
+              const func = new Function(body);
+              func.call(item); // 'item' as 'this'
+            }
+          };
+        } else {
+          useButton.onclick = () => {
+            alert("You don't have any of this item to use.");
+          };
+        }
       } else {
-        itemElement.onclick = () => {
-          if (item.onclick) {
-            const body = item.onclick
-              .substring(
-                item.onclick.indexOf("{") + 1,
-                item.onclick.lastIndexOf("}")
-              )
-              .trim();
-            const func = new Function(body);
-            func.call(item);
-          }
-        };
+        // If there is no use button, attach the onclick to the
+        // entire menu item element so that clicking anywhere on the item will trigger the onclick
+        if (item.count > 0) {
+          itemElement.onclick = () => {
+            if (item.onclick) {
+              const body = item.onclick
+                .substring(
+                  item.onclick.indexOf("{") + 1,
+                  item.onclick.lastIndexOf("}"),
+                )
+                .trim();
+              const func = new Function(body);
+              func.call(item);
+            }
+          };
+        } else {
+          itemElement.onclick = () => {
+            alert("You don't have any of this item to use.");
+          };
+        }
       }
 
       const inspectButton = itemElement.querySelector(".inspect-button");
-      if (inspectButton) {
+      if (inspectButton && item.count > 0) {
         inspectButton.onclick = () => {
           // Create a new window to display the inspectElement
           const inspectWindow = document.createElement("div");
@@ -528,6 +548,10 @@ export class HUD {
           };
           // Close the inspect window when Escape is pressed
           document.addEventListener("keydown", removeFromDocument);
+        };
+      } else if (inspectButton) {
+        inspectButton.onclick = () => {
+          alert("You don't have any of this item to inspect.");
         };
       }
 
