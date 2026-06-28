@@ -304,18 +304,22 @@ export class Reciever extends LevelObject {
 export class ItemPickup extends LevelObject {
   constructor(element) {
     super(element);
+    this.inventoryItem = this.initializeInventoryItem();
+
     let onClick = this.element.onclick;
     // This onclick is the trigger for the item pickup
-    // This lets it mix with other interactables, triggers, etc. 
+    // This lets it mix with other interactables, triggers, etc.
     // without breaking them
     this.element.onclick = () => {
-      this.element.onclick = onClick;
+      this.element.onclick = (event) => {
+        onClick?.(event);
+      };
       this.pickup();
-    }
+    };
 
-    // Since the onclick is used for picking up the item, 
+    // Since the onclick is used for picking up the item,
     // We need to make the item not clickable by default
-    // If the item is meant to be clickable, 
+    // If the item is meant to be clickable,
     // it should have the "clickable" class
     if (!this.element.classList.contains("clickable")) {
       this.element.style.pointerEvents = "none";
@@ -323,7 +327,7 @@ export class ItemPickup extends LevelObject {
       this.element.style.cursor = "pointer";
     }
 
-    // Disable the pickup if it's already in the player's 
+    // Disable the pickup if it's already in the player's
     // inventory and not meant to respawn
     if (
       !this.element.classList.contains("respawn") &&
@@ -342,14 +346,22 @@ export class ItemPickup extends LevelObject {
     if (!this.enabled) return;
     this.enabled = false;
     this.element.click();
-    
+
+    this.element.remove();
+    if (this.element.classList.contains("instant-use")) {
+      this.inventoryItem.triggerOnClick();
+      return;
+    }
+    gameInstance.player.inventory.addItem(this.inventoryItem);
+  }
+
+  initializeInventoryItem() {
     let itemName = "";
     for (let i = 0; i < this.element.classList.length; i++) {
       if (this.element.classList[i].includes("name-")) {
         itemName = this.element.classList[i].replace("name-", "");
       }
     }
-
     const onClick = this.element.onclick;
     let onClickString;
     if (onClick) {
@@ -369,13 +381,10 @@ export class ItemPickup extends LevelObject {
       iconElement,
       inspectElement,
       onClickString,
+      [],
+      gameInstance.player.inventory,
     );
-    this.element.remove();
-    if (this.element.classList.contains("instant-use")) {
-      item.triggerOnClick();
-      return;
-    }
-    gameInstance.player.inventory.addItem(item);
+    return item;
   }
 }
 

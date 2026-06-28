@@ -19,39 +19,92 @@ export default class Inventory {
     if (localStorage.getItem("itemsList") === null) {
       this.itemsList = [];
     } else {
-      this.itemsList = JSON.parse(localStorage.getItem("itemsList"));
+      const storedItems = JSON.parse(localStorage.getItem("itemsList"));
+      this.itemsList = storedItems.map((itemData) => this.normalizeItem(itemData));
       for (let i = 0; i < this.itemsList.length; i++) {
         const item = this.itemsList[i];
-        this.pickupIDs = this.pickupIDs.concat(item.pickupIDs);
+        const pickupIDs = Array.isArray(item.pickupIDs)
+          ? item.pickupIDs
+          : item.pickupID
+            ? [item.pickupID]
+            : [];
+        this.pickupIDs = this.pickupIDs.concat(pickupIDs);
         // Remove duplicate pickupIDs
         this.pickupIDs = [...new Set(this.pickupIDs)];
       }
     }
   }
 
+  normalizeItem(item) {
+    if (item instanceof InventoryItem) {
+      this.attachInventory(item);
+      return item;
+    }
+
+    const pickupIDs = Array.isArray(item.pickupIDs)
+      ? item.pickupIDs
+      : item.pickupID
+        ? [item.pickupID]
+        : [];
+
+    const normalizedItem = new InventoryItem(
+      item.name,
+      pickupIDs,
+      item.description,
+      item.count,
+      item.iconElement,
+      item.inspectElement,
+      item.onclick,
+      item.tags || []
+    );
+
+    this.attachInventory(normalizedItem);
+    return normalizedItem;
+  }
+
+  attachInventory(item) {
+    if (!item || typeof item !== "object") {
+      return;
+    }
+
+    Object.defineProperty(item, "inventory", {
+      value: this,
+      enumerable: false,
+      writable: true,
+      configurable: true,
+    });
+  }
+
   // Add item to the inventory
   addItem(item) {
-    item.inspectElement = item.inspectElement.outerHTML;
-    item.iconElement = item.iconElement.outerHTML;
+    const normalizedItem = this.normalizeItem(item);
+    normalizedItem.inspectElement =
+      normalizedItem.inspectElement && typeof normalizedItem.inspectElement === "object"
+        ? normalizedItem.inspectElement.outerHTML
+        : normalizedItem.inspectElement;
+    normalizedItem.iconElement =
+      normalizedItem.iconElement && typeof normalizedItem.iconElement === "object"
+        ? normalizedItem.iconElement.outerHTML
+        : normalizedItem.iconElement;
+
     // Check if item is already in the inventory
-    const existingItem = this.itemsList.find((i) => i.name === item.name);
+    const existingItem = this.itemsList.find((i) => i.name === normalizedItem.name);
     if (existingItem) {
-      existingItem.count += item.count;
-      existingItem.pickupIDs.push(item.pickupID);
+      existingItem.count += normalizedItem.count;
+      existingItem.pickupIDs.push(normalizedItem.pickupID);
       // Remove duplicate pickupIDs
       existingItem.pickupIDs = [...new Set(existingItem.pickupIDs)];
       // Update the HUD count for the item
-      this.HUD.updateCountForItem(item.name);
+      this.HUD.updateCountForItem(normalizedItem.name);
     } else {
-      const pickupID = item.pickupID;
-      delete item.pickupID;
-      item.pickupIDs = [pickupID];
-      this.itemsList.push(item);
+      const pickupID = normalizedItem.pickupID;
+      delete normalizedItem.pickupID;
+      normalizedItem.pickupIDs = [pickupID];
+      this.itemsList.push(normalizedItem);
       // Update the HUD count for the item
-      this.HUD.updateCountForItem(item.name);
+      this.HUD.updateCountForItem(normalizedItem.name);
       this.HUD.setIcons();
     }
-    console.log(this.itemsList);
     // Sync localstorage with itemsList
     this.syncToLocalStorage();
   }
@@ -66,6 +119,8 @@ export default class Inventory {
       }
       // Sync localstorage with itemsList
       this.syncToLocalStorage();
+      // Update the HUD count for the item
+      this.HUD.updateCountForItem(name);
     }
   }
   // Remove item from the inventory by pickupID
@@ -79,6 +134,8 @@ export default class Inventory {
       }
       // Sync localstorage with itemsList
       this.syncToLocalStorage();
+      // Update the HUD count for the item
+      this.HUD.updateCountForItem(item.name);
     }
   }
 
@@ -129,6 +186,9 @@ export default class Inventory {
       // Sync localstorage with itemsList
       this.syncToLocalStorage();
     }
+
+    // Update the HUD count for the item
+    this.HUD.updateCountForItem(newItem.name);
   }
 }
 
@@ -141,14 +201,46 @@ export class InventoryItem {
     iconElement,
     inspectElement,
     onclick,
-    tags = []
+    tags = [],
+    inventory = null
   ) {
+    if (
+      name &&
+      typeof name === "object" &&
+      typeof name.removeItemByName === "function" &&
+      Array.isArray(name.pickupIDs)
+    ) {
+      inventory = name;
+      name = pickupID;
+      pickupID = description;
+      description = count;
+      count = iconElement;
+      iconElement = inspectElement;
+      inspectElement = onclick;
+      onclick = tags;
+      tags = inventory && inventory.tags ? inventory.tags : [];
+    }
+
+    if (inventory) {
+      Object.defineProperty(this, "inventory", {
+        value: inventory,
+        enumerable: false,
+        writable: true,
+        configurable: true,
+      });
+    }
+
     // The name of the item
     this.name = name;
     // The ID of the item's pickup container
     // We want to use this to track items that shouldnt appear as they have already been picked up
     // We will need to accomodate for stackables so pickupID needs to be an array
-    this.pickupID = pickupID;
+    this.pickupID = Array.isArray(pickupID) ? pickupID[0] : pickupID;
+    this.pickupIDs = Array.isArray(pickupID)
+      ? [...pickupID]
+      : pickupID
+        ? [pickupID]
+        : [];
     // The description of the item
     this.description = description;
     // The count of the item in the inventory
@@ -172,6 +264,10 @@ export class InventoryItem {
       .trim();
     const func = new Function(body);
     func.call(this);
+  }
+
+  consume(count = 1) {
+    this.inventory.removeItemByName(this.name, count);
   }
 }
 
@@ -288,7 +384,24 @@ export class HUD {
           }
         }
       }
+    } else {
+      for (let i = 0; i < Object.keys(this.HUD).length; i++) {
+        const itemName = Object.keys(this.HUD)[i];
+        if (itemName === name) {
+          const elements = this.HUD[itemName];
+          for (let j = 0; j < elements.length; j++) {
+            const element = elements[j];
+            for (let k = 0; k < element.classList.length; k++) {
+              const className = element.classList[k];
+              if (className.includes("-count")) {
+                element.innerHTML = "0";
+              }
+            }
+          }
+        }
+      }
     }
+    this.syncInventoryMenu();
   }
 
   // Sync the inventory menu with the itemsList
@@ -395,7 +508,6 @@ export class HUD {
       const inspectButton = itemElement.querySelector(".inspect-button");
       if (inspectButton) {
         inspectButton.onclick = () => {
-          console.log("Inspecting item:", item.name);
           // Create a new window to display the inspectElement
           const inspectWindow = document.createElement("div");
           inspectWindow.className = "inspect-window";

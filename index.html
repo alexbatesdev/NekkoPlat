@@ -106,7 +106,11 @@
           <div
             id="mushroom"
             class="object item trigger name-shroom respawn"
-            onclick="console.log('picked up mushroom')"
+            onclick="{
+              console.log(this)
+              this.consume();
+              console.log('mushroom used with event:', event);
+            }"
           >
             <div class="iconElement shroom-icon"></div>
             <span class="inspectElement mushroom-inspect">
@@ -223,9 +227,9 @@
                 <span class="item-icon" title="item-name"
                   ><span class="shroom-icon" style="filter: invert()"></span
                 ></span>
-                <span class="item-name" title="item-description"
-                  >Placeholder</span
-                >
+                <span class="item-name" title="item-description">
+                  Placeholder
+                </span>
                 <span>X</span>
                 <span class="item-count">-1</span>
               </div>
@@ -244,6 +248,7 @@
     <div id="overlay">
       <div class="mushroom-hud">
         <span class="hud-item hud-shroom-icon"></span>
+        <span>x</span>
         <span class="hud-item hud-shroom-count"></span>
       </div>
       <div id="reciever-3" class="reciever">
