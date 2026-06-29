@@ -305,7 +305,7 @@ export class ItemPickup extends LevelObject {
   constructor(element) {
     super(element);
     this.inventoryItemPromise = this.initializeInventoryItem().then((item) => {
-      this.element.appendChild(item.iconElement);
+      if (item.iconElement) this.element.appendChild(item.iconElement);
       return item;
     });
 

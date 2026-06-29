@@ -1,4 +1,5 @@
 import gameInstance from "./game.js";
+import { loadInventoryItemFragment } from "./tools.js"
 
 export default class Inventory {
   constructor() {
@@ -109,7 +110,6 @@ export default class Inventory {
       this.itemsList.push(normalizedItem);
       // Update the HUD count for the item
       this.HUD.updateCountForItem(normalizedItem.name);
-      this.HUD.setIcons();
     }
     // Sync localstorage with itemsList
     this.syncToLocalStorage();
@@ -268,9 +268,14 @@ export class InventoryItem {
   triggerOnClick() {
     // This should be hardened. Bad innerHTML can cause weird behavior.
     // I'd rather fail loudly than have weird behavior
-    const body = this.onclick ? this.onclick
-      .substring(this.onclick.indexOf("{") + 1, this.onclick.lastIndexOf("}"))
-      .trim() : null;
+    const body = this.onclick
+      ? this.onclick
+          .substring(
+            this.onclick.indexOf("{") + 1,
+            this.onclick.lastIndexOf("}"),
+          )
+          .trim()
+      : null;
     if (!body) {
       console.warn(`No onclick function body found for item: ${this.name}`);
       return;
@@ -350,6 +355,15 @@ export class HUD {
             if (itemObj) {
               element.innerHTML = itemObj.iconElement;
             } else {
+              loadInventoryItemFragment(item).then(({ iconElement }) => {
+                const iconToken = iconElement?.cloneNode(true);
+                if (iconToken) {
+                  element.appendChild(iconToken);
+                } else {
+                  console.warn("HUD element icon failed to load")
+                  element.innerHTML = "?";
+                }
+              });
               element.innerHTML = "";
             }
           }
@@ -371,7 +385,7 @@ export class HUD {
             if (itemObj) {
               element.innerHTML = itemObj.count;
             } else {
-              element.innerHTML = "";
+              element.innerHTML = "0";
             }
           }
         }
@@ -415,6 +429,7 @@ export class HUD {
       }
     }
     this.syncInventoryMenu();
+    this.setIcons();
   }
 
   // Sync the inventory menu with the itemsList
