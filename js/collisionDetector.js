@@ -158,8 +158,9 @@ export class CollisionDetection {
 
     expression = expression.replace(/\s+/g, "");
     expression = expression.replace(/\^/g, "**");
-    expression = expression.replace(/([0-9)\w])([A-Za-z(])/g, "$1*$2");
-    expression = expression.replace(/([)\w])([0-9(])/g, "$1*$2");
+    expression = expression.replace(/([A-Za-z)])(?=[A-Za-z(])/g, "$1*");
+    expression = expression.replace(/([A-Za-z)])(?=[0-9(])/g, "$1*");
+    expression = expression.replace(/([0-9)])(?=[A-Za-z(])/g, "$1*");
 
     const variableValues = {};
     Object.entries(slopeElement.dataset).forEach(([key, value]) => {
