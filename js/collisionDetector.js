@@ -244,7 +244,37 @@ export class CollisionDetection {
     return canvas;
   }
 
+  updateSlopeClipPath(slopeElement) {
+    const clipAttr = slopeElement.dataset.slopeClip;
+    if (clipAttr === undefined || clipAttr === "false") return;
+
+    const rect = slopeElement.getBoundingClientRect();
+    const sampleCount = Math.max(4, Math.round(rect.width / 20));
+    const points = [`0 ${rect.height}px`, `${rect.width}px ${rect.height}px`];
+
+    for (let i = sampleCount; i >= 0; i--) {
+      const localX = (rect.width * i) / sampleCount;
+      let y = this.getSlopeSurfaceHeight(slopeElement, localX);
+      if (y == null) {
+        y = rect.height;
+      }
+      y = Math.max(0, Math.min(rect.height, y));
+      points.push(`${localX}px ${y}px`);
+    }
+
+    const clipPath = `polygon(${points.join(",")})`;
+    slopeElement.style.clipPath = clipPath;
+    slopeElement.style.webkitClipPath = clipPath;
+  }
+
   queueSlopeDebugDraw(object, collisionObjects) {
+    collisionObjects.forEach((entry) => {
+      const el = entry.element;
+      if (el?.classList?.contains("slope")) {
+        this.updateSlopeClipPath(el);
+      }
+    });
+
     if (!gameInstance.debug) {
       if (this.slopeDebugCanvas) {
         this.slopeDebugCanvas.style.display = "none";
