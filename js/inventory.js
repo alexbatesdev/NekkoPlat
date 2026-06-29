@@ -435,6 +435,8 @@ export class HUD {
   // Sync the inventory menu with the itemsList
   syncInventoryMenu() {
     const inventoryMenu = document.getElementById("inventory-menu");
+    if (!inventoryMenu) return;
+
     const itemList = inventoryMenu.querySelector(".item-list");
     const itemListPatternElement = inventoryMenu.querySelector(".list-pattern");
     const itemListPattern =

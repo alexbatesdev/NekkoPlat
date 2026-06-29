@@ -121,7 +121,7 @@ export const loadInventoryItemFragment = async (itemName) => {
     let onClickString;
 
     try {
-      const itemDataFragment = await fetch(`items/${itemName}.html`);
+      const itemDataFragment = await fetch(`/items/${itemName}.html`);
       if (itemDataFragment.ok) {
         const itemDataHTML = await itemDataFragment.text();
         const tempDiv = document.createElement("div");
