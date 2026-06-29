@@ -106,34 +106,7 @@
           <div
             id="mushroom"
             class="object item trigger name-shroom respawn"
-            onclick="{
-              console.log(this)
-              this.consume();
-              console.log('mushroom used with event:', event);
-            }"
           >
-            <div class="iconElement shroom-icon"></div>
-            <span class="inspectElement mushroom-inspect">
-              <h2>This is the dev mushroom</h2>
-              <p>Click the button below to toggle the broadcast on or off</p>
-              <button
-                onclick="
-                  console.log('awooga');
-                  const broadcastValue =
-                    game.signalManager.checkBroadcast('toggle_two');
-                  if (broadcastValue === 'on') {
-                    game.signalManager.broadcastSignal('toggle_two', 'off');
-                  } else {
-                    game.signalManager.broadcastSignal('toggle_two', 'on');
-                  }
-                "
-              >
-                Toggle Broadcast
-              </button>
-            </span>
-            <span class="description">
-              A mushroom that a plumber told you would increase your size
-            </span>
             <span class="count">1</span>
           </div>
         </div>

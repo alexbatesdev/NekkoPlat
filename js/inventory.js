@@ -205,8 +205,12 @@ export class InventoryItem {
     inspectElement,
     onclick,
     tags = [],
-    inventory = null,
+    inventory = null
   ) {
+    // 🐢💭
+    // I think this is a hacky thing AI suggested
+    // I should study this more
+    // AI thinks this is a way to allow the constructor to accept an object as the first argument, and then destructure it into the individual properties. This allows for more flexibility in how the constructor is called, and can make it easier to create new InventoryItem instances from existing objects.
     if (
       name &&
       typeof name === "object" &&
@@ -262,9 +266,15 @@ export class InventoryItem {
   }
 
   triggerOnClick() {
-    const body = this.onclick
+    // This should be hardened. Bad innerHTML can cause weird behavior.
+    // I'd rather fail loudly than have weird behavior
+    const body = this.onclick ? this.onclick
       .substring(this.onclick.indexOf("{") + 1, this.onclick.lastIndexOf("}"))
-      .trim();
+      .trim() : null;
+    if (!body) {
+      console.warn(`No onclick function body found for item: ${this.name}`);
+      return;
+    }
     const func = new Function(body);
     func.call(this);
   }
@@ -482,17 +492,7 @@ export class HUD {
       if (useButton) {
         if (item.count > 0) {
           useButton.onclick = () => {
-            if (item.onclick) {
-              // Extract the function body from the string
-              const body = item.onclick
-                .substring(
-                  item.onclick.indexOf("{") + 1,
-                  item.onclick.lastIndexOf("}"),
-                )
-                .trim();
-              const func = new Function(body);
-              func.call(item); // 'item' as 'this'
-            }
+            item.triggerOnClick();
           };
         } else {
           useButton.onclick = () => {
@@ -504,16 +504,7 @@ export class HUD {
         // entire menu item element so that clicking anywhere on the item will trigger the onclick
         if (item.count > 0) {
           itemElement.onclick = () => {
-            if (item.onclick) {
-              const body = item.onclick
-                .substring(
-                  item.onclick.indexOf("{") + 1,
-                  item.onclick.lastIndexOf("}"),
-                )
-                .trim();
-              const func = new Function(body);
-              func.call(item);
-            }
+            item.triggerOnClick();
           };
         } else {
           itemElement.onclick = () => {

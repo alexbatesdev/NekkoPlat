@@ -1,5 +1,5 @@
 import gameInstance from "./game.js";
-import { debugLog } from "./tools.js";
+import { debugLog, loadInventoryItemFragment } from "./tools.js";
 import ToggleManager, { MultiStateManager } from "./elementStateManagers.js";
 import { InventoryItem } from "./inventory.js";
 
@@ -304,7 +304,11 @@ export class Reciever extends LevelObject {
 export class ItemPickup extends LevelObject {
   constructor(element) {
     super(element);
-    this.inventoryItem = this.initializeInventoryItem();
+    this.inventoryItemPromise = this.initializeInventoryItem().then((item) => {
+      this.element.appendChild(item.iconElement);
+      return item;
+    });
+
 
     let onClick = this.element.onclick;
     // This onclick is the trigger for the item pickup
@@ -349,30 +353,27 @@ export class ItemPickup extends LevelObject {
 
     this.element.remove();
     if (this.element.classList.contains("instant-use")) {
-      this.inventoryItem.triggerOnClick();
+      this.inventoryItemPromise.then((item) => item.triggerOnClick());
       return;
     }
-    gameInstance.player.inventory.addItem(this.inventoryItem);
+    this.inventoryItemPromise.then((item) => {
+      gameInstance.player.inventory.addItem(item);
+    });
   }
 
-  initializeInventoryItem() {
+  async initializeInventoryItem() {
     let itemName = "";
     for (let i = 0; i < this.element.classList.length; i++) {
       if (this.element.classList[i].includes("name-")) {
         itemName = this.element.classList[i].replace("name-", "");
       }
     }
-    const onClick = this.element.onclick;
-    let onClickString;
-    if (onClick) {
-      onClickString = onClick.toString();
-      onClickString = onClickString.replace("function", "");
-      onClickString = onClickString.replace(/\(.*?\)/, "");
-    }
-    const inspectElement = this.element.querySelector(".inspectElement");
-    const iconElement = this.element.querySelector(".iconElement");
-    const description = this.element.querySelector(".description").innerHTML;
-    const count = parseInt(this.element.querySelector(".count").innerHTML);
+
+    const { inspectElement, iconElement, description, onClickString } =
+      await loadInventoryItemFragment(itemName);
+    
+      
+    let count = parseInt(this.element.querySelector(".count")?.innerHTML);
     const item = new InventoryItem(
       itemName,
       this.element.id,
