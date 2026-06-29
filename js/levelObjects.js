@@ -263,7 +263,7 @@ export class InteractableToggle extends InteractableObject {
   }
 }
 
-export class Reciever extends LevelObject {
+export class Receiver extends LevelObject {
   constructor(element) {
     super(element);
     this.signals = [];

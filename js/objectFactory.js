@@ -1,10 +1,10 @@
-import { SolidObject, InteractableObject, InteractableToggle, Reciever, LevelObject, TriggerArea, MovingPlatform, SaggingPlatform, OneWaySolidObject, ItemPickup } from "./levelObjects.js";
+import { SolidObject, InteractableObject, InteractableToggle, Receiver, LevelObject, TriggerArea, MovingPlatform, SaggingPlatform, OneWaySolidObject, ItemPickup } from "./levelObjects.js";
 import { debugLog } from "./tools.js";
 
 const objectFactory = {
     solid: SolidObject,
     trigger: TriggerArea,
-    reciever: Reciever,
+    receiver: Receiver,
     interactable: InteractableObject,
     'interactable-toggle': InteractableToggle,
     plax: LevelObject,

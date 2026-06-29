@@ -84,8 +84,8 @@ export default class Screen {
             this.getObjectsByTypes('interactable', 'interactable-toggle').forEach(interactableObject => {
                 interactableObject.update();
             });
-            this.getObjectsByTypes('reciever').forEach(reciever => {
-                reciever.update();
+            this.getObjectsByTypes('receiver').forEach(receiver => {
+                receiver.update();
             });
             this.getObjectsByTypes('solid').forEach(solid => {
                 if (typeof solid.update === 'function') solid.update();
