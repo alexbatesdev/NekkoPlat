@@ -1,5 +1,5 @@
 import gameInstance from "./game.js";
-import { Reciever } from "./levelObjects.js";
+import { Receiver } from "./levelObjects.js";
 
 export default class Camera {
     constructor(player = null, keyState = null, debugProvider = () => false) {
@@ -11,7 +11,7 @@ export default class Camera {
         }
         this.element.appendChild(this.overlayElement);
         this.filters = [];
-        this.filterReciever = null;
+        this.filterReceiver = null;
         this.initFilters();
         this.targetX = 0;
         this.targetY = 0;
@@ -56,9 +56,9 @@ export default class Camera {
         this.overlayElement.querySelectorAll('.filter').forEach(filter => {
             this.filters.push(new Filter(filter));
         });
-        const reciever = this.overlayElement.querySelector('.reciever')
-        if (reciever) {
-            this.filterReciever = new Reciever(reciever);
+        const receiver = this.overlayElement.querySelector('.receiver')
+        if (receiver) {
+            this.filterReceiver = new Receiver(receiver);
         }
 
     }
@@ -77,7 +77,7 @@ export default class Camera {
 
     update() {
         if (this.followPlayer) this.trackPlayer();
-        if (this.filterReciever) this.filterReciever.update();
+        if (this.filterReceiver) this.filterReceiver.update();
         this.processInput();
         this.applyMaxOffset();
         this.positionOverlay();
