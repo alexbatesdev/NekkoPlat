@@ -191,9 +191,11 @@ export class CollisionDetection {
 
     if (equation) {
       if (localX < 0 || localX > slopeRect.width) return null;
-      const localY = this.evaluateSlopeEquation(slopeElement, localX);
-      if (localY == null || localY < 0 || localY > slopeRect.height) return null;
-      return localY;
+      const inputY = this.evaluateSlopeEquation(slopeElement, localX);
+      if (inputY == null || inputY < 0 || inputY > slopeRect.height) return null;
+      // Interpret user input as a conventional math line with y increasing upward.
+      // Convert that to the screen-space height from the top edge.
+      return slopeRect.height - inputY;
     }
 
     const type = slopeElement.dataset.slope || "up-right";
