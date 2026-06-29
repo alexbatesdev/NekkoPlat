@@ -77,6 +77,12 @@
             way to view my site!<br />
             Thank you for checking out my project! <br />
           </div>
+                    <div
+            id="mushroom"
+            class="object item trigger name-shroom respawn"
+          >
+            <span class="count">1</span>
+          </div>
 
           <div class="object-label debug">Room 1</div>
           <div class="object rock plax z-2 rock-2"></div>
@@ -177,9 +183,39 @@
         <h1>Paused</h1>
         <p>Press <span class="key">ESC</span> to resume</p>
       </div>
+      <div id="inventory-menu">
+        <h1>Inventory</h1>
+        <div class="item-list">
+          <div class="list-pattern">
+            <div class="item-wrapper">
+              <div>
+                <span class="item-icon" title="item-name"
+                  ><span class="shroom-icon" style="filter: invert()"></span
+                ></span>
+                <span class="item-name" title="item-description">
+                  Placeholder
+                </span>
+                <span>X</span>
+                <span class="item-count">-1</span>
+              </div>
+              <div>
+                <span class="use-button">use</span>
+                <!-- INSPECT BUTTON -->
+                <span class="inspect-button">inspect</span>
+              </div>
+            </div>
+          </div>
+          <!-- Items will be dynamically added here -->
+        </div>
+      </div>
     </div>
     <!-- Need to make these elements (overlay) optional in the javascript to avoid errors! -->
     <div id="overlay">
+      <div class="mushroom-hud">
+        <span class="hud-item hud-shroom-icon"></span>
+        <span>x</span>
+        <span class="hud-item hud-shroom-count"></span>
+      </div>
       <div id="reciever-3" class="reciever">
         <span class="broadcast channel-toggle_one"></span>
         <div class="signal-none">
