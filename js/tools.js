@@ -137,8 +137,6 @@ export const loadInventoryItemFragment = async (itemName) => {
       console.warn(`Could not load item fragment for ${itemName}:`, error);
     }
 
-    console.log(onClickString)
-
     return {
         inspectElement,
         iconElement,
