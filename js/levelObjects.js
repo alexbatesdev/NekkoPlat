@@ -309,15 +309,12 @@ export class ItemPickup extends LevelObject {
       return item;
     });
 
-
     let onClick = this.element.onclick;
     // This onclick is the trigger for the item pickup
     // This lets it mix with other interactables, triggers, etc.
     // without breaking them
-    this.element.onclick = () => {
-      this.element.onclick = (event) => {
-        onClick?.(event);
-      };
+    this.element.onclick = (event) => {
+      onClick?.(event);
       this.pickup();
     };
 
@@ -371,8 +368,6 @@ export class ItemPickup extends LevelObject {
 
     const { inspectElement, iconElement, description, onClickString } =
       await loadInventoryItemFragment(itemName);
-    
-      
     let count = parseInt(this.element.querySelector(".count")?.innerHTML);
     const item = new InventoryItem(
       itemName,
