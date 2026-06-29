@@ -8,7 +8,11 @@ export default class ToggleManager {
         this.on_broadcasts = [];
         this.off_element = element.querySelector('.off');
         this.off_broadcasts = [];
-        this.toggledOn = startOn;
+        this.progressFlag = element.dataset.progressFlag || null;
+        const persisted = this.progressFlag
+            ? gameInstance.progressState.getState(this.progressFlag, startOn)
+            : startOn;
+        this.toggledOn = Boolean(persisted);
         this.initBroadcasts();
         this.syncState();
     }
@@ -56,6 +60,9 @@ export default class ToggleManager {
     setToggledOn(noClick = false) {
         debugLog('Toggled On');
         this.toggledOn = true;
+        if (this.progressFlag) {
+            gameInstance.progressState.setFlag(this.progressFlag, true);
+        }
         this.on_element.style.visibility = 'visible';
         this.off_element.style.visibility = 'hidden';
         if (!noClick) this.on_element.click();
@@ -65,6 +72,9 @@ export default class ToggleManager {
     setToggledOff(noClick = false) {
         debugLog('Toggled Off');
         this.toggledOn = false;
+        if (this.progressFlag) {
+            gameInstance.progressState.setFlag(this.progressFlag, false);
+        }
         this.on_element.style.visibility = 'hidden';
         this.off_element.style.visibility = 'visible';
         if (!noClick) this.off_element.click();
@@ -79,11 +89,17 @@ export default class ToggleManager {
         gameInstance.signalManager.addListener(channel, (signal) => {
             if (signal === onSignal && !this.toggledOn) {
                 this.toggledOn = true;
+                if (this.progressFlag) {
+                    gameInstance.progressState.setFlag(this.progressFlag, true);
+                }
                 this.on_element.style.visibility = 'visible';
                 this.off_element.style.visibility = 'hidden';
             }
             if (signal === offSignal && this.toggledOn) {
                 this.toggledOn = false;
+                if (this.progressFlag) {
+                    gameInstance.progressState.setFlag(this.progressFlag, false);
+                }
                 this.on_element.style.visibility = 'hidden';
                 this.off_element.style.visibility = 'visible';
             }
@@ -94,12 +110,26 @@ export default class ToggleManager {
 export class MultiStateManager {
     constructor(element, states = {}, startState = null) {
         this.parent_element = element;
-        this.states = states;
+        this.progressFlag = element.dataset.progressFlag || null;
+        this.states = Array.isArray(states) ? states : Object.keys(states);
         this.currentState = null;
-        this.setState(startState);
+
+        let initialState = startState;
+        if (this.progressFlag) {
+            const persisted = gameInstance.progressState.getState(this.progressFlag, null);
+            if (persisted !== null && persisted !== undefined) {
+                initialState = persisted;
+            }
+        }
+
+        if (initialState === null || initialState === undefined) {
+            initialState = Array.isArray(this.states) && this.states.length > 0 ? this.states[0] : null;
+        }
+
+        this.setState(initialState, true);
     }
 
-    setState(state) {
+    setState(state, noPersist = false) {
         if (this.currentState == state) return;
         this.currentState = state;
         let child_elements = this.parent_element.children;
@@ -109,6 +139,10 @@ export class MultiStateManager {
             } else {
                 child_elements[i].style.visibility = 'hidden';
             }
+        }
+
+        if (!noPersist && this.progressFlag) {
+            gameInstance.progressState.setState(this.progressFlag, state);
         }
     }
 

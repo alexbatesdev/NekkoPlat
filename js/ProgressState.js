@@ -1,4 +1,4 @@
-class ProgressState {
+export default class ProgressState {
   constructor(storageKey = "gameProgress") {
     this.storageKey = storageKey;
     this.data = this.load();

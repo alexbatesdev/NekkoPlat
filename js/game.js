@@ -1,6 +1,7 @@
 import Camera, { Filter } from './camera.js';
 import BroadcastManager from './broadcastManager.js';
 import InputManager from './inputManager.js';
+import ProgressState from './ProgressState.js';
 
 class Game {
     constructor() {
@@ -31,6 +32,7 @@ class Game {
 
         this.inputManager = new InputManager(defaultBindings);
         this.signalManager = new BroadcastManager();
+        this.progressState = new ProgressState();
 
         window.game = this;
     }
