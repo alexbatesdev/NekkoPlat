@@ -141,17 +141,36 @@ export class CollisionDetection {
     const rawEquation = slopeElement.dataset.slopeEquation || "";
     if (!rawEquation) return null;
 
-    const sanitizedEquation = rawEquation
-      .trim()
-      .replace(/^y\s*=\s*/i, "")
-      .replace(/\s+/g, "")
-      .toLowerCase();
+    let expression = rawEquation.trim();
+    if (!expression) return null;
 
-    if (!/^[0-9+\-*/().x]+$/.test(sanitizedEquation)) return null;
+    const equationMatch = expression.match(/^y\s*=\s*(.+)$/i);
+    if (equationMatch) {
+      expression = equationMatch[1];
+    }
+
+    expression = expression.replace(/\s+/g, "");
+    expression = expression.replace(/\^/g, "**");
+    expression = expression.replace(/([0-9)\w])([A-Za-z(])/g, "$1*$2");
+    expression = expression.replace(/([)\w])([0-9(])/g, "$1*$2");
+
+    const variableValues = {};
+    Object.entries(slopeElement.dataset).forEach(([key, value]) => {
+      const singleLetterMatch = key.match(/^slope([A-Za-z])$/);
+      if (!singleLetterMatch) return;
+      const variableName = singleLetterMatch[1].toLowerCase();
+      const numericValue = Number(value);
+      if (Number.isFinite(numericValue)) {
+        variableValues[variableName] = numericValue;
+      }
+    });
+
+    const paramNames = ["x", ...Object.keys(variableValues)];
+    const paramValues = [x, ...Object.values(variableValues)];
 
     try {
-      const evaluator = new Function("x", `return (${sanitizedEquation});`);
-      const result = evaluator(x);
+      const evaluator = new Function(...paramNames, `return (${expression});`);
+      const result = evaluator(...paramValues);
       return Number.isFinite(result) ? result : null;
     } catch (error) {
       return null;
