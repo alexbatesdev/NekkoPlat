@@ -384,23 +384,31 @@ export class CollisionDetection {
 
   checkSlopeCollisions(object, collisionObjects) {
     let collisionCount = 0;
+    const playerRect = object.element.getBoundingClientRect();
+
     collisionObjects.forEach((collisionObject) => {
-      if (!collisionObject.element.classList.contains("slope")) return;
-      const playerRect = object.element.getBoundingClientRect();
-      const slopeRect = collisionObject.element.getBoundingClientRect();
+      const slopeElement = collisionObject.element;
+      if (!slopeElement.classList.contains("slope")) return;
+      const slopeRect = slopeElement.getBoundingClientRect();
       if (!intersects(playerRect, slopeRect)) return;
 
-      const surfaceY = this.getSlopeSurfaceY(collisionObject.element, playerRect);
+      const surfaceY = this.getSlopeSurfaceY(slopeElement, playerRect);
       if (surfaceY == null) return;
 
       const playerBottom = playerRect.bottom;
-      if (playerBottom >= surfaceY && playerRect.top <= surfaceY) {
-        const overlap = playerBottom - surfaceY;
-        object.y -= overlap;
-        object.velocityY = 0;
-        this.state.bottom = overlap;
-        object.updateTransform?.();
-        collisionCount++;
+      const verticalGap = playerBottom - surfaceY;
+      const isDescending = object.velocityY >= 0;
+      const isCloseToSurface = verticalGap >= -8 && verticalGap <= 16;
+
+      if (isDescending && isCloseToSurface) {
+        const snapOffset = surfaceY - playerBottom;
+        if (Math.abs(snapOffset) > 0.001) {
+          object.y += snapOffset;
+          object.velocityY = 0;
+          this.state.bottom = Math.max(0, -snapOffset);
+          object.updateTransform?.();
+          collisionCount++;
+        }
       }
     });
     return collisionCount;
