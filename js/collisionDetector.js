@@ -9,6 +9,8 @@ export class CollisionDetection {
       top: 0,
       bottom: 0,
     };
+    this.slopeDebugCanvas = null;
+    this.slopeDebugContext = null;
   }
 
   applyCollisions(object, collisionObjects) {
@@ -55,6 +57,8 @@ export class CollisionDetection {
         bottom: 0,
       };
     }
+
+    this.drawSlopeDebugLines(object, collisionObjects);
   }
 
   checkTriggerCollisions(object, collisionObjects) {
@@ -177,35 +181,132 @@ export class CollisionDetection {
     }
   }
 
-  getSlopeSurfaceY(slopeElement, playerRect) {
+  getSlopeSurfaceHeight(slopeElement, localX) {
     const slopeRect = slopeElement.getBoundingClientRect();
-    const centerX = playerRect.left + playerRect.width / 2;
     const equation = slopeElement.dataset.slopeEquation;
 
     if (equation) {
-      const localX = centerX - slopeRect.left;
       if (localX < 0 || localX > slopeRect.width) return null;
       const localY = this.evaluateSlopeEquation(slopeElement, localX);
       if (localY == null || localY < 0 || localY > slopeRect.height) return null;
-      return slopeRect.top + localY;
+      return localY;
     }
 
     const type = slopeElement.dataset.slope || "up-right";
-    const xRatio = (centerX - slopeRect.left) / slopeRect.width;
+    const xRatio = localX / slopeRect.width;
     if (xRatio < 0 || xRatio > 1) return null;
 
     switch (type) {
       case "up-right":
-        return slopeRect.bottom - slopeRect.height * xRatio;
+        return slopeRect.height * (1 - xRatio);
       case "up-left":
-        return slopeRect.bottom - slopeRect.height * (1 - xRatio);
+        return slopeRect.height * xRatio;
       case "down-right":
-        return slopeRect.top + slopeRect.height * xRatio;
+        return slopeRect.height * xRatio;
       case "down-left":
-        return slopeRect.top + slopeRect.height * (1 - xRatio);
+        return slopeRect.height * (1 - xRatio);
       default:
-        return slopeRect.bottom - slopeRect.height * xRatio;
+        return slopeRect.height * (1 - xRatio);
     }
+  }
+
+  getSlopeSurfaceY(slopeElement, playerRect) {
+    const slopeRect = slopeElement.getBoundingClientRect();
+    const centerX = playerRect.left + playerRect.width / 2;
+    const localX = centerX - slopeRect.left;
+    const surfaceHeight = this.getSlopeSurfaceHeight(slopeElement, localX);
+    if (surfaceHeight == null) return null;
+    return slopeRect.top + surfaceHeight;
+  }
+
+  ensureSlopeDebugCanvas() {
+    if (typeof document === "undefined") return null;
+    if (this.slopeDebugCanvas) return this.slopeDebugCanvas;
+
+    const canvas = document.createElement("canvas");
+    canvas.style.position = "fixed";
+    canvas.style.inset = "0";
+    canvas.style.width = "100vw";
+    canvas.style.height = "100vh";
+    canvas.style.pointerEvents = "none";
+    canvas.style.zIndex = "10000";
+    canvas.style.opacity = "0.9";
+    document.body.appendChild(canvas);
+
+    this.slopeDebugCanvas = canvas;
+    this.slopeDebugContext = canvas.getContext("2d");
+    return canvas;
+  }
+
+  drawSlopeDebugLines(object, collisionObjects) {
+    if (!gameInstance.debug) {
+      if (this.slopeDebugCanvas) {
+        this.slopeDebugCanvas.style.display = "none";
+      }
+      return;
+    }
+
+    if (!this.ensureSlopeDebugCanvas()) return;
+    const canvas = this.slopeDebugCanvas;
+    canvas.style.display = "block";
+    const ctx = this.slopeDebugContext;
+    if (!ctx) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    const width = Math.round(window.innerWidth * dpr);
+    const height = Math.round(window.innerHeight * dpr);
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width;
+      canvas.height = height;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    ctx.strokeStyle = "rgba(255, 0, 0, 0.9)";
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    collisionObjects.forEach((collisionObject) => {
+      const el = collisionObject.element;
+      if (!el.classList.contains("slope")) return;
+      const rect = el.getBoundingClientRect();
+      const startX = rect.left;
+      const endX = rect.right;
+      const sampleCount = Math.max(20, Math.round(rect.width / 8));
+      ctx.beginPath();
+      let hasPoint = false;
+      for (let i = 0; i <= sampleCount; i++) {
+        const localX = (rect.width * i) / sampleCount;
+        const y = this.getSlopeSurfaceHeight(el, localX);
+        if (y == null) continue;
+        const x = rect.left + localX;
+        const worldY = rect.top + y;
+        if (!hasPoint) {
+          ctx.moveTo(x, worldY);
+          hasPoint = true;
+        } else {
+          ctx.lineTo(x, worldY);
+        }
+      }
+      if (hasPoint) {
+        ctx.stroke();
+      }
+
+      if (object?.element) {
+        const playerRect = object.element.getBoundingClientRect();
+        const centerX = playerRect.left + playerRect.width / 2;
+        const localX = centerX - rect.left;
+        const surfaceHeight = this.getSlopeSurfaceHeight(el, localX);
+        if (surfaceHeight != null) {
+          const surfaceY = rect.top + surfaceHeight;
+          ctx.beginPath();
+          ctx.fillStyle = "#00f7ff";
+          ctx.arc(centerX, surfaceY, 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    });
   }
 
   checkSlopeCollisions(object, collisionObjects) {
