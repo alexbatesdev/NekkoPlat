@@ -11,6 +11,9 @@ export class CollisionDetection {
     };
     this.slopeDebugCanvas = null;
     this.slopeDebugContext = null;
+    this.slopeDebugFramePending = false;
+    this.slopeDebugLastDrawTime = 0;
+    this.slopeDebugLastBounds = null;
   }
 
   applyCollisions(object, collisionObjects) {
@@ -58,7 +61,7 @@ export class CollisionDetection {
       };
     }
 
-    this.drawSlopeDebugLines(object, collisionObjects);
+    this.queueSlopeDebugDraw(object, collisionObjects);
   }
 
   checkTriggerCollisions(object, collisionObjects) {
@@ -238,7 +241,7 @@ export class CollisionDetection {
     return canvas;
   }
 
-  drawSlopeDebugLines(object, collisionObjects) {
+  queueSlopeDebugDraw(object, collisionObjects) {
     if (!gameInstance.debug) {
       if (this.slopeDebugCanvas) {
         this.slopeDebugCanvas.style.display = "none";
@@ -247,10 +250,49 @@ export class CollisionDetection {
     }
 
     if (!this.ensureSlopeDebugCanvas()) return;
+    this.slopeDebugCanvas.style.display = "block";
+
+    const playerRect = object?.element?.getBoundingClientRect?.();
+    const bounds = {
+      playerLeft: playerRect?.left ?? 0,
+      playerTop: playerRect?.top ?? 0,
+      playerWidth: playerRect?.width ?? 0,
+      collisionCount: collisionObjects.filter((entry) => entry.element?.classList?.contains("slope")).length,
+      width: window.innerWidth,
+      height: window.innerHeight,
+      dpr: window.devicePixelRatio || 1,
+    };
+
+    const shouldSkip =
+      this.slopeDebugFramePending ||
+      (this.slopeDebugLastBounds &&
+        this.slopeDebugLastBounds.playerLeft === bounds.playerLeft &&
+        this.slopeDebugLastBounds.playerTop === bounds.playerTop &&
+        this.slopeDebugLastBounds.playerWidth === bounds.playerWidth &&
+        this.slopeDebugLastBounds.collisionCount === bounds.collisionCount &&
+        this.slopeDebugLastBounds.width === bounds.width &&
+        this.slopeDebugLastBounds.height === bounds.height &&
+        this.slopeDebugLastBounds.dpr === bounds.dpr);
+
+    if (shouldSkip) return;
+
+    this.slopeDebugLastBounds = bounds;
+    this.slopeDebugFramePending = true;
+    window.requestAnimationFrame(() => {
+      this.slopeDebugFramePending = false;
+      this.drawSlopeDebugLines(object, collisionObjects);
+    });
+  }
+
+  drawSlopeDebugLines(object, collisionObjects) {
     const canvas = this.slopeDebugCanvas;
-    canvas.style.display = "block";
     const ctx = this.slopeDebugContext;
-    if (!ctx) return;
+    if (!gameInstance.debug || !canvas || !ctx) {
+      if (this.slopeDebugCanvas) {
+        this.slopeDebugCanvas.style.display = "none";
+      }
+      return;
+    }
 
     const dpr = window.devicePixelRatio || 1;
     const width = Math.round(window.innerWidth * dpr);
@@ -271,8 +313,6 @@ export class CollisionDetection {
       const el = collisionObject.element;
       if (!el.classList.contains("slope")) return;
       const rect = el.getBoundingClientRect();
-      const startX = rect.left;
-      const endX = rect.right;
       const sampleCount = Math.max(20, Math.round(rect.width / 8));
       ctx.beginPath();
       let hasPoint = false;
