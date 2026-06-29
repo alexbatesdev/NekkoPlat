@@ -137,6 +137,58 @@ export class CollisionDetection {
     return collisionCount;
   }
 
+  evaluateSlopeEquation(slopeElement, x) {
+    const rawEquation = slopeElement.dataset.slopeEquation || "";
+    if (!rawEquation) return null;
+
+    const sanitizedEquation = rawEquation
+      .trim()
+      .replace(/^y\s*=\s*/i, "")
+      .replace(/\s+/g, "")
+      .toLowerCase();
+
+    if (!/^[0-9+\-*/().x]+$/.test(sanitizedEquation)) return null;
+
+    try {
+      const evaluator = new Function("x", `return (${sanitizedEquation});`);
+      const result = evaluator(x);
+      return Number.isFinite(result) ? result : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  getSlopeSurfaceY(slopeElement, playerRect) {
+    const slopeRect = slopeElement.getBoundingClientRect();
+    const centerX = playerRect.left + playerRect.width / 2;
+    const equation = slopeElement.dataset.slopeEquation;
+
+    if (equation) {
+      const localX = centerX - slopeRect.left;
+      if (localX < 0 || localX > slopeRect.width) return null;
+      const localY = this.evaluateSlopeEquation(slopeElement, localX);
+      if (localY == null || localY < 0 || localY > slopeRect.height) return null;
+      return slopeRect.top + localY;
+    }
+
+    const type = slopeElement.dataset.slope || "up-right";
+    const xRatio = (centerX - slopeRect.left) / slopeRect.width;
+    if (xRatio < 0 || xRatio > 1) return null;
+
+    switch (type) {
+      case "up-right":
+        return slopeRect.bottom - slopeRect.height * xRatio;
+      case "up-left":
+        return slopeRect.bottom - slopeRect.height * (1 - xRatio);
+      case "down-right":
+        return slopeRect.top + slopeRect.height * xRatio;
+      case "down-left":
+        return slopeRect.top + slopeRect.height * (1 - xRatio);
+      default:
+        return slopeRect.bottom - slopeRect.height * xRatio;
+    }
+  }
+
   checkSlopeCollisions(object, collisionObjects) {
     let collisionCount = 0;
     collisionObjects.forEach((collisionObject) => {
@@ -144,27 +196,10 @@ export class CollisionDetection {
       const playerRect = object.element.getBoundingClientRect();
       const slopeRect = collisionObject.element.getBoundingClientRect();
       if (!intersects(playerRect, slopeRect)) return;
-      const type = collisionObject.element.dataset.slope || "up-right";
-      const centerX = playerRect.left + playerRect.width / 2;
-      const xRatio = (centerX - slopeRect.left) / slopeRect.width;
-      if (xRatio < 0 || xRatio > 1) return;
-      let surfaceY = 0;
-      switch (type) {
-        case "up-right":
-          surfaceY = slopeRect.bottom - slopeRect.height * xRatio;
-          break;
-        case "up-left":
-          surfaceY = slopeRect.bottom - slopeRect.height * (1 - xRatio);
-          break;
-        case "down-right":
-          surfaceY = slopeRect.top + slopeRect.height * xRatio;
-          break;
-        case "down-left":
-          surfaceY = slopeRect.top + slopeRect.height * (1 - xRatio);
-          break;
-        default:
-          surfaceY = slopeRect.bottom - slopeRect.height * xRatio;
-      }
+
+      const surfaceY = this.getSlopeSurfaceY(collisionObject.element, playerRect);
+      if (surfaceY == null) return;
+
       const playerBottom = playerRect.bottom;
       if (playerBottom >= surfaceY && playerRect.top <= surfaceY) {
         const overlap = playerBottom - surfaceY;
