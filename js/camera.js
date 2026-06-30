@@ -76,6 +76,13 @@ export default class Camera {
     }
 
     update() {
+        // TODO: 🐢💭
+        // I'm thinking instead of a "following player" boolean
+        // there should be a "mode" enum
+        // Modes:
+        // 1. Follow Player
+        // 2. Pinned to coordinates/manual control
+        // 3. Follow another element
         if (this.followPlayer) this.trackPlayer();
         if (this.filterReceiver) this.filterReceiver.update();
         this.processInput();
