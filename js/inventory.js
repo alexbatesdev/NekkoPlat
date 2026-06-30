@@ -119,7 +119,7 @@ export default class Inventory {
   removeItemByName(name, count) {
     const item = this.itemsList.find((i) => i.name === name);
     if (item) {
-      item.count -= count;
+      item.count = Math.max(0, item.count - count);
       // Sync localstorage with itemsList
       this.syncToLocalStorage();
       // Update the HUD count for the item
@@ -130,11 +130,7 @@ export default class Inventory {
   removeItemByPickupID(pickupID) {
     const item = this.itemsList.find((i) => i.pickupIDs.includes(pickupID));
     if (item) {
-      item.count -= 1;
-      item.pickupIDs = item.pickupIDs.filter((id) => id !== pickupID);
-      if (item.count <= 0) {
-        this.itemsList = this.itemsList.filter((i) => i.name !== item.name);
-      }
+      item.count = Math.max(0, item.count - 1);
       // Sync localstorage with itemsList
       this.syncToLocalStorage();
       // Update the HUD count for the item
@@ -144,7 +140,7 @@ export default class Inventory {
 
   // Check if item is in the inventory
   hasItem(name) {
-    return this.itemsList.some((i) => i.name === name);
+    return this.itemsList.some((i) => i.name === name && i.count > 0);
   }
 
   // Get item by name
@@ -451,8 +447,10 @@ export class HUD {
       itemListPatternElement.style.display = "none";
     }
 
-    for (let i = 0; i < this.inventory.itemsList.length; i++) {
-      const item = this.inventory.itemsList[i];
+    const ownedItems = this.inventory.itemsList.filter((item) => item.count > 0);
+
+    for (let i = 0; i < ownedItems.length; i++) {
+      const item = ownedItems[i];
       const itemElement = itemListPatternTemplate.cloneNode(true);
       const itemIcon = itemElement.querySelector(".item-icon");
       const itemName = itemElement.querySelector(".item-name");
