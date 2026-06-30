@@ -1,7 +1,20 @@
-import gameInstance from "./game.js";
-import { loadInventoryItemFragment } from "./tools.js"
+/**
+ * DEPRECATED: This file is kept for backwards compatibility only.
+ * New code should import from the services and adapters directly:
+ * - import { InventoryService } from "./services/inventoryService.js"
+ * - import { InventoryItem } from "./services/inventoryItem.js"
+ * - import { HUDAdapter } from "./adapters/hudAdapter.js"
+ * - import { InventoryMenuAdapter } from "./adapters/inventoryMenuAdapter.js"
+ */
 
-export default class Inventory {
+export { InventoryService as default, InventoryService as Inventory } from "./services/inventoryService.js";
+export { InventoryItem } from "./services/inventoryItem.js";
+
+// ============= OLD CODE BELOW (KEPT FOR REFERENCE, UNUSED) =============
+// import gameInstance from "./game.js";
+// import { loadInventoryItemFragment } from "./tools.js"
+
+// export default class Inventory {
   constructor() {
     this.pickupIDs = [];
     this.itemsList = [];

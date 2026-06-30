@@ -1,7 +1,7 @@
 import gameInstance from "./game.js";
 import { debugLog, loadInventoryItemFragment } from "./tools.js";
 import ToggleManager, { MultiStateManager } from "./elementStateManagers.js";
-import { InventoryItem } from "./inventory.js";
+import { InventoryItem } from "./services/inventoryItem.js";
 
 export class LevelObject {
   constructor(element) {
@@ -332,7 +332,7 @@ export class ItemPickup extends LevelObject {
     // inventory and not meant to respawn
     if (
       !this.element.classList.contains("respawn") &&
-      gameInstance.player.inventory.pickupIDs.includes(this.element.id)
+      gameInstance.player.inventory.isPickedUp(this.element.id)
     ) {
       this.enabled = false;
     }
