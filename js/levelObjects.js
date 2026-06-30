@@ -368,7 +368,8 @@ export class ItemPickup extends LevelObject {
 
     const { inspectElement, iconElement, description, onClickString } =
       await loadInventoryItemFragment(itemName);
-    let count = parseInt(this.element.querySelector(".count")?.innerHTML);
+    const countValue = parseInt(this.element.querySelector(".count")?.innerHTML);
+    const count = Number.isNaN(countValue) ? 1 : countValue;
     const item = new InventoryItem(
       itemName,
       this.element.id,
