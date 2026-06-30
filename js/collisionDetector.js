@@ -255,13 +255,17 @@ export class CollisionDetection {
 
     const rect = slopeElement.getBoundingClientRect();
     const sampleCount = Math.max(4, Math.round(rect.width / 20));
-    const points = [`0 ${rect.height}px`, `${rect.width}px ${rect.height}px`];
+    const slopeRole = this.getSlopeRole(slopeElement);
+    const points =
+      slopeRole === "ceiling"
+        ? [`0 0`, `${rect.width}px 0`]
+        : [`0 ${rect.height}px`, `${rect.width}px ${rect.height}px`];
 
     for (let i = sampleCount; i >= 0; i--) {
       const localX = (rect.width * i) / sampleCount;
       let y = this.getSlopeSurfaceHeight(slopeElement, localX);
       if (y == null) {
-        y = rect.height;
+        y = slopeRole === "ceiling" ? 0 : rect.height;
       }
       y = Math.max(0, Math.min(rect.height, y));
       points.push(`${localX}px ${y}px`);
