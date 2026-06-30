@@ -156,6 +156,11 @@ export class CollisionDetection {
       expression = equationMatch[1];
     }
 
+    // 🐢💭
+    // This is a very basic and limited parser for simple mathematical expressions.
+    // Eventually, a proper math expression parser module should be used for more 
+    // complex expressions and better error handling. 
+    // And because it would be fun to make I think! No AI except for asking questions
     expression = expression.replace(/\s+/g, "");
     expression = expression.replace(/\^/g, "**");
     expression = expression.replace(/([A-Za-z)])(?=[A-Za-z(])/g, "$1*");
