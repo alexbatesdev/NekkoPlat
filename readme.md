@@ -76,7 +76,7 @@ Defines in‑level object types:
 - `SolidObject`: impassable geometry.
 - `TriggerArea`: runs its `onclick` when the player enters.
 - `InteractableObject` and `InteractableToggle`: elements that react to player interaction and can broadcast signals.
-- `Reciever`: shows different child elements based on received signals.
+- `Receiver`: shows different child elements based on received signals.
 - `Slope`: ramp geometry. Combine classes `object`, `solid` and `slope` and set `data-slope` to `up-right`, `up-left`, `down-right` or `down-left`.
 - `OneWaySolid`: blocks movement from one side. Use classes `object solid oneway-DIR` where `DIR` is `up`, `down`, `left` or `right`. Add `dropthrough` to an `oneway-up` element to allow falling through by holding `S` and pressing a jump key; each platform maintains its own drop timer.
 
@@ -106,7 +106,7 @@ Example toggle/receiver pair:
   <div class="on"><span class="broadcast channel-door">open</span></div>
   <div class="off"><span class="broadcast channel-door">close</span></div>
 </div>
-<div class="object reciever">
+<div class="object receiver">
   <span class="broadcast channel-door"></span>
   <div class="signal-open">Door is open</div>
   <div class="signal-close">Door is closed</div>

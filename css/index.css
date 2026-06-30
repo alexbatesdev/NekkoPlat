@@ -831,11 +831,11 @@ a {
     border-radius: 10px;
 }
 
-.reciever {
+.receiver {
     position: absolute;
 }
 
-.reciever .on {
+.receiver .on {
     position: absolute;
     top: 0;
     left: 0;
@@ -847,7 +847,7 @@ a {
     align-items: center;
 }
 
-.reciever .off {
+.receiver .off {
     position: absolute;
     top: 0;
     left: 0;
@@ -859,28 +859,28 @@ a {
     align-items: center;
 }
 
-#reciever-1 {
+#receiver-1 {
     left: 20%;
     top: 20%;
     width: 100px;
     height: 100px;
 }
 
-#reciever-2 {
+#receiver-2 {
     left: 50%;
     top: 20%;
     width: 100px;
     height: 100px;
 }
 
-#reciever-3 {
+#receiver-3 {
     left: 0;
     right: 0;
     top: 0;
     bottom: 0;
 }
 
-#reciever-4 {
+#receiver-4 {
     left: 0;
     top: 0;
     width: 100px;
