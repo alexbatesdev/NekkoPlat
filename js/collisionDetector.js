@@ -398,9 +398,10 @@ export class CollisionDetection {
       const playerBottom = playerRect.bottom;
       const verticalGap = playerBottom - surfaceY;
       const isDescending = object.velocityY >= 0;
-      const isCloseToSurface = verticalGap >= -8 && verticalGap <= 16;
+      const isCloseToSurface = verticalGap >= -8 && verticalGap <= 24;
+      const isSunkIntoSlope = verticalGap > 0 && verticalGap <= playerRect.height;
 
-      if (isDescending && isCloseToSurface) {
+      if ((isDescending && isCloseToSurface) || isSunkIntoSlope) {
         const snapOffset = surfaceY - playerBottom;
         if (Math.abs(snapOffset) > 0.001) {
           object.y += snapOffset;
