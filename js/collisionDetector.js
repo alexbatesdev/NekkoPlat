@@ -156,6 +156,11 @@ export class CollisionDetection {
       expression = equationMatch[1];
     }
 
+    // 🐢💭
+    // This is a very basic and limited parser for simple mathematical expressions.
+    // Eventually, a proper math expression parser module should be used for more 
+    // complex expressions and better error handling. 
+    // And because it would be fun to make I think! No AI except for asking questions
     expression = expression.replace(/\s+/g, "");
     expression = expression.replace(/\^/g, "**");
     expression = expression.replace(/([A-Za-z)])(?=[A-Za-z(])/g, "$1*");
@@ -225,6 +230,11 @@ export class CollisionDetection {
     return slopeRect.top + surfaceHeight;
   }
 
+  getSlopeRole(slopeElement) {
+    const role = (slopeElement.dataset.slopeRole || "floor").toLowerCase();
+    return role === "ceiling" ? "ceiling" : "floor";
+  }
+
   ensureSlopeDebugCanvas() {
     if (typeof document === "undefined") return null;
     if (this.slopeDebugCanvas) return this.slopeDebugCanvas;
@@ -250,13 +260,17 @@ export class CollisionDetection {
 
     const rect = slopeElement.getBoundingClientRect();
     const sampleCount = Math.max(4, Math.round(rect.width / 20));
-    const points = [`0 ${rect.height}px`, `${rect.width}px ${rect.height}px`];
+    const slopeRole = this.getSlopeRole(slopeElement);
+    const points =
+      slopeRole === "ceiling"
+        ? [`0 0`, `${rect.width}px 0`]
+        : [`0 ${rect.height}px`, `${rect.width}px ${rect.height}px`];
 
     for (let i = sampleCount; i >= 0; i--) {
       const localX = (rect.width * i) / sampleCount;
       let y = this.getSlopeSurfaceHeight(slopeElement, localX);
       if (y == null) {
-        y = rect.height;
+        y = slopeRole === "ceiling" ? 0 : rect.height;
       }
       y = Math.max(0, Math.min(rect.height, y));
       points.push(`${localX}px ${y}px`);
@@ -384,11 +398,14 @@ export class CollisionDetection {
 
   checkSlopeCollisions(object, collisionObjects) {
     let collisionCount = 0;
-    const playerRect = object.element.getBoundingClientRect();
 
     collisionObjects.forEach((collisionObject) => {
+      if (!collisionObject.enabled) return;
       const slopeElement = collisionObject.element;
       if (!slopeElement.classList.contains("slope")) return;
+      const slopeRole = this.getSlopeRole(slopeElement);
+
+      const playerRect = object.element.getBoundingClientRect();
       const slopeRect = slopeElement.getBoundingClientRect();
       if (!intersects(playerRect, slopeRect)) return;
 
@@ -396,12 +413,18 @@ export class CollisionDetection {
       if (surfaceY == null) return;
 
       const playerBottom = playerRect.bottom;
-      const verticalGap = playerBottom - surfaceY;
-      const isDescending = object.velocityY >= 0;
-      const isCloseToSurface = verticalGap >= -8 && verticalGap <= 24;
-      const isSunkIntoSlope = verticalGap > 0 && verticalGap <= playerRect.height;
+      const playerTop = playerRect.top;
 
-      if ((isDescending && isCloseToSurface) || isSunkIntoSlope) {
+      // Floor collision (player on top of slope)
+      const floorGap = playerBottom - surfaceY;
+      const isDescending = object.velocityY >= 0;
+      const isCloseToFloor = floorGap >= -8 && floorGap <= 24;
+      const isSunkIntoSlope = floorGap > 0 && floorGap <= playerRect.height;
+
+      if (
+        slopeRole === "floor" &&
+        ((isDescending && isCloseToFloor) || isSunkIntoSlope)
+      ) {
         const snapOffset = surfaceY - playerBottom;
         if (Math.abs(snapOffset) > 0.001) {
           object.y += snapOffset;
@@ -409,6 +432,28 @@ export class CollisionDetection {
           this.state.bottom = Math.max(0, -snapOffset);
           object.updateTransform?.();
           collisionCount++;
+          return;
+        }
+      }
+
+      // Ceiling collision (player hitting slope from below)
+      const ceilingGap = surfaceY - playerTop;
+      const isAscending = object.velocityY < 0;
+      const isSunkIntoCeiling = ceilingGap > 0 && ceilingGap <= playerRect.height;
+
+      if (
+        slopeRole === "ceiling" &&
+        isAscending &&
+        isSunkIntoCeiling
+      ) {
+        const snapOffset = surfaceY - playerTop;
+        if (Math.abs(snapOffset) > 0.001) {
+          object.y += snapOffset;
+          object.velocityY = 0;
+          this.state.top = Math.max(0, snapOffset);
+          object.updateTransform?.();
+          collisionCount++;
+          return;
         }
       }
     });
@@ -428,6 +473,12 @@ export class CollisionDetection {
       const el = collisionObject.element;
       if (!(el.classList.contains("solid") || el.classList.contains("slope")))
         return false;
+      if (
+        el.classList.contains("slope") &&
+        this.getSlopeRole(el) === "ceiling"
+      ) {
+        return false;
+      }
       const hit = intersects(probeRect, el.getBoundingClientRect());
       if (hit) groundedObj = collisionObject;
       return hit;
