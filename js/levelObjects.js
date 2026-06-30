@@ -350,7 +350,9 @@ export class ItemPickup extends LevelObject {
 
     this.element.remove();
     if (this.element.classList.contains("instant-use")) {
-      this.inventoryItemPromise.then((item) => item.triggerOnClick());
+      this.inventoryItemPromise.then((item) =>
+        gameInstance.player.inventory.executeItem(item),
+      );
       return;
     }
     this.inventoryItemPromise.then((item) => {

@@ -34,7 +34,7 @@ export class InventoryItem {
    * Trigger onclick handler
    * @param {Event} event - optional event to pass to handler
    */
-  triggerOnClick(event) {
+  triggerOnClick(event, helpers = {}) {
     if (!this.onclick) {
       console.warn(`No onclick function body found for item: ${this.name}`);
       return;
@@ -49,11 +49,33 @@ export class InventoryItem {
       return;
     }
 
+    const helperKeys = Object.keys(helpers);
+    const previousValues = new Map();
+
     try {
+      // Inject helpers directly on the item so onclick scripts can both:
+      // 1) call helper methods like this.consume()
+      // 2) mutate the live item instance (e.g. this.description = "...")
+      helperKeys.forEach((key) => {
+        if (Object.prototype.hasOwnProperty.call(this, key)) {
+          previousValues.set(key, this[key]);
+        }
+        this[key] = helpers[key];
+      });
+
       const func = new Function("event", body);
       func.call(this, event);
     } catch (error) {
       console.error(`Error executing onclick for item ${this.name}:`, error);
+    } finally {
+      // Restore or remove injected helpers so they do not permanently pollute item state.
+      helperKeys.forEach((key) => {
+        if (previousValues.has(key)) {
+          this[key] = previousValues.get(key);
+        } else {
+          delete this[key];
+        }
+      });
     }
   }
 }

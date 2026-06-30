@@ -18,6 +18,7 @@ export class InventoryService {
   constructor(storageKey = "itemsList") {
     this.storageKey = storageKey;
     this.store = new InventoryStore();
+    this.helperProviders = [];
     this.syncFromStorage();
   }
 
@@ -255,13 +256,64 @@ export class InventoryService {
    * @param {Object} updates
    */
   modifyItem(name, updates) {
-    const item = this.store.getItem(name);
+    let item = this.store.getItem(name);
     if (!item) return;
 
     Object.assign(item, updates);
     item = this._serializeElements(item);
     this.store._updateItem(name, item);
     this.syncToStorage();
+  }
+
+  /**
+   * Execute an item action by item name.
+   * Supplies helper methods (e.g. this.consume()) to onclick scripts.
+   * @param {string} name
+   * @param {Event} event
+   * @returns {boolean}
+   */
+  useItemByName(name, event) {
+    const item = this.getItem(name);
+    if (!item || item.count <= 0) return false;
+    this.executeItem(item, event);
+    return true;
+  }
+
+  /**
+   * Execute an item action for an item instance.
+   * Useful for instant-use world pickups.
+   * @param {InventoryItem} item
+   * @param {Event} event
+   */
+  executeItem(item, event) {
+    if (!item || typeof item.triggerOnClick !== "function") return;
+    const previousName = item.name;
+    const helpers = this._buildActionHelpers(item, event);
+    item.triggerOnClick(event, helpers);
+
+    // Persist and broadcast any live mutations performed by item scripts.
+    // Use the pre-action name as a stable lookup key in case the action renamed the item.
+    this.store._updateItem(previousName, item);
+    this._rebuildPickupIDs();
+    this.syncToStorage();
+  }
+
+  /**
+   * Register a provider that contributes helper methods for item onclick handlers.
+   * Provider signature: ({ service, item, event }) => ({ helperName: fn, ... })
+   * @param {Function} provider
+   * @returns {Function} unregister callback
+   */
+  registerHelperProvider(provider) {
+    if (typeof provider !== "function") {
+      return () => {};
+    }
+
+    this.helperProviders.push(provider);
+
+    return () => {
+      this.helperProviders = this.helperProviders.filter((p) => p !== provider);
+    };
   }
 
   /**
@@ -285,5 +337,35 @@ export class InventoryService {
       }
     });
     this.store._setPickupIDs([...new Set(pickupIDs)]);
+  }
+
+  /**
+   * Build helper methods that item onclick handlers can use via `this`.
+   * @private
+   */
+  _buildActionHelpers(item, event) {
+    const baseHelpers = {
+      consume: (count = 1) => this.removeItemByName(item.name, count),
+      hasItem: (name) => this.hasItem(name),
+      addItem: (newItem) => this.addItem(newItem),
+      getItem: (name) => this.getItem(name),
+    };
+
+    const externalHelpers = {};
+    this.helperProviders.forEach((provider) => {
+      try {
+        const provided = provider({ service: this, item, event });
+        if (provided && typeof provided === "object") {
+          Object.assign(externalHelpers, provided);
+        }
+      } catch (error) {
+        console.warn("Inventory helper provider failed:", error);
+      }
+    });
+
+    return {
+      ...baseHelpers,
+      ...externalHelpers,
+    };
   }
 }

@@ -116,23 +116,38 @@ export class HUDAdapter {
     const item = this.inventoryService.getItem(itemName);
 
     elements.forEach((element) => {
-      const iconElements = element.querySelectorAll("[class*='-icon']");
-      iconElements.forEach((iconEl) => {
+      const iconElements = [];
+
+      // Support both patterns:
+      // 1) element itself is the icon container (e.g. class includes -icon)
+      // 2) nested child icon container(s)
+      if (element.classList.toString().includes("-icon")) {
+        iconElements.push(element);
+      }
+
+      const nestedIcons = element.querySelectorAll("[class*='-icon']");
+      nestedIcons.forEach((nested) => iconElements.push(nested));
+
+      // De-duplicate if element itself also matches nested query
+      const uniqueIconElements = [...new Set(iconElements)];
+
+      uniqueIconElements.forEach((iconEl) => {
         if (item && item.iconElement) {
           iconEl.innerHTML = item.iconElement;
-        } else {
-          // Load from fragment
-          loadInventoryItemFragment(itemName).then(({ iconElement }) => {
-            if (iconElement) {
-              const clone = iconElement.cloneNode(true);
-              iconEl.innerHTML = "";
-              iconEl.appendChild(clone);
-            } else {
-              iconEl.innerHTML = "?";
-            }
-          });
-          iconEl.innerHTML = "";
+          return;
         }
+
+        // Load from fragment when not owned yet
+        loadInventoryItemFragment(itemName).then(({ iconElement }) => {
+          if (iconElement) {
+            const clone = iconElement.cloneNode(true);
+            iconEl.innerHTML = "";
+            iconEl.appendChild(clone);
+          } else {
+            iconEl.innerHTML = "?";
+          }
+        });
+        iconEl.innerHTML = "";
       });
     });
   }

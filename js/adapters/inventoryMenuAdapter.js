@@ -119,18 +119,18 @@ export class InventoryMenuAdapter {
     const inspectButton = itemElement.querySelector(".inspect-button");
 
     if (useButton) {
-      useButton.onclick = () => {
+      useButton.onclick = (event) => {
         if (item.count > 0) {
-          item.triggerOnClick();
+          this.inventoryService.useItemByName(item.name, event);
         } else {
           alert("You don't have any of this item to use.");
         }
       };
     } else {
       // If no use button, attach to entire element
-      itemElement.onclick = () => {
+      itemElement.onclick = (event) => {
         if (item.count > 0) {
-          item.triggerOnClick();
+          this.inventoryService.useItemByName(item.name, event);
         } else {
           alert("You don't have any of this item to use.");
         }
