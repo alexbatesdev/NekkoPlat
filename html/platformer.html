@@ -145,17 +145,28 @@
                 <div class="object solid moving-platform moving-platform-y oneway-up dropthrough" id="moving-platform-1" style="width:100px;height:20px;top:350px;left:20vw;background-color: yellow;"></div>
                 <div class="object solid moving-platform moving-platform-x oneway-up dropthrough" id="moving-platform-2" style="width:100px;height:20px;top:75vh;left:20vw;background-color: yellow;"></div>
 
+                <div
+                    class="object solid"
+                    style="position: absolute;top: 43%;left: 63%;width: 200px;height: 20px;background-color: red;"
+                ></div>
                 <!-- Example ceiling/overhang slope: jump into this from below to test head bonk collisions. -->
                 <div
                     class="object solid slope"
                     id="ceiling-slope-example"
                     data-slope-clip="true"
                     data-slope-role="ceiling"
-                    data-slope-equation="y=-0.5*x+80"
-                    style="position:absolute;top:250px;left:760px;width:200px;height:120px;background-color:#3d4e6d;"
+                    data-slope-equation="y=0.4*x"
+                    style="position:absolute;top:46%;left:63%;width:200px;height:80px;background-color:#3d4e6d;"
                 ></div>
             </div>
             <div class="screen">
+                <div
+                    class="object solid slope"
+                    id="ceiling-slope-example-2"
+                    data-slope-clip="true"
+                    data-slope-equation="y=0.4*x"
+                    style="position:absolute;top:calc(75% - 80px);left:13.5%;width:200px;height:80px;background-color:#3d4e6d;"
+                ></div>
                 <div class="object solid floor" id="floor-2"></div>
                 <img src="../img/blj.gif" alt="Mario Backwards Long Jumping" id="img-1">
                 <img src="../img/amogus.gif" alt="amogus club penguin dencing" id="img-2">
