@@ -1,5 +1,5 @@
 import gameInstance from "./game.js";
-import { LevelObject, Receiver } from "./levelObjects.js";
+import { Receiver } from "./levelObjects.js";
 
 export default class Camera {
     constructor(player = null, keyState = null, debugProvider = () => false) {
