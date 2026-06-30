@@ -261,7 +261,7 @@ export class InventoryItem {
     // stackable, permanent (for things we want to track even at 0 count like money/keys)
   }
 
-  triggerOnClick() {
+  triggerOnClick(event) {
     // This should be hardened. Bad innerHTML can cause weird behavior.
     // I'd rather fail loudly than have weird behavior
     const body = this.onclick
@@ -276,8 +276,8 @@ export class InventoryItem {
       console.warn(`No onclick function body found for item: ${this.name}`);
       return;
     }
-    const func = new Function(body);
-    func.call(this);
+    const func = new Function("event", body);
+    func.call(this, event);
   }
 
   consume(count = 1) {
