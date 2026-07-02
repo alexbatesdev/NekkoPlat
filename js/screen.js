@@ -96,5 +96,3 @@ export default class Screen {
         });
     }
 }
-
-// JavaScript code written by an AI assistant
