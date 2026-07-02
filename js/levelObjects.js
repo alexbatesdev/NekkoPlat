@@ -2,6 +2,10 @@ import gameInstance from "./game.js";
 import { debugLog, loadInventoryItemFragment } from "./tools.js";
 import ToggleManager, { MultiStateManager } from "./elementStateManagers.js";
 import { InventoryItem } from "./services/inventoryItem.js";
+import {
+  executeOnclickWithContext,
+  getOnclickHandlerFromElement,
+} from "./onclickExecutor.js";
 
 export class LevelObject {
   constructor(element) {
@@ -17,6 +21,57 @@ export class LevelObject {
     if (this.element.classList.contains("plax")) {
       this.calculateParallax();
     }
+  }
+
+  getOnclickHelpers(event) {
+    return {
+      self: this,
+      element: this.element,
+      game: gameInstance,
+      player: gameInstance.player,
+      level: gameInstance.level,
+      camera: gameInstance.camera,
+      window,
+      document,
+      globalThis,
+      location,
+      enable: () => {
+        this.enabled = true;
+        this.element.classList.remove("disabled");
+      },
+      disable: () => {
+        this.enabled = false;
+        this.element.classList.add("disabled");
+      },
+      hasClass: (className, target = this.element) =>
+        target?.classList?.contains(className) ?? false,
+      addClass: (className, target = this.element) =>
+        target?.classList?.add(className),
+      removeClass: (className, target = this.element) =>
+        target?.classList?.remove(className),
+      toggleClass: (className, force, target = this.element) =>
+        target?.classList?.toggle(className, force),
+      broadcastSignal: (channel, signal) =>
+        gameInstance.signalManager.broadcastSignal(channel, signal),
+      log: (...args) => debugLog(...args),
+      event,
+    };
+  }
+
+  executeElementOnclick(element = this.element, event, helpers = {}) {
+    const onclick = getOnclickHandlerFromElement(element);
+    if (!onclick) return false;
+
+    return executeOnclickWithContext({
+      onclick,
+      event,
+      thisArg: this,
+      helpers: {
+        ...this.getOnclickHelpers(event),
+        ...helpers,
+      },
+      errorLabel: `onclick for level object ${element?.id || element?.className || "unknown"}`,
+    });
   }
 
   calculateParallax() {
@@ -198,7 +253,19 @@ export class TriggerArea extends LevelObject {
     }
   }
 
-  trigger() {
+  getOnclickHelpers(event) {
+    return {
+      ...super.getOnclickHelpers(event),
+      triggerArea: this,
+      trigger: (nextEvent = event) => this.trigger(nextEvent),
+      disableOnce: () => {
+        this.enabled = false;
+        this.element.classList.add("disabled");
+      },
+    };
+  }
+
+  trigger(event) {
     if (!this.enabled) return;
     if (this.element.classList.contains("once")) {
       this.enabled = false;
@@ -209,7 +276,9 @@ export class TriggerArea extends LevelObject {
     // want a configurable cooldown to prevent it from triggering
     // multiple times in one frame
     debugLog("Triggered");
-    this.element.click();
+    this.executeElementOnclick(this.element, event, {
+      triggerEvent: event,
+    });
   }
 
   reinitStyles() {
@@ -226,8 +295,8 @@ export class InteractableObject extends LevelObject {
   constructor(element) {
     super(element);
     if (this.element.classList.contains("clickable")) {
-      this.element.addEventListener("pointerup", () => {
-        this.interact();
+      this.element.addEventListener("pointerup", (event) => {
+        this.interact(event);
       });
       this.element.style.cursor = "pointer";
     } else {
@@ -235,11 +304,24 @@ export class InteractableObject extends LevelObject {
     }
   }
 
-  interact() {
+  getOnclickHelpers(event) {
+    return {
+      ...super.getOnclickHelpers(event),
+      interactable: this,
+      interact: (nextEvent = event) => this.interact(nextEvent),
+      setEnabled: (enabled) => {
+        this.enabled = Boolean(enabled);
+      },
+    };
+  }
+
+  interact(event) {
     if (!this.enabled) return;
     debugLog("Interacted");
     debugLog(this.element);
-    this.element.click();
+    this.executeElementOnclick(this.element, event, {
+      interactEvent: event,
+    });
   }
 
   update() {
@@ -257,9 +339,19 @@ export class InteractableToggle extends InteractableObject {
     this.stateManager = new ToggleManager(element);
   }
 
-  interact() {
+  getOnclickHelpers(event) {
+    return {
+      ...super.getOnclickHelpers(event),
+      toggle: () => this.stateManager.toggle(event),
+      setOn: () => this.stateManager.setToggledOn(false, event),
+      setOff: () => this.stateManager.setToggledOff(false, event),
+      getToggleState: () => this.stateManager.getState(),
+    };
+  }
+
+  interact(event) {
     if (!this.enabled) return;
-    this.stateManager.toggle();
+    this.stateManager.toggle(event);
   }
 }
 
@@ -309,13 +401,13 @@ export class ItemPickup extends LevelObject {
       return item;
     });
 
-    let onClick = this.element.onclick;
+    this.originalOnClick = this.element.onclick;
     // This onclick is the trigger for the item pickup
     // This lets it mix with other interactables, triggers, etc.
     // without breaking them
     this.element.onclick = (event) => {
-      onClick?.(event);
-      this.pickup();
+      this.runOriginalOnClick(event);
+      this.pickup(event, { runOriginalOnClick: false });
     };
 
     // Since the onclick is used for picking up the item,
@@ -343,15 +435,51 @@ export class ItemPickup extends LevelObject {
     }
   }
 
-  pickup() {
+  getOnclickHelpers(event) {
+    return {
+      ...super.getOnclickHelpers(event),
+      pickup: this,
+      pickupNow: (nextEvent = event) => this.pickup(nextEvent),
+      addToInventory: () =>
+        this.inventoryItemPromise.then((item) =>
+          gameInstance.player.inventory.addItem(item),
+        ),
+      executeInstantUse: () =>
+        this.inventoryItemPromise.then((item) =>
+          gameInstance.player.inventory.executeItem(item, event),
+        ),
+      hideSelf: () => {
+        this.enabled = false;
+        this.element.style.opacity = "0";
+      },
+    };
+  }
+
+  runOriginalOnClick(event) {
+    if (!this.originalOnClick) return false;
+
+    return executeOnclickWithContext({
+      onclick: this.originalOnClick,
+      event,
+      thisArg: this,
+      helpers: this.getOnclickHelpers(event),
+      errorLabel: `onclick for pickup ${this.element.id || this.element.className}`,
+    });
+  }
+
+  pickup(event, options = {}) {
+    const { runOriginalOnClick = true } = options;
     if (!this.enabled) return;
     this.enabled = false;
-    this.element.click();
+
+    if (runOriginalOnClick) {
+      this.runOriginalOnClick(event);
+    }
 
     this.element.remove();
     if (this.element.classList.contains("instant-use")) {
       this.inventoryItemPromise.then((item) =>
-        gameInstance.player.inventory.executeItem(item),
+        gameInstance.player.inventory.executeItem(item, event),
       );
       return;
     }

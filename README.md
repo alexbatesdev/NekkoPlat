@@ -214,6 +214,60 @@ Built-in helpers available in item onclick scripts:
 
 Note: helper methods are injected for the duration of action execution and then removed, while direct item mutations (for example `this.description = "..."`) persist.
 
+## Onclick Context Runtime
+
+NekkoPlat now routes dynamic onclick execution through a shared runtime in `js/onclickExecutor.js`.
+
+What this gives you:
+- Full browser-global access inside onclick scripts (`window`, `document`, `globalThis`, `location`, etc.).
+- A helper-rich `this` context based on the object type that triggered the onclick.
+- Temporary helper injection: helpers are attached only while the onclick runs, then restored/removed.
+
+Why helper restore exists:
+- Prevents temporary helpers from leaking into persistent object state.
+- Prevents accidental long-term property collisions after a click.
+- Keeps object mutations explicit: only properties your script intentionally sets on the object remain.
+
+
+### Authoring Onclick Scripts
+
+Use regular inline onclick scripts in your HTML fragments and level markup.
+
+Example: trigger that disables itself after broadcasting a signal
+
+```html
+<div class="object trigger" onclick="{
+  this.broadcastSignal('door', 'open');
+  this.disableOnce();
+}"></div>
+```
+
+Example: interactable door navigation (still works with globals)
+
+```html
+<div class="door object interactable" onclick="window.location.href='./hub.html'"></div>
+```
+
+Example: inventory item onclick from item fragment
+
+```html
+<div onclick="{
+  if (this.hasItem('key')) {
+    this.consume(1);
+    this.description = 'Used key';
+  }
+}">
+  ...
+</div>
+```
+
+### Practical Rules
+
+- Prefer helper methods for game actions (`this.broadcastSignal`, `this.consume`, `this.setOn`, etc.).
+- Keep using browser globals when needed (`window.location`, `document.querySelector`, timers, fetch).
+- If a helper name overlaps an existing property, the original value is restored after onclick returns.
+- If you intentionally mutate object state (for example `this.description = ...` on inventory items), that mutation persists.
+
 ## Dependencies
 The engine uses no external build tools or packages and runs entirely in the browser. A modern browser with ES module support is required.
 

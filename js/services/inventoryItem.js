@@ -3,6 +3,8 @@
  * Data class representing a single inventory item.
  * No direct inventory reference; consumed via service.
  */
+import { executeOnclickWithContext } from "../onclickExecutor.js";
+
 export class InventoryItem {
   constructor(
     name,
@@ -39,43 +41,12 @@ export class InventoryItem {
       console.warn(`No onclick function body found for item: ${this.name}`);
       return;
     }
-
-    const body = this.onclick
-      .substring(this.onclick.indexOf("{") + 1, this.onclick.lastIndexOf("}"))
-      .trim();
-
-    if (!body) {
-      console.warn(`No onclick function body found for item: ${this.name}`);
-      return;
-    }
-
-    const helperKeys = Object.keys(helpers);
-    const previousValues = new Map();
-
-    try {
-      // Inject helpers directly on the item so onclick scripts can both:
-      // 1) call helper methods like this.consume()
-      // 2) mutate the live item instance (e.g. this.description = "...")
-      helperKeys.forEach((key) => {
-        if (Object.prototype.hasOwnProperty.call(this, key)) {
-          previousValues.set(key, this[key]);
-        }
-        this[key] = helpers[key];
-      });
-
-      const func = new Function("event", body);
-      func.call(this, event);
-    } catch (error) {
-      console.error(`Error executing onclick for item ${this.name}:`, error);
-    } finally {
-      // Restore or remove injected helpers so they do not permanently pollute item state.
-      helperKeys.forEach((key) => {
-        if (previousValues.has(key)) {
-          this[key] = previousValues.get(key);
-        } else {
-          delete this[key];
-        }
-      });
-    }
+    executeOnclickWithContext({
+      onclick: this.onclick,
+      event,
+      thisArg: this,
+      helpers,
+      errorLabel: `onclick for item ${this.name}`,
+    });
   }
 }
