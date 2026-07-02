@@ -527,7 +527,7 @@ export class CollisionDetection {
         object.x -= playerRect.left - levelRect.left;
         object.updateTransform?.();
       } else if (outOfBoundEffect.left == "respawn") {
-        this.respawnAtCheckpoint();
+        object.respawnAtCheckpoint?.();
       } else if (outOfBoundEffect.left == "wrap") {
         object.x = levelRect.width - playerRect.width * 1.25;
         gameInstance.camera.snapToPlayer();
@@ -539,7 +539,7 @@ export class CollisionDetection {
         object.x -= playerRect.right - levelRect.right;
         object.updateTransform?.();
       } else if (outOfBoundEffect.right == "respawn") {
-        this.respawnAtCheckpoint();
+        object.respawnAtCheckpoint?.();
       } else if (outOfBoundEffect.right == "wrap") {
         object.x = 0 + playerRect.width / 4;
         gameInstance.camera.snapToPlayer();
@@ -552,7 +552,7 @@ export class CollisionDetection {
         object.y -= playerRect.top - levelRect.top;
         object.updateTransform?.();
       } else if (outOfBoundEffect.top == "respawn") {
-        this.respawnAtCheckpoint();
+        object.respawnAtCheckpoint?.();
       } else if (outOfBoundEffect.top == "wrap") {
         object.y = levelRect.height - (playerRect.height + 1);
         gameInstance.camera.snapToPlayer();
@@ -564,7 +564,7 @@ export class CollisionDetection {
         object.y -= playerRect.height - (levelRect.bottom - playerRect.top);
         object.updateTransform?.();
       } else if (outOfBoundEffect.bottom == "respawn") {
-        this.respawnAtCheckpoint();
+        object.respawnAtCheckpoint?.();
       } else if (outOfBoundEffect.bottom == "wrap") {
         object.y = 0;
         gameInstance.camera.snapToPlayer();

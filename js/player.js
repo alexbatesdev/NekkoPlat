@@ -148,6 +148,7 @@ export default class Player {
                     const spawnY = targetRect.top - screenRect.top + targetRect.height / 2;
                     debugLog(`Spawning player at target #${spawnTargetId}`);
                     this.spawnAt(spawnX, spawnY, screenElement);
+                    this.setCheckpoint(spawnX, spawnY, screenElement);
                     return;
                 }
             }
@@ -203,6 +204,7 @@ export default class Player {
         debugLog(`Spawning player at (${xValue}, ${yValue}) relative to screen`);
         this.x = xValue - (width / 2);
         this.y = yValue - (height / 2);
+        this.setCheckpoint(xValue, yValue, this.respawnScreen);
         this.updateTransform();
     }
 
