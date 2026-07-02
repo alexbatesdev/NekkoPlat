@@ -73,6 +73,7 @@ export default class ToggleManager {
             setOff: (nextEvent = event) => this.setToggledOff(false, nextEvent),
             getState: () => this.getState(),
             broadcastSignal: (channel, signal) => gameInstance.signalManager.broadcastSignal(channel, signal),
+            navigate: (url) => { window.location.href = url; },
             event,
             ...additionalHelpers,
         };

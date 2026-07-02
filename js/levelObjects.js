@@ -53,6 +53,9 @@ export class LevelObject {
         target?.classList?.toggle(className, force),
       broadcastSignal: (channel, signal) =>
         gameInstance.signalManager.broadcastSignal(channel, signal),
+      navigate: (url) => {
+        window.location.href = url;
+      },
       log: (...args) => debugLog(...args),
       event,
     };
