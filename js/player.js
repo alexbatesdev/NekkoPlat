@@ -1,5 +1,6 @@
 import gameInstance from "./game.js";
 import { anyTrue, debugLog } from "./tools.js";
+import { getHashTarget } from "./urlParams.js";
 import GifAnimationManager from "./gifAnimationManager.js";
 import { Physics } from "./physics.js";
 import { CollisionDetection } from "./collisionDetector.js";
@@ -133,10 +134,28 @@ export default class Player {
     }
 
     spawn() {
-        const spawn_x_query_param = new URLSearchParams(window.location.search).get('spawn_x');
-        const spawn_y_query_param = new URLSearchParams(window.location.search).get('spawn_y');
-        const playerSpawnXRelativeToScreen = spawn_x_query_param ? spawn_x_query_param : getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-x');
-        const playerSpawnYRelativeToScreen = spawn_y_query_param ? spawn_y_query_param : getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-y');
+        // Preferred syntax: URL fragment target, e.g. ./grassland.html#door-1
+        const spawnTargetId = getHashTarget();
+        if (spawnTargetId) {
+            const spawnTargetElement = document.getElementById(spawnTargetId);
+            if (spawnTargetElement) {
+                const screenElement = spawnTargetElement.closest('.screen');
+                if (screenElement) {
+                    this.respawnScreen = screenElement;
+                    const targetRect = spawnTargetElement.getBoundingClientRect();
+                    const screenRect = screenElement.getBoundingClientRect();
+                    const spawnX = targetRect.left - screenRect.left + targetRect.width / 2;
+                    const spawnY = targetRect.top - screenRect.top + targetRect.height / 2;
+                    debugLog(`Spawning player at target #${spawnTargetId}`);
+                    this.spawnAt(spawnX, spawnY, screenElement);
+                    return;
+                }
+            }
+            debugLog(`Spawn target #${spawnTargetId} not found, falling back to default spawn`);
+        }
+
+        const playerSpawnXRelativeToScreen = getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-x');
+        const playerSpawnYRelativeToScreen = getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-y');
         const screenRect = this.respawnScreen.getBoundingClientRect();
         const width = this.element.getBoundingClientRect().width;
         const height = this.element.getBoundingClientRect().height;
