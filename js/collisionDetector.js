@@ -9,6 +9,12 @@ export class CollisionDetection {
       top: 0,
       bottom: 0,
     };
+    this.trackedObjects = {
+      allTrackedObjects: [],
+      solidObjects: [],
+      triggerObjects: [],
+      slopeObjects: [],
+    };
     this.slopeDebugCanvas = null;
     this.slopeDebugContext = null;
     this.slopeDebugFramePending = false;
@@ -16,21 +22,51 @@ export class CollisionDetection {
     this.slopeDebugLastBounds = null;
   }
 
+  getTrackedObjects(collisionObjects) {
+    const trackedObjects = {
+      allTrackedObjects: [],
+      solidObjects: [],
+      triggerObjects: [],
+      slopeObjects: [],
+    };
+
+    collisionObjects.forEach((collisionObject) => {
+      const el = collisionObject?.element;
+      if (!el) return;
+
+      trackedObjects.allTrackedObjects.push(collisionObject);
+
+      const isTrigger = el.classList.contains("trigger");
+      const isSlope = el.classList.contains("slope");
+      const isSolid = el.classList.contains("solid");
+
+      if (isTrigger) trackedObjects.triggerObjects.push(collisionObject);
+      if (isSlope) trackedObjects.slopeObjects.push(collisionObject);
+      if (isSolid && !isSlope && !isTrigger) {
+        trackedObjects.solidObjects.push(collisionObject);
+      }
+    });
+
+    this.trackedObjects = trackedObjects;
+    return trackedObjects;
+  }
+
   applyCollisions(object, collisionObjects) {
     this.checkOutOfBounds(object);
     object.updateTransform?.();
-    this.checkTriggerCollisions(object, collisionObjects);
+    const trackedObjects = this.getTrackedObjects(collisionObjects);
+    this.checkTriggerCollisions(object, trackedObjects.triggerObjects);
     let horizontal_collision_count = this.checkHorizontalCollisions(
       object,
-      collisionObjects
+      trackedObjects.solidObjects
     );
     let vertical_collision_count = this.checkVerticalCollisions(
       object,
-      collisionObjects
+      trackedObjects.solidObjects
     );
     let slope_collision_count = this.checkSlopeCollisions(
       object,
-      collisionObjects
+      trackedObjects.slopeObjects
     );
     if (horizontal_collision_count <= 0) {
       this.state = {
@@ -61,21 +97,16 @@ export class CollisionDetection {
       };
     }
 
-    this.queueSlopeDebugDraw(object, collisionObjects);
+    this.queueSlopeDebugDraw(object, trackedObjects.slopeObjects);
   }
 
-  checkTriggerCollisions(object, collisionObjects) {
+  checkTriggerCollisions(object, triggerObjects) {
     const playerRect = object.element.getBoundingClientRect();
-    // TODO: 🐢
-    // If we can filter to just trigger objects without unnecessary iterations,
-    // that could be a performance boost, especially for levels with many objects.
-    // Not sure how we'd do that tho, it's not like it'd be a sql query like at work
-    collisionObjects.forEach((collisionObject) => {
+    triggerObjects.forEach((collisionObject) => {
+      if (!collisionObject.enabled) return;
       const collisionRect = collisionObject.element.getBoundingClientRect();
       if (intersects(playerRect, collisionRect)) {
-        if (collisionObject.element.classList.contains("trigger")) {
-          collisionObject.trigger();
-        }
+        collisionObject.trigger();
       }
     });
   }
@@ -85,8 +116,6 @@ export class CollisionDetection {
     collisionObjects.forEach((collisionObject) => {
       if (!collisionObject.enabled) return;
       const el = collisionObject.element;
-      if (el.classList.contains("trigger")) return;
-      if (el.classList.contains("slope")) return;
       const playerRect = object.element.getBoundingClientRect();
       const collisionRect = el.getBoundingClientRect();
       if (intersects(playerRect, collisionRect)) {
@@ -119,8 +148,6 @@ export class CollisionDetection {
     collisionObjects.forEach((collisionObject) => {
       if (!collisionObject.enabled) return;
       const el = collisionObject.element;
-      if (el.classList.contains("trigger")) return;
-      if (el.classList.contains("slope")) return;
       const playerRect = object.element.getBoundingClientRect();
       const collisionRect = el.getBoundingClientRect();
       if (intersects(playerRect, collisionRect)) {
@@ -285,12 +312,10 @@ export class CollisionDetection {
     slopeElement.style.webkitClipPath = clipPath;
   }
 
-  queueSlopeDebugDraw(object, collisionObjects) {
-    collisionObjects.forEach((entry) => {
+  queueSlopeDebugDraw(object, slopeObjects) {
+    slopeObjects.forEach((entry) => {
       const el = entry.element;
-      if (el?.classList?.contains("slope")) {
-        this.updateSlopeClipPath(el);
-      }
+      this.updateSlopeClipPath(el);
     });
 
     if (!gameInstance.debug) {
@@ -308,7 +333,7 @@ export class CollisionDetection {
       playerLeft: playerRect?.left ?? 0,
       playerTop: playerRect?.top ?? 0,
       playerWidth: playerRect?.width ?? 0,
-      collisionCount: collisionObjects.filter((entry) => entry.element?.classList?.contains("slope")).length,
+      collisionCount: slopeObjects.length,
       width: window.innerWidth,
       height: window.innerHeight,
       dpr: window.devicePixelRatio || 1,
@@ -331,11 +356,11 @@ export class CollisionDetection {
     this.slopeDebugFramePending = true;
     window.requestAnimationFrame(() => {
       this.slopeDebugFramePending = false;
-      this.drawSlopeDebugLines(object, collisionObjects);
+      this.drawSlopeDebugLines(object, slopeObjects);
     });
   }
 
-  drawSlopeDebugLines(object, collisionObjects) {
+  drawSlopeDebugLines(object, slopeObjects) {
     const canvas = this.slopeDebugCanvas;
     const ctx = this.slopeDebugContext;
     if (!gameInstance.debug || !canvas || !ctx) {
@@ -360,9 +385,8 @@ export class CollisionDetection {
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
 
-    collisionObjects.forEach((collisionObject) => {
+    slopeObjects.forEach((collisionObject) => {
       const el = collisionObject.element;
-      if (!el.classList.contains("slope")) return;
       const rect = el.getBoundingClientRect();
       const sampleCount = Math.max(20, Math.round(rect.width / 8));
       ctx.beginPath();
@@ -400,13 +424,12 @@ export class CollisionDetection {
     });
   }
 
-  checkSlopeCollisions(object, collisionObjects) {
+  checkSlopeCollisions(object, slopeObjects) {
     let collisionCount = 0;
 
-    collisionObjects.forEach((collisionObject) => {
+    slopeObjects.forEach((collisionObject) => {
       if (!collisionObject.enabled) return;
       const slopeElement = collisionObject.element;
-      if (!slopeElement.classList.contains("slope")) return;
       const slopeRole = this.getSlopeRole(slopeElement);
 
       const playerRect = object.element.getBoundingClientRect();
@@ -465,6 +488,11 @@ export class CollisionDetection {
   }
 
   isGrounded(object, collisionObjects) {
+    const trackedObjects = this.getTrackedObjects(collisionObjects);
+    const groundProbeObjects = [
+      ...trackedObjects.solidObjects,
+      ...trackedObjects.slopeObjects,
+    ];
     const playerRect = object.element.getBoundingClientRect();
     const probeRect = {
       left: playerRect.left,
@@ -473,10 +501,8 @@ export class CollisionDetection {
       bottom: playerRect.bottom + 1,
     };
     let groundedObj = null;
-    const grounded = collisionObjects.some((collisionObject) => {
+    const grounded = groundProbeObjects.some((collisionObject) => {
       const el = collisionObject.element;
-      if (!(el.classList.contains("solid") || el.classList.contains("slope")))
-        return false;
       if (
         el.classList.contains("slope") &&
         this.getSlopeRole(el) === "ceiling"
