@@ -282,5 +282,12 @@ The engine uses no external build tools or packages and runs entirely in the bro
 - `platformer.js` currently initializes `Level` with the hardcoded id `level-one`.
 - APIs are unstable and subject to change as the project evolves.
 
+## TODO Notes (7/1/2026)
+- `js/camera.js`: replace the current `followPlayer` boolean approach with a camera mode system (follow player, pinned/manual coordinates, follow another element).
+- `js/collisionDetector.js`: optimize trigger collision checks by avoiding full-list scans when only trigger objects need to be evaluated.
+- `js/levelObjects.js`: add a configurable cooldown for `TriggerArea` so repeatable triggers do not fire multiple times in one frame.
+- `js/gifAnimationManager.js`: add a sprite-sheet animation manager as an alternative to GIF-only animation switching.
+- `README.md` (`interactionBox.js` idea note): interaction currently triggers all interactables in range; proposed improvement is single-target interaction with cycling and focused indicator display.
+
 ## License
 No license information is provided.
