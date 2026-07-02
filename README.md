@@ -25,7 +25,7 @@ A browser-based platformer engine built with plain JavaScript, HTML and CSS. Lev
 </div>
 ```
 
-3. Open the page in a modern browser. Use `WASD` to move, `Shift` to sprint, `Space/W` to jump and `E` to interact. `ESC` pauses the game and `3` toggles debug mode.
+3. Open the page in a modern browser. Use `WASD` to move, `Shift` to sprint, `Space/W` to jump and `E` to interact. `R` respawns at the current checkpoint. `ESC` pauses the game, `3` toggles debug mode, and arrow keys adjust camera framing.
 
 ## Configuration
 
@@ -49,6 +49,7 @@ A browser-based platformer engine built with plain JavaScript, HTML and CSS. Lev
 ```
 
 * Grid dimensions are defined on the `.level` element via a `grid-colsxrows` class.
+* Add `dynamic` or `initial` on `.level` to control how `--screen-width`/`--screen-height` are initialized (`dynamic` updates on resize).
 * Out-of-bounds behavior is controlled by classes on the `.level` element such as `contain`, `respawn` or `wrap` with optional direction suffixes (e.g. `wrap-vert`).
 * Player spawn can be set via URL fragment target IDs (for example `#door-1`), which aligns with normal DOM anchor-style syntax.
 * Filters and camera behavior are controlled with classes on `#viewport` (e.g. `no-follow`, `scroll-bar`).
@@ -56,10 +57,10 @@ A browser-based platformer engine built with plain JavaScript, HTML and CSS. Lev
 ## Module Overview
 
 ### `platformer.js`
-Entry point that instantiates the game. It locates `#player` and the `.level` element, creates `Player` and `Level` objects, registers them with the global `gameInstance` and starts the game loop. Exposes helpers (`teleportCheat`, `game`, `player`, `level`) on `window`.
+Entry point that instantiates the game on `DOMContentLoaded`. It locates `#player`, creates `Player`, creates `Level` with the hardcoded id `level-one`, registers both on `gameInstance`, and starts the game loop. Exposes `teleportCheat` and `game` on `window`; `player` is also exposed once `Player` is constructed.
 
 ### `game.js`
-Central controller. Maintains key state, debug and pause modes, the `Camera`, active `Player` and `Level`, and a `BroadcastManager` for in‑game signals. Runs the update loop that processes input and updates all components.
+Central controller. Maintains debug and pause modes, the `Camera`, active `Player` and `Level`, and a `BroadcastManager` for in-game signals. Uses `InputManager` action bindings (`move`, `jump`, `interact`, `respawn`, `camera` offsets, etc.) and runs a fixed-step update loop.
 
 ### `player.js`
 Handles player physics, input, collisions, animation and interaction logic. Reads configuration from the embedded `.config` element and manages an `InteractionBox` and `GifAnimationManager`.
@@ -74,7 +75,7 @@ Also wires inventory runtime dependencies:
 - `InventoryMenuAdapter` for pause menu rendering
 
 ### `level.js`
-Represents the level grid. Discovers `.screen` elements, wraps them as `Screen` objects, sets CSS variables for screen size and enforces out‑of‑bounds effects (`contain`, `respawn`, `wrap`).
+Represents the level grid. Discovers `.screen` elements, wraps them as `Screen` objects, configures grid dimensions from `grid-CxR`, and initializes screen sizing variables (`--screen-width`, `--screen-height`) based on `initial`/`dynamic` classes. It stores per-side out-of-bounds policy that collision handling applies at runtime.
 
 ### `screen.js`
 Represents a single screen within the level. Collects solid objects, interactables, receivers and parallax objects, registers nearby solids/interactables with the player and updates objects when the player is present.
@@ -83,11 +84,14 @@ Represents a single screen within the level. Collects solid objects, interactabl
 Defines in‑level object types:
 - `LevelObject`: base class with enable/disable logic and optional parallax support.
 - `SolidObject`: impassable geometry.
+- `MovingPlatform`: follows CSS transform motion and carries the grounded player by transform delta.
+- `SaggingPlatform`: applies configurable downward sag while the player is standing on it.
 - `TriggerArea`: runs its `onclick` when the player enters.
 - `InteractableObject` and `InteractableToggle`: elements that react to player interaction and can broadcast signals.
 - `Receiver`: shows different child elements based on received signals.
 - `ItemPickup`: builds `InventoryItem` data from item fragments and adds or executes item actions.
 - `Slope`: ramp geometry. Combine classes `object`, `solid` and `slope` and set `data-slope` to `up-right`, `up-left`, `down-right` or `down-left`.
+- `Slope` also supports `data-slope-equation` (`y=...`) and optional `data-slope-role="ceiling"` for ceiling collisions.
 - `OneWaySolid`: blocks movement from one side. Use classes `object solid oneway-DIR` where `DIR` is `up`, `down`, `left` or `right`. Add `dropthrough` to an `oneway-up` element to allow falling through by holding `S` and pressing a jump key; each platform maintains its own drop timer.
 
 Example sloped surface:
@@ -149,7 +153,7 @@ Event-driven pause-menu adapter that renders inventory rows and wires use/inspec
 Controls the viewport. Follows the player with smoothing and lookahead, allows offset adjustment with arrow keys, manages overlay elements and display filters via the `Filter` helper class.
 
 ### `collisionDetector.js`
-Performs axis‑aligned collision checks between the player and level objects, handles trigger activation and applies out‑of‑bounds effects defined by the level.
+Performs collision checks between the player and level objects, handles trigger activation, applies side-specific out-of-bounds effects from the level config, and resolves both AABB solids and slope surfaces.
 
 ### `physics.js`
 Applies gravity, friction and acceleration limits. Provides a `move` method used by `Player` to adjust velocity.
@@ -160,9 +164,7 @@ Tracks nearby interactable objects relative to the player. When the player press
 Idea 🐢: Make the interaction only happen with 1 interactable in range, then add a button to cycle through them. Only show the interaction indicator over the currently selected interactable.
 
 ### `broadcastManager.js`
-Minimal pub/sub system. Stores channel → signal mappings, allowing toggles to broadcast state changes and receivers to query them.
-
-Idea 🐢: Instead of having receivers query every frame, have them listen for specific broadcast events and only update when those events occur. We can make custom events for event listeners, right? 
+Pub/sub signal system. Stores channel -> signal mappings and supports channel listeners (`addListener`/`removeListener`) so state managers can react to broadcasts immediately.
 
 ### `elementStateManagers.js`
 `ToggleManager` swaps visibility of `.on`/`.off` elements and issues broadcasts. `MultiStateManager` selects a child matching a broadcast signal from a channel.
@@ -276,7 +278,8 @@ Example: inventory item onclick from item fragment
 The engine uses no external build tools or packages and runs entirely in the browser. A modern browser with ES module support is required.
 
 ## Known Limitations
-- Collision detection is axis‑aligned and may allow tunnelling at very high speeds.
+- Collision is still discrete/step-based and can allow tunneling at very high speeds.
+- `platformer.js` currently initializes `Level` with the hardcoded id `level-one`.
 - APIs are unstable and subject to change as the project evolves.
 
 ## License
