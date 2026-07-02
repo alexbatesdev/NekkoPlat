@@ -289,3 +289,9 @@ The engine uses no external build tools or packages and runs entirely in the bro
 - `js/gifAnimationManager.js`: add a sprite-sheet animation manager as an alternative to GIF-only animation switching.
 - `README.md` (`interactionBox.js` idea note): interaction currently triggers all interactables in range; proposed improvement is single-target interaction with cycling and focused indicator display.
 
+### Turtle Notes (🐢)
+- `js/camera.js`: `// TODO: 🐢💭` note in camera follow logic.
+- `js/collisionDetector.js`: `// 🐢💭` note in trigger collision handling.
+- `js/levelObjects.js`: `// TODO: 🐢<(I am the TODO TURTLE)` note near trigger-area behavior.
+- `README.md` (`interactionBox.js` idea note): `Idea 🐢` proposes single-target interaction with cycling and a focused indicator.
+
