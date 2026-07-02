@@ -113,3 +113,43 @@ export const addTransform = (element, transformString) => {
 
     element.style.transform = combinedMatrix.toString();
 }
+
+export const loadInventoryItemFragment = async (itemName) => {
+    let inspectElement;
+    let iconElement;
+    let description;
+    let onClickString;
+
+    try {
+        const itemDataFragment = await fetch(`/items/${itemName}.html`);
+        if (itemDataFragment.ok) {
+            const itemDataHTML = await itemDataFragment.text();
+            const tempDiv = document.createElement("div");
+            tempDiv.innerHTML = itemDataHTML;
+            const rootElement = tempDiv.firstElementChild;
+
+            if (!rootElement) {
+                return {
+                    inspectElement,
+                    iconElement,
+                    description,
+                    onClickString,
+                };
+            }
+
+            inspectElement = rootElement.querySelector(".inspectElement");
+            iconElement = rootElement.querySelector(".iconElement");
+            description = rootElement.querySelector(".description")?.innerHTML;
+            onClickString = rootElement.getAttribute("onclick") || "";
+        }
+    } catch (error) {
+        console.warn(`Could not load item fragment for ${itemName}:`, error);
+    }
+
+    return {
+        inspectElement,
+        iconElement,
+        description,
+        onClickString,
+    };
+}

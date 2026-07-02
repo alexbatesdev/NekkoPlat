@@ -64,6 +64,11 @@ Central controller. Maintains key state, debug and pause modes, the `Camera`, ac
 ### `player.js`
 Handles player physics, input, collisions, animation and interaction logic. Reads configuration from the embedded `.config` element and manages an `InteractionBox` and `GifAnimationManager`.
 
+Also wires inventory runtime dependencies:
+- `InventoryService` for inventory state and item actions
+- `HUDAdapter` for HUD icon/count rendering
+- `InventoryMenuAdapter` for pause menu rendering
+
 ### `level.js`
 Represents the level grid. Discovers `.screen` elements, wraps them as `Screen` objects, sets CSS variables for screen size and enforces out‑of‑bounds effects (`contain`, `respawn`, `wrap`).
 
@@ -77,6 +82,7 @@ Defines in‑level object types:
 - `TriggerArea`: runs its `onclick` when the player enters.
 - `InteractableObject` and `InteractableToggle`: elements that react to player interaction and can broadcast signals.
 - `Receiver`: shows different child elements based on received signals.
+- `ItemPickup`: builds `InventoryItem` data from item fragments and adds or executes item actions.
 - `Slope`: ramp geometry. Combine classes `object`, `solid` and `slope` and set `data-slope` to `up-right`, `up-left`, `down-right` or `down-left`.
 - `OneWaySolid`: blocks movement from one side. Use classes `object solid oneway-DIR` where `DIR` is `up`, `down`, `left` or `right`. Add `dropthrough` to an `oneway-up` element to allow falling through by holding `S` and pressing a jump key; each platform maintains its own drop timer.
 
@@ -113,6 +119,28 @@ Example toggle/receiver pair:
 </div>
 ```
 
+### `stores/inventoryStore.js`
+Pure inventory state container. Stores `itemsList` and `pickupIDs`, exposes query methods, and emits state-change events to subscribers.
+
+### `services/inventoryService.js`
+Domain/service layer for inventory logic:
+- add/remove/modify item operations
+- localStorage sync (`itemsList`)
+- pickup tracking (`isPickedUp`)
+- item action execution (`useItemByName`, `executeItem`)
+- helper-provider extension system (`registerHelperProvider`)
+
+### `services/inventoryItem.js`
+Data model for inventory entries and dynamic onclick execution.
+
+Item onclick scripts run with `this` bound to the live item instance, so scripts can mutate item state directly.
+
+### `adapters/hudAdapter.js`
+Event-driven HUD adapter that renders icon/count displays for `.hud-item` targets and falls back to fragment icon loading when needed.
+
+### `adapters/inventoryMenuAdapter.js`
+Event-driven pause-menu adapter that renders inventory rows and wires use/inspect interactions.
+
 ### `camera.js`
 Controls the viewport. Follows the player with smoothing and lookahead, allows offset adjustment with arrow keys, manages overlay elements and display filters via the `Filter` helper class.
 
@@ -143,6 +171,48 @@ Utility to align and animate hex‑pattern backgrounds. Call `syncBackgrounds()`
 
 ### `tools.js`
 Collection of helpers for geometry (`intersects`, `getCollisionOverlap`), logging (`debugLog`), class list checks and transform manipulation.
+
+Also includes `loadInventoryItemFragment(itemName)` for loading item fragment data from `/items/*.html`.
+
+## Inventory Helper Providers
+
+The inventory action system supports helper injection through `InventoryService.registerHelperProvider`.
+
+Use this when you want item scripts (the `onclick` body in item fragments) to access helpers from other modules without hard-coupling those modules to `InventoryItem`.
+
+Provider signature:
+
+```js
+({ service, item, event }) => ({
+  helperName: (...args) => {
+    // custom behavior
+  },
+})
+```
+
+Example:
+
+```js
+const unregister = player.inventory.registerHelperProvider(
+  ({ service, item, event }) => ({
+    healPlayer: (amount = 1) => {
+      service.removeItemByName(item.name, 1);
+      // call into your health system here
+    },
+  }),
+);
+
+// Later if needed:
+unregister();
+```
+
+Built-in helpers available in item onclick scripts:
+- `this.consume(count = 1)`
+- `this.hasItem(name)`
+- `this.addItem(item)`
+- `this.getItem(name)`
+
+Note: helper methods are injected for the duration of action execution and then removed, while direct item mutations (for example `this.description = "..."`) persist.
 
 ## Dependencies
 The engine uses no external build tools or packages and runs entirely in the browser. A modern browser with ES module support is required.

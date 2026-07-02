@@ -52,7 +52,7 @@ export default class Camera {
 
     }
 
-    initFilters() {
+   initFilters() {
         this.overlayElement.querySelectorAll('.filter').forEach(filter => {
             this.filters.push(new Filter(filter));
         });

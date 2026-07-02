@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <!-- anti caching measures -->
@@ -18,14 +18,13 @@
 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="../css/reset.css" />
-    <link rel="stylesheet" href="../css/custom-fonts.css" />
-    <link rel="stylesheet" href="../css/pixel-corners.css" />
-    <script type="module" src="../js/platformer.js" defer></script>
-    <link rel="stylesheet" href="../css/grassland.css" />
-    <link rel="stylesheet" href="../css/hexBackground.css" />
-    <link rel="stylesheet" href="../css/global.css" />
-    <script src="../js/hexBackground.js" defer></script>
+    <link rel="stylesheet" href="./css/custom-fonts.css" />
+    <link rel="stylesheet" href="./css/pixel-corners.css" />
+    <script type="module" src="./js/platformer.js" defer></script>
+    <link rel="stylesheet" href="./css/index.css" />
+    <link rel="stylesheet" href="./css/hexBackground.css" />
+    <link rel="stylesheet" href="./css/global.css" />
+    <script src="./js/hexBackground.js" defer></script>
     <title>Piinro's Platformer</title>
   </head>
 
@@ -34,7 +33,7 @@
     <span class="cross debug"></span>
 
     <div id="viewport">
-      <div class="level contain grid-3x1" id="level-one">
+      <div class="level grid-3x1 contain" id="level-one">
         <div class="screen">
           <div class="cat" id="player">
             <div class="interaction-indicator question-indicator">?</div>
@@ -54,15 +53,15 @@
             <div class="animation-container gif">
               <img
                 class="idle"
-                src="../img/cat_stand.gif"
+                src="./img/cat_stand.gif"
                 alt="A cat standing there menacingly"
               />
-              <img class="walk" src="../img/cat_walk.gif" alt="A cat walking" />
-              <img class="run" src="../img/cat_run.gif" alt="A cat running" />
-              <img class="jump" src="../img/cat_jump.gif" alt="A cat jumping" />
+              <img class="walk" src="./img/cat_walk.gif" alt="A cat walking" />
+              <img class="run" src="./img/cat_run.gif" alt="A cat running" />
+              <img class="jump" src="./img/cat_jump.gif" alt="A cat jumping" />
               <img
                 class="wait"
-                src="../img/cat_fall_asleep.gif"
+                src="./img/cat_fall_asleep.gif"
                 alt="A cat falling asleep"
               />
             </div>
@@ -77,38 +76,46 @@
             way to view my site!<br />
             Thank you for checking out my project! <br />
           </div>
-                    <div
-            id="mushroom"
-            class="object item trigger name-shroom respawn"
-          >
-            <span class="count">1</span>
-          </div>
 
           <div class="object-label debug">Room 1</div>
           <div class="object rock plax z-2 rock-2"></div>
           <div class="object rock rock-3"></div>
-          <div class="object rock plax rock-1"></div>
+          <div class="object rock plax z2 rock-1"></div>
+
+          <div id="receiver-1" class="object receiver">
+            <span class="broadcast channel-toggle_two"></span>
+            <div class="signal-off off">
+              <p>OFF</p>
+            </div>
+            <div class="signal-on on">
+              <p>ON</p>
+            </div>
+          </div>
+
+          <div id="toggle-2" class="object clickable interactable toggle">
+            <div class="on">
+              <span class="broadcast channel-toggle_two">on</span>
+              <p>ON</p>
+            </div>
+            <div class="off">
+              <span class="broadcast channel-toggle_two">off</span>
+              <p>OFF</p>
+            </div>
+          </div>
+
+          <div
+            id="mushroom"
+            class="object item trigger name-shroom respawn"
+            onclick="console.log('mushroom picked up')"
+          >
+            <span class="count">1</span>
+          </div>
         </div>
         <div class="screen">
           <div class="object-label debug">Room 2</div>
-          <div
-            class="object solid slope"
-            data-slope-clip="true"
-            data-slope-equation="y=mx+b"
-            data-slope-m="0.5"
-            data-slope-b="00"
-            style="
-              width: 300px;
-              height: 150px;
-              position: absolute;
-              bottom: 50px;
-              left: calc(50% - 599px);
-            "
-          ></div>
-
           <div class="object solid floor grass-green" id="floor-2"></div>
           <img
-            src="../img/debug.jpg"
+            src="./img/debug.jpg"
             class="debug"
             style="height: 600px; border: solid 1px red"
             srcset=""
@@ -138,7 +145,7 @@
           <div
             class="door object interactable clickable plax z-7"
             id="door-2"
-            onClick="window.location.href='./platformer.html?spawn_x=3427px&spawn_y=1026px'"
+            onClick="window.location.href='./html/platformer.html?spawn_x=3427px&spawn_y=1026px'"
           ></div>
 
           <div class="object rock plax z-1 rock-6"></div>
@@ -170,14 +177,14 @@
           <div
             class="door object interactable"
             id="door-1"
-            onClick="window.location.href='./hub.html?spawn_x=602px&spawn_y=501px'"
+            onClick="window.location.href='./html/hub.html?spawn_x=602px&spawn_y=501px'"
           ></div>
 
           <div class="object solid floor grass-green"></div>
         </div>
       </div>
     </div>
-    <!-- Need to make these elements optional (pause) in the javascript to avoid errors! -->
+    <!-- Need to make these elements (pause) optional in the javascript to avoid errors! -->
     <div id="pause">
       <span class="filter blur"></span>
       <span class="filter dark"></span>

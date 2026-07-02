@@ -4,6 +4,9 @@ import GifAnimationManager from "./gifAnimationManager.js";
 import { Physics } from "./physics.js";
 import { CollisionDetection } from "./collisionDetector.js";
 import InteractionBox from "./interactionBox.js";
+import { InventoryService } from "./services/inventoryService.js";
+import { HUDAdapter } from "./adapters/hudAdapter.js";
+import { InventoryMenuAdapter } from "./adapters/inventoryMenuAdapter.js";
 import { OneWaySolidObject } from "./levelObjects.js";
 
 export default class Player {
@@ -61,6 +64,12 @@ export default class Player {
         this.currentAnimation = 'idle';
         //   Interaction
         this.interactionBox = new InteractionBox(this);
+        // Inventory
+        this.inventory = new InventoryService("itemsList");
+        this.hudAdapter = new HUDAdapter(this.inventory);
+        this.menuAdapter = new InventoryMenuAdapter(this.inventory);
+        this.hudAdapter.initialize();
+        this.menuAdapter.initialize();
         this.isFacingRight = false;
 
         // Cached DOM references

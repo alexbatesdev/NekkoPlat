@@ -1,6 +1,7 @@
 import gameInstance from "./game.js";
-import { debugLog } from "./tools.js";
+import { debugLog, loadInventoryItemFragment } from "./tools.js";
 import ToggleManager, { MultiStateManager } from "./elementStateManagers.js";
+import { InventoryItem } from "./services/inventoryItem.js";
 
 export class LevelObject {
   constructor(element) {
@@ -60,6 +61,7 @@ export class LevelObject {
     })`;
   }
 }
+
 export class SolidObject extends LevelObject {
   constructor(element) {
     super(element);
@@ -79,7 +81,7 @@ export class OneWaySolidObject extends LevelObject {
   constructor(element) {
     super(element);
     const dirClass = Array.from(element.classList).find((cls) =>
-      cls.startsWith("oneway-")
+      cls.startsWith("oneway-"),
     );
     this.direction = dirClass ? dirClass.split("-")[1] : "up";
     this.dropthrough = element.classList.contains("dropthrough");
@@ -99,7 +101,10 @@ export class OneWaySolidObject extends LevelObject {
     let shouldEnable = true;
     switch (this.direction) {
       case "up":
-        shouldEnable = playerRect.bottom <= rectCenterY && this.dropTimer === 0 && gameInstance.player.velocityY >= 0;
+        shouldEnable =
+          playerRect.bottom <= rectCenterY &&
+          this.dropTimer === 0 &&
+          gameInstance.player.velocityY >= 0;
         break;
       case "down":
         shouldEnable = playerRect.top >= rectCenterY;
@@ -113,7 +118,9 @@ export class OneWaySolidObject extends LevelObject {
     }
     this.enabled = shouldEnable;
     if (gameInstance.debug) {
-      this.element.style.backgroundColor = this.enabled ? "rgba(0, 255, 0, 0.5)" : "rgba(255, 0, 0, 0.5)";
+      this.element.style.backgroundColor = this.enabled
+        ? "rgba(0, 255, 0, 0.5)"
+        : "rgba(255, 0, 0, 0.5)";
     } else {
       this.element.style.backgroundColor = this.initialBackgroundColor;
     }
@@ -155,31 +162,31 @@ export class MovingPlatform extends LevelObject {
 }
 
 export class SaggingPlatform extends LevelObject {
-    constructor(element) {
-        super(element);
-        this.sagAmount = 8;
-        this.sagDuration = 200;
-        for (const cls of element.classList) {
-            if (cls.startsWith('sag-time-')) {
-                const duration = parseFloat(cls.slice(9));
-                if (!isNaN(duration)) this.sagDuration = duration;
-            } else if (cls.startsWith('sag-') && cls !== 'sag-platform') {
-                const amount = parseFloat(cls.slice(4));
-                if (!isNaN(amount)) this.sagAmount = amount;
-            }
-        }
-        this.element.style.transition = `transform ${this.sagDuration}ms ease`;
+  constructor(element) {
+    super(element);
+    this.sagAmount = 8;
+    this.sagDuration = 200;
+    for (const cls of element.classList) {
+      if (cls.startsWith("sag-time-")) {
+        const duration = parseFloat(cls.slice(9));
+        if (!isNaN(duration)) this.sagDuration = duration;
+      } else if (cls.startsWith("sag-") && cls !== "sag-platform") {
+        const amount = parseFloat(cls.slice(4));
+        if (!isNaN(amount)) this.sagAmount = amount;
+      }
     }
+    this.element.style.transition = `transform ${this.sagDuration}ms ease`;
+  }
 
-    update() {
-        const player = gameInstance.player;
-        if (player.grounded && player.groundedObject === this) {
-            this.element.style.transform = `translateY(${this.sagAmount}px)`;
-        } else {
-            this.element.style.transform = 'translateY(0px)';
-        }
-        super.update();
+  update() {
+    const player = gameInstance.player;
+    if (player.grounded && player.groundedObject === this) {
+      this.element.style.transform = `translateY(${this.sagAmount}px)`;
+    } else {
+      this.element.style.transform = "translateY(0px)";
     }
+    super.update();
+  }
 }
 
 export class TriggerArea extends LevelObject {
@@ -197,6 +204,10 @@ export class TriggerArea extends LevelObject {
       this.enabled = false;
       this.element.classList.add("disabled");
     }
+    // TODO: 🐢<(I am the TODO TURTLE)
+    // If this trigger can be triggered multiple times, we probably
+    // want a configurable cooldown to prevent it from triggering
+    // multiple times in one frame
     debugLog("Triggered");
     this.element.click();
   }
@@ -276,7 +287,7 @@ export class Receiver extends LevelObject {
     this.stateManager = new MultiStateManager(
       element,
       this.signals,
-      this.signals[0]
+      this.signals[0],
     );
     this.stateManager.listenToBroadcast(this.broadcastChannel);
   }
@@ -287,6 +298,92 @@ export class Receiver extends LevelObject {
     } else {
       this.element.style.outline = "none";
     }
+  }
+}
+
+export class ItemPickup extends LevelObject {
+  constructor(element) {
+    super(element);
+    this.inventoryItemPromise = this.initializeInventoryItem().then((item) => {
+      if (item.iconElement) this.element.appendChild(item.iconElement);
+      return item;
+    });
+
+    let onClick = this.element.onclick;
+    // This onclick is the trigger for the item pickup
+    // This lets it mix with other interactables, triggers, etc.
+    // without breaking them
+    this.element.onclick = (event) => {
+      onClick?.(event);
+      this.pickup();
+    };
+
+    // Since the onclick is used for picking up the item,
+    // We need to make the item not clickable by default
+    // If the item is meant to be clickable,
+    // it should have the "clickable" class
+    if (!this.element.classList.contains("clickable")) {
+      this.element.style.pointerEvents = "none";
+    } else {
+      this.element.style.cursor = "pointer";
+    }
+
+    // Disable the pickup if it's already in the player's
+    // inventory and not meant to respawn
+    if (
+      !this.element.classList.contains("respawn") &&
+      gameInstance.player.inventory.isPickedUp(this.element.id)
+    ) {
+      this.enabled = false;
+    }
+
+    // Hide the pickup if it's disabled and not meant to show a ghost
+    if (!this.enabled && !this.element.classList.contains("show-ghost")) {
+      this.element.style.opacity = "0";
+    }
+  }
+
+  pickup() {
+    if (!this.enabled) return;
+    this.enabled = false;
+    this.element.click();
+
+    this.element.remove();
+    if (this.element.classList.contains("instant-use")) {
+      this.inventoryItemPromise.then((item) =>
+        gameInstance.player.inventory.executeItem(item),
+      );
+      return;
+    }
+    this.inventoryItemPromise.then((item) => {
+      gameInstance.player.inventory.addItem(item);
+    });
+  }
+
+  async initializeInventoryItem() {
+    let itemName = "";
+    for (let i = 0; i < this.element.classList.length; i++) {
+      if (this.element.classList[i].includes("name-")) {
+        itemName = this.element.classList[i].replace("name-", "");
+      }
+    }
+
+    const { inspectElement, iconElement, description, onClickString } =
+      await loadInventoryItemFragment(itemName);
+    const countValue = parseInt(this.element.querySelector(".count")?.innerHTML);
+    const count = Number.isNaN(countValue) ? 1 : countValue;
+    const item = new InventoryItem(
+      itemName,
+      this.element.id,
+      description,
+      count,
+      iconElement,
+      inspectElement,
+      onClickString,
+      [],
+      gameInstance.player.inventory,
+    );
+    return item;
   }
 }
 
