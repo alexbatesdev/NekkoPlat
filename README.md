@@ -289,5 +289,3 @@ The engine uses no external build tools or packages and runs entirely in the bro
 - `js/gifAnimationManager.js`: add a sprite-sheet animation manager as an alternative to GIF-only animation switching.
 - `README.md` (`interactionBox.js` idea note): interaction currently triggers all interactables in range; proposed improvement is single-target interaction with cycling and focused indicator display.
 
-## License
-No license information is provided.
