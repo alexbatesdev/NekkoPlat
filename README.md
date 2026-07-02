@@ -50,7 +50,7 @@ A browser-based platformer engine built with plain JavaScript, HTML and CSS. Lev
 
 * Grid dimensions are defined on the `.level` element via a `grid-colsxrows` class.
 * Out-of-bounds behavior is controlled by classes on the `.level` element such as `contain`, `respawn` or `wrap` with optional direction suffixes (e.g. `wrap-vert`).
-* Player spawn can be set via URL query parameters `?spawn_x=` and `?spawn_y=`.
+* Player spawn can be set via URL fragment target IDs (for example `#door-1`), which aligns with normal DOM anchor-style syntax.
 * Filters and camera behavior are controlled with classes on `#viewport` (e.g. `no-follow`, `scroll-bar`).
 
 ## Module Overview
@@ -63,6 +63,10 @@ Central controller. Maintains key state, debug and pause modes, the `Camera`, ac
 
 ### `player.js`
 Handles player physics, input, collisions, animation and interaction logic. Reads configuration from the embedded `.config` element and manages an `InteractionBox` and `GifAnimationManager`.
+
+Spawn resolution order:
+- If the URL includes a hash target (for example `./grassland.html#door-1`), the player spawns at the center of that element.
+- If there is no hash target, player spawn falls back to CSS variables `--player-spawn-x` and `--player-spawn-y`.
 
 Also wires inventory runtime dependencies:
 - `InventoryService` for inventory state and item actions
@@ -242,10 +246,10 @@ Example: trigger that disables itself after broadcasting a signal
 }"></div>
 ```
 
-Example: interactable door navigation (still works with globals)
+Example: interactable door navigation with fragment-based spawn target
 
 ```html
-<div class="door object interactable" onclick="window.location.href='./hub.html'"></div>
+<div class="door object interactable" onclick="window.location.href='./hub.html#door-1'"></div>
 ```
 
 Example: inventory item onclick from item fragment
