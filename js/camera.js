@@ -24,6 +24,7 @@ export default class Camera {
         this.followPlayer = true;
         if (this.element.classList.contains('no-follow')) this.followPlayer = false;
         if (this.element.classList.contains('scroll-bar')) this.element.style.overflow = 'auto';
+        if (gameInstance.debug) this.element.style.overflow = "auto";
         else this.element.style.overflow = 'hidden';
         this.offsetBounds = 0;
         this.maxOffset = 1 - this.offsetBounds;
@@ -91,7 +92,8 @@ export default class Camera {
         if (this.debugProvider && this.debugProvider()) this.element.style.overflow = "auto";
         else {
             if (this.element.classList.contains('scroll-bar')) this.element.style.overflow = 'auto';
-            else this.element.style.overflow = 'hidden';
+            if (gameInstance.debug) this.element.style.overflow = "auto";
+            else this.element.style.overflow = 'hidden'
         }
     }
 
