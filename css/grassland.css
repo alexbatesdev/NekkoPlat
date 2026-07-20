@@ -124,6 +124,20 @@ body {
     overflow: hidden;
 }
 
+.grassland-skyline {
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(circle at 15% 20%, rgba(255, 244, 199, 0.38), transparent 18%),
+        radial-gradient(circle at 78% 18%, rgba(255, 227, 159, 0.22), transparent 14%),
+        linear-gradient(to bottom, rgba(192, 235, 255, 0.85) 0%, rgba(175, 223, 255, 0.78) 35%, rgba(148, 198, 222, 0.48) 60%, rgba(113, 166, 145, 0.12) 100%),
+        linear-gradient(to top, rgba(61, 104, 78, 0.58) 0 18%, transparent 18%),
+        linear-gradient(90deg, rgba(34, 66, 54, 0.34) 0 14%, rgba(51, 90, 69, 0.18) 14% 28%, rgba(31, 59, 49, 0.28) 28% 40%, rgba(56, 97, 77, 0.2) 40% 57%, rgba(30, 57, 46, 0.34) 57% 68%, rgba(53, 88, 69, 0.18) 68% 82%, rgba(28, 54, 43, 0.3) 82% 100%);
+    background-size: auto, auto, 100% 100%, 100% 100%, 480px 100%;
+    background-position: center top, center top, center top, center bottom, left bottom;
+    opacity: 0.9;
+}
+
 .solid {
     z-index: 1;
     outline-offset: -1px;

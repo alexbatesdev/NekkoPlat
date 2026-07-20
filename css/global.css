@@ -138,10 +138,28 @@ position: absolute
 
 .screen {
     pointer-events: none;
+    z-index: 1;
 }
 
 .screen > * {
     pointer-events: auto;
+}
+
+.level-parallax-root {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.level-parallax-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    transform-origin: top left;
+    will-change: transform;
 }
 
 #interactionBox {
