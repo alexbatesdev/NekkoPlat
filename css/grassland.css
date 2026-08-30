@@ -584,13 +584,6 @@ a {
     z-index: 100;
 }
 
-.interaction-indicator {
-    position: absolute;
-    top: 0%;
-    left: 50%;
-    transform: translate(-50%, -100%);
-}
-
 .question-indicator {
     width: 2.5rem;
     height: 2.5rem;

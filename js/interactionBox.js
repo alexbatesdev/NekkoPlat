@@ -12,6 +12,12 @@ export default class InteractionBox {
         this.interactionIndicatorElement = this.player.element.querySelector('.interaction-indicator');
         if (this.interactionIndicatorElement) {
             this.interactionIndicatorElement.style.display = 'none';
+            // Centering anchor lives here in JS (not CSS) so it can't drift out of sync
+            // with the translate(-50%, ...) applied in player.js's lookLeft/lookRight.
+            this.interactionIndicatorElement.style.position = 'absolute';
+            this.interactionIndicatorElement.style.top = '0';
+            this.interactionIndicatorElement.style.left = '50%';
+            this.interactionIndicatorElement.style.transform = 'translate(-50%, -100%)';
         }
     }
 
