@@ -1,0 +1,37 @@
+/*
+    Same rationale as ../minimal-import/minimal-import.css: this project's platformer.css
+    theme isn't imported, so each room supplies its own minimal object appearance.
+    Floor color is keyed off a class on <body> so all three rooms can share this file.
+*/
+
+.floor {
+    --height: 50px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: var(--height);
+}
+
+.room-a .floor {
+    background-color: #c0392b;
+}
+
+.room-b .floor {
+    background-color: #27ae60;
+}
+
+.room-c .floor {
+    background-color: #2980b9;
+}
+
+/* .door's size/shape comes from global.css; these just place it against a screen edge */
+.door-left {
+    left: 40px;
+    top: calc(100% - 200px);
+}
+
+.door-right {
+    right: 40px;
+    top: calc(100% - 200px);
+}

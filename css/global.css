@@ -167,6 +167,8 @@ position: absolute
     position: absolute;
     bottom: 0;
     right: 0;
+    width: 75px;
+    height: 120%;
     z-index: 100;
 }
 
