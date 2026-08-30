@@ -4,9 +4,10 @@ A browser-based platformer engine built with plain JavaScript, HTML and CSS. Lev
 
 ## Getting Started
 
-1. Include the engine script and styles in your HTML:
+1. Include the engine script and styles in your HTML. `global.css` is required — it holds structural rules the engine's JS depends on (viewport sizing, object positioning, etc.). `platformer.css` is this project's own visual theme for levels/objects (stone textures, backgrounds, etc.); you can swap it for your own stylesheet as long as you cover the same object/solid classes your level uses. See `examples/minimal-import/` for a level that supplies its own minimal theme instead of `platformer.css`.
 
 ```html
+<link rel="stylesheet" href="css/global.css">
 <link rel="stylesheet" href="css/platformer.css">
 <script type="module" src="js/platformer.js" defer></script>
 ```

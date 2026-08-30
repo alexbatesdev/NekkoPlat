@@ -8,17 +8,18 @@
 
     <!--
         This file lives outside the engine's own html/ folder on purpose.
-        It only pulls in the two files the README documents as required,
-        via the same kind of relative path an external project would use
-        once it has copied/vendored the css/, js/ and img/ folders next to
-        its own page. Nothing else from this repo is referenced.
+        It only pulls in css/global.css and js/platformer.js, the engine's required files,
+        via the same kind of relative path an external project would use once it has
+        copied/vendored the css/ and js/ folders next to its own page. It supplies its own
+        object/solid appearance via minimal-import.css rather than the site's platformer.css theme.
     -->
-    <link rel="stylesheet" href="../../css/platformer.css">
+    <link rel="stylesheet" href="../../css/global.css">
+    <link rel="stylesheet" href="./minimal-import.css">
     <script type="module" src="../../js/platformer.js" defer></script>
     <style>
-        /* --player-spawn-x/y are only defined in global.css upstream; set them here since we don't import it.
-           Values are in px (not vh) because this level has no "initial"/"dynamic" class, so the screen
-           uses platformer.css's fixed 1600x900 (scaled) size rather than the real browser viewport. */
+        /* This level has no "initial"/"dynamic" class, so --screen-width/height fall back to
+           global.css's 100vw/100vh; override the vh-based --player-spawn-y default here in px
+           so it doesn't spawn the player below the floor. */
         :root {
             --player-spawn-x: 300px;
             --player-spawn-y: 300px;

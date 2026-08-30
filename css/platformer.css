@@ -337,15 +337,6 @@ position: absolute
     position: absolute;
 }
 
-/* level.js always injects this element as a grid child of .level; it must stay out of grid flow */
-.level-parallax-root {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 0;
-}
-
 .solid {
     z-index: 3;
     outline-offset: -1px;
