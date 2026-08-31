@@ -10,12 +10,10 @@ const addDoorDestinationTitles = () => {
     document.querySelectorAll('.door[onclick]').forEach(door => {
         if (door.title) return;
 
-        const target = door.getAttribute('onclick').match(/["'](?:\.\/)?([^#"']+)/)?.[1];
+        const target = door.getAttribute('onclick').match(/room-\d+-([^/#"'\s.]+)/)?.[1];
         if (!target) return;
 
         door.title = target
-            .replace(/\.html$/, '')
-            .replace(/^room-\d+-/, '')
             .replace(/[_-]+/g, ' ')
             .replace(/\b\w/g, character => character.toUpperCase());
     });
