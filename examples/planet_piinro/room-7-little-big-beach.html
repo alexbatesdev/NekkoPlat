@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Planet Piinro - Little Big Beach</title>
+    <link rel="stylesheet" href="../../css/reset.css" />
+    <link rel="stylesheet" href="../../css/global.css" />
+    <link rel="stylesheet" href="./planet-piinro.css" />
+    <script type="module" src="../../js/platformer.js" defer></script>
+  </head>
+  <body>
+    <div id="viewport">
+      <div class="level grid-1x1 contain" id="level-one">
+        <div class="screen">
+          <div class="room-number">Room 7</div>
+          <h1 class="room-title">Little Big Beach</h1>
+          <div
+            id="player"
+            style="width: 50px; height: 50px; background: hotpink"
+          >
+            <div class="interaction-indicator question-indicator">?</div>
+            <div id="interactionBox"></div>
+          </div>
+          <div class="object solid floor"></div>
+          <div class="arrival-marker arrival-1" id="arrival-from-5"></div>
+          <div class="arrival-marker arrival-2" id="arrival-from-6"></div>
+          <div class="arrival-marker arrival-3" id="arrival-from-8"></div>
+          <div
+            class="door object interactable clickable exit-1"
+            onclick="
+              location.href = './room-5-dolphin-island-port.html#arrival-from-7'
+            "
+          ></div>
+          <div
+            class="door object interactable clickable exit-2"
+            onclick="
+              location.href = './room-6-little-big-city.html#arrival-from-7'
+            "
+          ></div>
+          <div
+            class="door object interactable clickable exit-3"
+            onclick="
+              location.href = './room-8-mountain-base.html#arrival-from-7'
+            "
+          ></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

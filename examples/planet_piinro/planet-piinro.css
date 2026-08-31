@@ -1,0 +1,88 @@
+:root {
+    --player-spawn-x: 280px;
+    --player-spawn-y: 300px;
+}
+
+body {
+    /* background: #050915;
+    color: #f4f7ff; */
+    font-family: monospace;
+}
+
+.screen {
+    /* background: radial-gradient(circle at 50% 20%, #1b3566 0, #0a1530 42%, #050915 100%); */
+}
+
+.room-title,
+.room-number {
+    position: absolute;
+    z-index: 1;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
+.room-title {
+    top: 44px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 24px;
+}
+
+.room-number {
+    top: 48px;
+    left: 48px;
+    /* color: #8ea9dc; */
+}
+
+.floor {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background-color: rebeccapurple;
+    /* background: #23385a; */
+    /* border-top: 4px solid #8fd3ff; */
+}
+
+.door {
+    top: calc(100% - 200px);
+}
+
+.door::after {
+    content: attr(title);
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 50%;
+    width: 180px;
+    color: #f4f7ff;
+    font-size: 14px;
+    text-align: center;
+    text-transform: uppercase;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.exit-1,
+.arrival-1 {
+    left: 70px;
+}
+
+.exit-2,
+.arrival-2 {
+    right: 70px;
+}
+
+.exit-3,
+.arrival-3 { left: 35%; }
+
+.exit-4,
+.arrival-4 { right: 35%; }
+
+.arrival-marker {
+    position: absolute;
+    top: calc(100% - 115px);
+    /* width: 40px; */
+    /* height: 8px; */
+    /* background: #f6d365; */
+}
