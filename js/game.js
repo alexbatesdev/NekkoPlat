@@ -1,38 +1,35 @@
 import Camera, { Filter } from './camera.js';
 import BroadcastManager from './broadcastManager.js';
-import { debugLog } from './tools.js';
+import InputManager from './inputManager.js';
 
 class Game {
     constructor() {
         this.player = null;
         this.level = null;
-        this.camera = new Camera();
-        this.pauseElement = document.getElementById('pause');
-        if (this.pauseElement) {
-            this.camera.overlayElement.appendChild(this.pauseElement);
-            this.initPauseElement();
-        }
+        this.camera = null;
+        this.pauseElement = null;
 
         this.debug = false;
         this.paused = false;
         this.processedInput = false;
-        // New input processor/keyState system
-        // https://chatgpt.com/c/f5c9ad3a-6d67-40eb-b2a6-9dc3d5afcff0
-        this.keyState = {
-            W: false,
-            A: false,
-            S: false,
-            D: false,
-            SHIFT: false,
-            SPACE: false,
-            CONTROL: false,
-            ARROWUP: false,
-            ARROWDOWN: false,
-            ARROWLEFT: false,
-            ARROWRIGHT: false,
-            ESCAPE: false
+
+        const defaultBindings = {
+            debug: ['Digit3'],
+            pause: ['Escape'],
+            moveLeft: ['KeyA'],
+            moveRight: ['KeyD'],
+            moveDown: ['KeyS'],
+            jump: ['KeyW', 'Space'],
+            respawn: ['KeyR'],
+            sprint: ['ShiftLeft', 'ShiftRight'],
+            interact: ['KeyE'],
+            cameraUp: ['ArrowUp'],
+            cameraDown: ['ArrowDown'],
+            cameraLeft: ['ArrowLeft'],
+            cameraRight: ['ArrowRight'],
         };
 
+        this.inputManager = new InputManager(defaultBindings);
         this.signalManager = new BroadcastManager();
 
         window.game = this;
@@ -53,10 +50,6 @@ class Game {
             new Filter(filter);
             this.pauseElement.appendChild(filter);
         });
-    }
-
-    getKeyState(key) {
-        return this.keyState[key];
     }
 
     setPlayer(player) {
@@ -90,32 +83,62 @@ class Game {
         });
     }
 
+    initCamera() {
+        this.camera = new Camera();
+        this.camera.setPlayer(this.player);
+        this.camera.keyState = this.keyState;
+    }
+
+    initPauseScreen() {
+        this.pauseElement = document.getElementById('pause');
+        if (this.pauseElement) {
+            this.camera.overlayElement.appendChild(this.pauseElement);
+            this.initPauseElement();
+        }
+    }
+
     start() {
+        this.initCamera();
+        this.initPauseScreen();
+        this.lastTime = performance.now();
+        this.accumulator = 0;
+        this.fixedDelta = 1 / 60; // 60 FPS simulation step
         requestAnimationFrame(this.update.bind(this));
-        this.initKeyStateListeners();
         this.player.start();
     }
 
-    update() {
-        this.processInput();
-        if (!this.paused) {
-            this.player.update(this.keyState);
-            this.level.update();
-            this.camera.update();
-        }
+    update(timestamp) {
+        const now = timestamp || performance.now();
+        let frameTime = (now - this.lastTime) / 1000; // convert to seconds
+        if (frameTime > 0.25) frameTime = 0.25; // avoid spiral of death
+        this.lastTime = now;
+        this.accumulator += frameTime;
 
+        while (this.accumulator >= this.fixedDelta) {
+            this.processInput();
+            if (!this.paused) {
+                this.player.update();
+                this.level.update();
+                this.camera.update();
+                this.level.updateParallaxLayers(this.camera.element);
+            }
+            this.accumulator -= this.fixedDelta;
+        }
 
         requestAnimationFrame(this.update.bind(this));
     }
 
     processInput() {
-        if (this.keyState['3'] && !this.processedInput) {
+        if (this.inputManager.isActionActive('debug') && !this.processedInput) {
             this.processedInput = true;
             this.toggleDebug();
-        } else if (this.keyState['ESCAPE'] && !this.processedInput) {
+        } else if (this.inputManager.isActionActive('pause') && !this.processedInput) {
             this.processedInput = true;
             if (this.pauseElement) this.togglePause();
-        } else if (!this.keyState['ESCAPE'] && !this.keyState['3']) {
+        } else if (
+            !this.inputManager.isActionActive('pause') &&
+            !this.inputManager.isActionActive('debug')
+        ) {
             this.processedInput = false;
         }
     }
@@ -125,6 +148,7 @@ class Game {
         if (this.paused) {
             this.pauseElement.style.visibility = 'visible';
             this.pauseElement.style.pointerEvents = 'all';
+            this.player.menuAdapter.syncMenu();
         } else {
             this.pauseElement.style.visibility = 'hidden';
             this.pauseElement.style.pointerEvents = 'none';

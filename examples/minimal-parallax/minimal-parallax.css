@@ -1,0 +1,34 @@
+/*
+    Same rationale as ../minimal-import/minimal-import.css: this project's platformer.css
+    theme isn't imported, so this level supplies its own minimal object appearance.
+*/
+
+.floor {
+    --height: 50px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: var(--height);
+    background-color: #5b3a29;
+}
+
+.solid {
+    background-color: rebeccapurple;
+}
+
+.pillar {
+    top: 0;
+    width: 60px;
+    height: 100%;
+    background-color: #8a6d3b;
+}
+
+.sun {
+    top: 40px;
+    left: 40vw;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: #ffd23f;
+}

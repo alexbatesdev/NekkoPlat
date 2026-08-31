@@ -18,8 +18,8 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../css/custom-fonts.css">
-    <link rel="stylesheet" href="../css/pixel-corners.css">
+    <link rel="stylesheet" href="/css/custom-fonts.css">
+    <link rel="stylesheet" href="/css/pixel-corners.css">
     <script type="module" src="../js/platformer.js" defer></script>
     <link rel="stylesheet" href="../css/hub.css">
     <link rel="stylesheet" href="../css/global.css">
@@ -31,7 +31,7 @@
     <span class="cross debug"></span>
 
     <div class="tv" id="viewport">
-        <div class="level 3x2 contain" id="level-one">
+        <div class="level contain grid-3x2" id="level-one">
             <div class="screen">
                 <div class="cat" id="player">
                     <div class="interaction-indicator question-indicator">?</div>
@@ -85,7 +85,7 @@
                 <div class="object solid edges-art" id="solidObject-2"></div>
                 <div class="object" id="bgObject-1"></div>
                 <div class="door object interactable"
-                    onclick="window.location.href='../index.html?spawn_x=3249px&spawn_y=601px'" id="door-1"></div>
+                    onclick="window.location.href='./grassland.html#door-1'" id="door-1"></div>
 
                 <div class="object solid" id="start-cap">
                 </div>
@@ -134,7 +134,7 @@
     </div>
     <!-- Need to make these elements (overlay) optional in the javascript to avoid errors! -->
     <div id="overlay">
-        <div id="reciever-3" class="reciever">
+        <div id="receiver-3" class="receiver">
             <span class="broadcast channel-toggle_two"></span>
             <div class="signal-none">
                 <!-- <span class="filter dark"></span> -->

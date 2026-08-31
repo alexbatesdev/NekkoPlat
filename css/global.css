@@ -1,5 +1,17 @@
+:root {
+    --screen-width: 100vw;
+    --screen-height: 100vh;
+    --debug: hidden;
+    --player-spawn-x: 50vw;
+    --player-spawn-y: calc(100vh - 100px);
+}
+
 .debug {
     visibility: var(--debug);
+}
+
+.none {
+    display: none;
 }
 
 /* 
@@ -24,4 +36,146 @@
     position: absolute;
     border-top-left-radius: 50px;
     border-top-right-radius: 50px;
+}
+
+#inventory-menu {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    width: 30vw;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border-radius: 10px;
+    min-width: 350px;
+}
+
+#inventory-menu h1 {
+    text-align: center;
+    font-size: 2rem;
+}
+
+.item-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.item-wrapper {
+    display: flex;
+    overflow-x: hidden;
+    overflow-y: auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    /* cursor: pointer; */
+}
+
+.item-wrapper > div {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.item-name {
+    font-size: 1.75rem;
+    font-style: italic;
+}
+
+.item-count {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.use-button,
+.inspect-button {
+    cursor: pointer;
+    user-select: none;
+}
+
+.inspect-window {
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    background-color: rgba(0, 0, 0, 0.3);
+    color: white;
+    width: 100%;
+    height: 100%;
+    z-index: 11;
+    pointer-events: initial;
+}
+/* 
+Necessary styles
+width
+height
+position: relative or absolute
+
+*/
+#viewport {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+}
+
+#viewport > * {
+    pointer-events: auto;
+}
+
+/*
+
+Object needs
+position: absolute
+
+*/
+.object {
+    position: absolute;
+}
+
+.screen {
+    pointer-events: none;
+    z-index: 1;
+}
+
+.screen > * {
+    pointer-events: auto;
+}
+
+/* level.js always injects this element as a grid child of .level; it must stay out of grid flow */
+.level-parallax-root {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.level-parallax-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    transform-origin: top left;
+    will-change: transform;
+}
+
+#interactionBox {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 75px;
+    height: 120%;
+    z-index: 100;
+}
+
+.hidden {
+    visibility: hidden !important;
+}
+
+.no-display {
+    display: none !important;
 }

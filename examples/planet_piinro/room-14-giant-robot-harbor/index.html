@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Planet Piinro - Giant Robot Harbor</title>
+    <link rel="stylesheet" href="../../../css/reset.css" />
+    <link rel="stylesheet" href="../../../css/global.css" />
+    <link rel="stylesheet" href="../planet-piinro.css" />
+      <link rel="stylesheet" href="./room-14-giant-robot-harbor.css" />
+    <script type="module" src="../../../js/platformer.js" defer></script>
+  </head>
+  <body>
+    <div id="viewport">
+      <div class="level grid-1x1 contain" id="level-one">
+        <div class="screen">
+          <div class="room-number">Room 14</div>
+          <h1 class="room-title">Giant Robot Harbor</h1>
+          <div
+            id="player"
+            style="width: 50px; height: 50px; background: hotpink"
+          >
+            <div class="interaction-indicator question-indicator">?</div>
+            <div id="interactionBox"></div>
+          </div>
+          <div class="object solid floor"></div>
+          <div
+            id="arrival-from-3"
+            class="door object interactable clickable exit-1"
+            onclick="
+              location.href = '../room-3-star-isle-port/#arrival-from-14'
+            "
+          ></div>
+          <div
+            id="arrival-from-5"
+            class="door object interactable clickable exit-2"
+            onclick="
+              location.href =
+                '../room-5-dolphin-island-port/#arrival-from-14'
+            "
+          ></div>
+          <div
+            id="arrival-from-13"
+            class="door object interactable clickable exit-3"
+            onclick="
+              location.href = '../room-13-giant-robot-city/#arrival-from-14'
+            "
+          ></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -282,6 +282,11 @@ position: relative or absolute
     height: var(--screen-height);
 }
 
+.cat {
+    width: 50px;
+    height: 50px;
+}
+
 .tv {
     top: 50%;
     left: 50%;
@@ -769,13 +774,6 @@ a {
     z-index: 100;
 }
 
-.interaction-indicator {
-    position: absolute;
-    top: 0%;
-    left: 50%;
-    transform: translate(-50%, -100%);
-}
-
 .question-indicator {
     width: 2.5rem;
     height: 2.5rem;
@@ -828,11 +826,11 @@ a {
     align-items: center;
 }
 
-.reciever {
+.receiver {
     position: absolute;
 }
 
-.reciever .on {
+.receiver .on {
     position: absolute;
     top: 0;
     left: 0;
@@ -844,7 +842,7 @@ a {
     align-items: center;
 }
 
-.reciever .off {
+.receiver .off {
     position: absolute;
     top: 0;
     left: 0;
@@ -856,28 +854,28 @@ a {
     align-items: center;
 }
 
-#reciever-1 {
+#receiver-1 {
     left: 20%;
     top: 20%;
     width: 100px;
     height: 100px;
 }
 
-#reciever-2 {
+#receiver-2 {
     left: 50%;
     top: 20%;
     width: 100px;
     height: 100px;
 }
 
-#reciever-3 {
+#receiver-3 {
     left: 0;
     right: 0;
     top: 0;
     bottom: 0;
 }
 
-#reciever-4 {
+#receiver-4 {
     left: 0;
     top: 0;
     width: 100px;
@@ -1083,5 +1081,23 @@ a {
 
 #door-1 {
     top: 225px;
-    left: 980px
+    left: 980px;
+}
+
+@keyframes platform-move-example-y {
+    from { transform: translateY(0); }
+    to { transform: translateY(200px); }
+}
+
+@keyframes platform-move-example-x {
+    from { transform: translateX(0); }
+    to { transform: translateX(200px); }
+}
+
+.moving-platform-y {
+    animation: platform-move-example-y 3s ease-in-out infinite alternate;
+}
+
+.moving-platform-x {
+    animation: platform-move-example-x 3s ease-in-out infinite alternate;
 }

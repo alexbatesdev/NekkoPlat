@@ -2,193 +2,574 @@ import gameInstance from "./game.js";
 import { intersects, getCollisionOverlap, debugLog } from "./tools.js";
 
 export class CollisionDetection {
-    constructor() {
-        this.state = {
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-        };
+  constructor() {
+    this.state = {
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+    };
+    this.trackedObjects = {
+      allTrackedObjects: [],
+      solidObjects: [],
+      triggerObjects: [],
+      slopeObjects: [],
+    };
+    this.slopeDebugCanvas = null;
+    this.slopeDebugContext = null;
+    this.slopeDebugFramePending = false;
+    this.slopeDebugLastDrawTime = 0;
+    this.slopeDebugLastBounds = null;
+  }
+
+  getTrackedObjects(collisionObjects) {
+    const trackedObjects = {
+      allTrackedObjects: [],
+      solidObjects: [],
+      triggerObjects: [],
+      slopeObjects: [],
+    };
+
+    collisionObjects.forEach((collisionObject) => {
+      const el = collisionObject?.element;
+      if (!el) return;
+
+      trackedObjects.allTrackedObjects.push(collisionObject);
+
+      const isTrigger = el.classList.contains("trigger");
+      const isSlope = el.classList.contains("slope");
+      const isSolid = el.classList.contains("solid");
+
+      if (isTrigger) trackedObjects.triggerObjects.push(collisionObject);
+      if (isSlope) trackedObjects.slopeObjects.push(collisionObject);
+      if (isSolid && !isSlope && !isTrigger) {
+        trackedObjects.solidObjects.push(collisionObject);
+      }
+    });
+
+    this.trackedObjects = trackedObjects;
+    return trackedObjects;
+  }
+
+  applyCollisions(object, collisionObjects) {
+    this.checkOutOfBounds(object);
+    object.updateTransform?.();
+    const trackedObjects = this.getTrackedObjects(collisionObjects);
+    this.checkTriggerCollisions(object, trackedObjects.triggerObjects);
+    let horizontal_collision_count = this.checkHorizontalCollisions(
+      object,
+      trackedObjects.solidObjects
+    );
+    let vertical_collision_count = this.checkVerticalCollisions(
+      object,
+      trackedObjects.solidObjects
+    );
+    let slope_collision_count = this.checkSlopeCollisions(
+      object,
+      trackedObjects.slopeObjects
+    );
+    if (horizontal_collision_count <= 0) {
+      this.state = {
+        left: 0,
+        right: 0,
+        top: this.state.top,
+        bottom: this.state.bottom,
+      };
+    }
+    if (vertical_collision_count <= 0 && slope_collision_count <= 0) {
+      this.state = {
+        left: this.state.left,
+        right: this.state.right,
+        top: 0,
+        bottom: 0,
+      };
+    }
+    if (
+      vertical_collision_count == 0 &&
+      horizontal_collision_count == 0 &&
+      slope_collision_count == 0
+    ) {
+      this.state = {
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+      };
     }
 
-    applyCollisions(object, collisionObjects) {
-        this.checkOutOfBounds(object);
-        this.checkTriggerCollisions(object, collisionObjects);
-        let horizontal_collision_count = this.checkHorizontalCollisions(object, collisionObjects);
-        let vertical_collision_count = this.checkVerticalCollisions(object, collisionObjects);
-        if (horizontal_collision_count <= 0) {
-            this.state = {
-                left: 0,
-                right: 0,
-                top: this.state.top,
-                bottom: this.state.bottom,
-            }
+    this.queueSlopeDebugDraw(object, trackedObjects.slopeObjects);
+  }
+
+  checkTriggerCollisions(object, triggerObjects) {
+    const playerRect = object.element.getBoundingClientRect();
+    triggerObjects.forEach((collisionObject) => {
+      if (!collisionObject.enabled) return;
+      const collisionRect = collisionObject.element.getBoundingClientRect();
+      if (intersects(playerRect, collisionRect)) {
+        collisionObject.trigger();
+      }
+    });
+  }
+
+  checkVerticalCollisions(object, collisionObjects) {
+    let collisionCount = 0;
+    collisionObjects.forEach((collisionObject) => {
+      if (!collisionObject.enabled) return;
+      const el = collisionObject.element;
+      const playerRect = object.element.getBoundingClientRect();
+      const collisionRect = el.getBoundingClientRect();
+      if (intersects(playerRect, collisionRect)) {
+        const collision = getCollisionOverlap(playerRect, collisionRect);
+        if (
+          collision.bottom > 0 &&
+          collisionObject.element.classList.contains("solid")
+        ) {
+          collisionCount++;
+          this.state.bottom = collision.bottom;
+          object.y -= collision.bottom;
+          object.velocityY = 0;
         }
-        if (vertical_collision_count <= 0) {
-            this.state = {
-                left: this.state.left,
-                right: this.state.right,
-                top: 0,
-                bottom: 0,
-            }
+        if (
+          collision.top > 0 &&
+          collisionObject.element.classList.contains("solid")
+        ) {
+          collisionCount++;
+          this.state.top = collision.top;
+          object.y += collision.top;
+          object.velocityY = 0;
         }
-        if (vertical_collision_count == 0 && horizontal_collision_count == 0) {
-            this.state = {
-                left: 0,
-                right: 0,
-                top: 0,
-                bottom: 0,
-            }
+      }
+    });
+    return collisionCount;
+  }
+
+  checkHorizontalCollisions(object, collisionObjects) {
+    let collisionCount = 0;
+    collisionObjects.forEach((collisionObject) => {
+      if (!collisionObject.enabled) return;
+      const el = collisionObject.element;
+      const playerRect = object.element.getBoundingClientRect();
+      const collisionRect = el.getBoundingClientRect();
+      if (intersects(playerRect, collisionRect)) {
+        const collision = getCollisionOverlap(playerRect, collisionRect);
+        if (
+          collision.left > 0 &&
+          collisionObject.element.classList.contains("solid")
+        ) {
+          this.state.left = collision.left;
+          object.x += collision.left;
+          object.velocityX = 0;
+          collisionCount++;
         }
+        if (
+          collision.right > 0 &&
+          collisionObject.element.classList.contains("solid")
+        ) {
+          collisionCount++;
+          this.state.right = collision.right;
+          object.x -= collision.right;
+          object.velocityX = 0;
+        }
+      }
+    });
+    return collisionCount;
+  }
+
+  evaluateSlopeEquation(slopeElement, x) {
+    const rawEquation = slopeElement.dataset.slopeEquation || "";
+    if (!rawEquation) return null;
+
+    let expression = rawEquation.trim();
+    if (!expression) return null;
+
+    const equationMatch = expression.match(/^y\s*=\s*(.+)$/i);
+    if (equationMatch) {
+      expression = equationMatch[1];
     }
 
-    checkTriggerCollisions(object, collisionObjects) {
+    // 🐢💭
+    // This is a very basic and limited parser for simple mathematical expressions.
+    // Eventually, a proper math expression parser module should be used for more 
+    // complex expressions and better error handling. 
+    // And because it would be fun to make I think! No AI except for asking questions
+    expression = expression.replace(/\s+/g, "");
+    expression = expression.replace(/\^/g, "**");
+    expression = expression.replace(/([A-Za-z)])(?=[A-Za-z(])/g, "$1*");
+    expression = expression.replace(/([A-Za-z)])(?=[0-9(])/g, "$1*");
+    expression = expression.replace(/([0-9)])(?=[A-Za-z(])/g, "$1*");
+
+    const variableValues = {};
+    Object.entries(slopeElement.dataset).forEach(([key, value]) => {
+      const singleLetterMatch = key.match(/^slope([A-Za-z])$/);
+      if (!singleLetterMatch) return;
+      const variableName = singleLetterMatch[1].toLowerCase();
+      const numericValue = Number(value);
+      if (Number.isFinite(numericValue)) {
+        variableValues[variableName] = numericValue;
+      }
+    });
+
+    const paramNames = ["x", ...Object.keys(variableValues)];
+    const paramValues = [x, ...Object.values(variableValues)];
+
+    try {
+      const evaluator = new Function(...paramNames, `return (${expression});`);
+      const result = evaluator(...paramValues);
+      return Number.isFinite(result) ? result : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  getSlopeSurfaceHeight(slopeElement, localX) {
+    const slopeRect = slopeElement.getBoundingClientRect();
+    const equation = slopeElement.dataset.slopeEquation;
+
+    if (equation) {
+      if (localX < 0 || localX > slopeRect.width) return null;
+      const inputY = this.evaluateSlopeEquation(slopeElement, localX);
+      if (inputY == null || inputY < 0 || inputY > slopeRect.height) return null;
+      // Interpret user input as a conventional math line with y increasing upward.
+      // Convert that to the screen-space height from the top edge.
+      return slopeRect.height - inputY;
+    }
+
+    const type = slopeElement.dataset.slope || "up-right";
+    const xRatio = localX / slopeRect.width;
+    if (xRatio < 0 || xRatio > 1) return null;
+
+    switch (type) {
+      case "up-right":
+        return slopeRect.height * (1 - xRatio);
+      case "up-left":
+        return slopeRect.height * xRatio;
+      case "down-right":
+        return slopeRect.height * xRatio;
+      case "down-left":
+        return slopeRect.height * (1 - xRatio);
+      default:
+        return slopeRect.height * (1 - xRatio);
+    }
+  }
+
+  getSlopeSurfaceY(slopeElement, playerRect) {
+    const slopeRect = slopeElement.getBoundingClientRect();
+    const centerX = playerRect.left + playerRect.width / 2;
+    const localX = centerX - slopeRect.left;
+    const surfaceHeight = this.getSlopeSurfaceHeight(slopeElement, localX);
+    if (surfaceHeight == null) return null;
+    return slopeRect.top + surfaceHeight;
+  }
+
+  getSlopeRole(slopeElement) {
+    const role = (slopeElement.dataset.slopeRole || "floor").toLowerCase();
+    return role === "ceiling" ? "ceiling" : "floor";
+  }
+
+  ensureSlopeDebugCanvas() {
+    if (typeof document === "undefined") return null;
+    if (this.slopeDebugCanvas) return this.slopeDebugCanvas;
+
+    const canvas = document.createElement("canvas");
+    canvas.style.position = "fixed";
+    canvas.style.inset = "0";
+    canvas.style.width = "100vw";
+    canvas.style.height = "100vh";
+    canvas.style.pointerEvents = "none";
+    canvas.style.zIndex = "10000";
+    canvas.style.opacity = "0.9";
+    document.body.appendChild(canvas);
+
+    this.slopeDebugCanvas = canvas;
+    this.slopeDebugContext = canvas.getContext("2d");
+    return canvas;
+  }
+
+  updateSlopeClipPath(slopeElement) {
+    const clipAttr = slopeElement.dataset.slopeClip;
+    if (clipAttr === undefined || clipAttr === "false") return;
+
+    const rect = slopeElement.getBoundingClientRect();
+    const sampleCount = Math.max(4, Math.round(rect.width / 20));
+    const slopeRole = this.getSlopeRole(slopeElement);
+    const points =
+      slopeRole === "ceiling"
+        ? [`0 0`, `${rect.width}px 0`]
+        : [`0 ${rect.height}px`, `${rect.width}px ${rect.height}px`];
+
+    for (let i = sampleCount; i >= 0; i--) {
+      const localX = (rect.width * i) / sampleCount;
+      let y = this.getSlopeSurfaceHeight(slopeElement, localX);
+      if (y == null) {
+        y = slopeRole === "ceiling" ? 0 : rect.height;
+      }
+      y = Math.max(0, Math.min(rect.height, y));
+      points.push(`${localX}px ${y}px`);
+    }
+
+    const clipPath = `polygon(${points.join(",")})`;
+    slopeElement.style.clipPath = clipPath;
+    slopeElement.style.webkitClipPath = clipPath;
+  }
+
+  queueSlopeDebugDraw(object, slopeObjects) {
+    slopeObjects.forEach((entry) => {
+      const el = entry.element;
+      this.updateSlopeClipPath(el);
+    });
+
+    if (!gameInstance.debug) {
+      if (this.slopeDebugCanvas) {
+        this.slopeDebugCanvas.style.display = "none";
+      }
+      return;
+    }
+
+    if (!this.ensureSlopeDebugCanvas()) return;
+    this.slopeDebugCanvas.style.display = "block";
+
+    const playerRect = object?.element?.getBoundingClientRect?.();
+    const bounds = {
+      playerLeft: playerRect?.left ?? 0,
+      playerTop: playerRect?.top ?? 0,
+      playerWidth: playerRect?.width ?? 0,
+      collisionCount: slopeObjects.length,
+      width: window.innerWidth,
+      height: window.innerHeight,
+      dpr: window.devicePixelRatio || 1,
+    };
+
+    const shouldSkip =
+      this.slopeDebugFramePending ||
+      (this.slopeDebugLastBounds &&
+        this.slopeDebugLastBounds.playerLeft === bounds.playerLeft &&
+        this.slopeDebugLastBounds.playerTop === bounds.playerTop &&
+        this.slopeDebugLastBounds.playerWidth === bounds.playerWidth &&
+        this.slopeDebugLastBounds.collisionCount === bounds.collisionCount &&
+        this.slopeDebugLastBounds.width === bounds.width &&
+        this.slopeDebugLastBounds.height === bounds.height &&
+        this.slopeDebugLastBounds.dpr === bounds.dpr);
+
+    if (shouldSkip) return;
+
+    this.slopeDebugLastBounds = bounds;
+    this.slopeDebugFramePending = true;
+    window.requestAnimationFrame(() => {
+      this.slopeDebugFramePending = false;
+      this.drawSlopeDebugLines(object, slopeObjects);
+    });
+  }
+
+  drawSlopeDebugLines(object, slopeObjects) {
+    const canvas = this.slopeDebugCanvas;
+    const ctx = this.slopeDebugContext;
+    if (!gameInstance.debug || !canvas || !ctx) {
+      if (this.slopeDebugCanvas) {
+        this.slopeDebugCanvas.style.display = "none";
+      }
+      return;
+    }
+
+    const dpr = window.devicePixelRatio || 1;
+    const width = Math.round(window.innerWidth * dpr);
+    const height = Math.round(window.innerHeight * dpr);
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width;
+      canvas.height = height;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    ctx.strokeStyle = "rgba(255, 0, 0, 0.9)";
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    slopeObjects.forEach((collisionObject) => {
+      const el = collisionObject.element;
+      const rect = el.getBoundingClientRect();
+      const sampleCount = Math.max(20, Math.round(rect.width / 8));
+      ctx.beginPath();
+      let hasPoint = false;
+      for (let i = 0; i <= sampleCount; i++) {
+        const localX = (rect.width * i) / sampleCount;
+        const y = this.getSlopeSurfaceHeight(el, localX);
+        if (y == null) continue;
+        const x = rect.left + localX;
+        const worldY = rect.top + y;
+        if (!hasPoint) {
+          ctx.moveTo(x, worldY);
+          hasPoint = true;
+        } else {
+          ctx.lineTo(x, worldY);
+        }
+      }
+      if (hasPoint) {
+        ctx.stroke();
+      }
+
+      if (object?.element) {
         const playerRect = object.element.getBoundingClientRect();
-        collisionObjects.forEach(collisionObject => {
-            if (!collisionObject.enabled) return;
-            const collisionRect = collisionObject.element.getBoundingClientRect();
-            if (intersects(playerRect, collisionRect)) {
-                if (collisionObject.element.classList.contains('trigger')) {
-                    collisionObject.trigger();
-                }
-            }
-        });
-    }
-
-    checkVerticalCollisions(object, collisionObjects) {
-        const playerRect = object.element.getBoundingClientRect();
-        let collisionCount = 0;
-        collisionObjects.forEach(collisionObject => {
-            if (!collisionObject.enabled) return;
-            if (collisionObject.element.classList.contains('trigger')) return;
-            const collisionRect = collisionObject.element.getBoundingClientRect();
-            const playerRectBase = {
-                left: playerRect.left + 20,
-                right: playerRect.right - 20,
-                x: playerRect.x,
-                y: playerRect.y,
-                width: playerRect.width,
-                height: playerRect.height,
-            };
-            for (let i = 0.25; i < 1; i += 0.25) {
-                const playerRectNext = {
-                    ...playerRectBase,
-                    top: playerRect.top + (object.velocityY * i),
-                    bottom: playerRect.bottom + ((object.velocityY - object.physics.gravity) * i),
-                };
-                if (intersects(playerRectNext, collisionRect)) {
-                    if (collisionObject.element.classList.contains('solid')) {
-                        object.velocityY = 0;
-                    }
-                }
-            }
-            if (intersects(playerRect, collisionRect)) {
-                const collision = getCollisionOverlap(playerRect, collisionRect);
-                if (collision.bottom > 0 && collisionObject.element.classList.contains('solid')) {
-                    collisionCount++;
-                    this.state.bottom = collision.bottom;
-                    object.y -= collision.bottom;
-                }
-                if (collision.top > 0 && collisionObject.element.classList.contains('solid')) {
-                    collisionCount++;
-                    this.state.top = collision.top;
-                    object.y += collision.top;
-                }
-            }
-        });
-        return collisionCount;
-    }
-
-    checkHorizontalCollisions(object, collisionObjects) {
-        const playerRect = object.element.getBoundingClientRect();
-        let collisionCount = 0;
-        collisionObjects.forEach(collisionObject => {
-            if (!collisionObject.enabled) return;
-            if (collisionObject.element.classList.contains('trigger')) return;
-            const collisionRect = collisionObject.element.getBoundingClientRect();
-            const playerRectBase = {
-                top: playerRect.top,
-                bottom: playerRect.bottom - 25,
-                x: playerRect.x,
-                y: playerRect.y,
-                width: playerRect.width,
-                height: playerRect.height,
-            };
-            for (let i = 0.25; i < 1; i += 0.25) {
-                const playerRectNext = {
-                    ...playerRectBase,
-                    left: playerRect.left + (object.velocityX * i),
-                    right: playerRect.right + (object.velocityX * i),
-                };
-                if (intersects(playerRectNext, collisionRect)) {
-                    if (collisionObject.element.classList.contains('solid')) {
-                        object.velocityX = 0;
-                    }
-                }
-            }
-            if (intersects(playerRect, collisionRect)) {
-                const collision = getCollisionOverlap(playerRect, collisionRect);
-                if (collision.left > 0 && collisionObject.element.classList.contains('solid')) {
-                    this.state.left = collision.left;
-                    object.x += collision.left;
-                    collisionCount++;
-                }
-                if (collision.right > 0 && collisionObject.element.classList.contains('solid')) {
-                    collisionCount++;
-                    this.state.right = collision.right;
-                    object.x -= collision.right;
-                }
-            }
-        });
-        return collisionCount;
-    }
-
-    checkOutOfBounds(object) {
-        const playerRect = object.element.getBoundingClientRect();
-        const levelRect = gameInstance.level.element.getBoundingClientRect();
-        const outOfBoundEffect = gameInstance.level.outOfBoundEffect;
-        if (playerRect.left < levelRect.left) {
-            debugLog("Out of bounds left");
-            if (outOfBoundEffect.left == "contain") {
-                object.x -= playerRect.left - levelRect.left;
-            } else if (outOfBoundEffect.left == "respawn") {
-                this.respawnAtCheckpoint();
-            } else if (outOfBoundEffect.left == "wrap") {
-                object.x = levelRect.width - (playerRect.width * 1.25);
-                gameInstance.camera.snapToPlayer();
-            }
-        } else if (playerRect.right > levelRect.right) {
-            debugLog("Out of bounds right");
-            if (outOfBoundEffect.right == "contain") {
-                object.x -= playerRect.right - levelRect.right;
-            } else if (outOfBoundEffect.right == "respawn") {
-                this.respawnAtCheckpoint();
-            } else if (outOfBoundEffect.right == "wrap") {
-                object.x = 0 + (playerRect.width / 4)
-                gameInstance.camera.snapToPlayer();
-            }
+        const centerX = playerRect.left + playerRect.width / 2;
+        const localX = centerX - rect.left;
+        const surfaceHeight = this.getSlopeSurfaceHeight(el, localX);
+        if (surfaceHeight != null) {
+          const surfaceY = rect.top + surfaceHeight;
+          ctx.beginPath();
+          ctx.fillStyle = "#00f7ff";
+          ctx.arc(centerX, surfaceY, 4, 0, Math.PI * 2);
+          ctx.fill();
         }
-        if (playerRect.top < levelRect.top) {
-            debugLog("Out of bounds top");
-            if (outOfBoundEffect.top == "contain") {
-                object.y -= playerRect.top - levelRect.top;
-            } else if (outOfBoundEffect.top == "respawn") {
-                this.respawnAtCheckpoint();
-            } else if (outOfBoundEffect.top == "wrap") {
-                object.y = levelRect.height - (playerRect.height + 1);
-                gameInstance.camera.snapToPlayer();
-            }
-        } else if (playerRect.bottom > levelRect.bottom) {
-            debugLog("Out of bounds bottom");
-            if (outOfBoundEffect.bottom == "contain") {
-                object.y -= playerRect.height - (levelRect.bottom - playerRect.top);
-            } else if (outOfBoundEffect.bottom == "respawn") {
-                this.respawnAtCheckpoint();
-            } else if (outOfBoundEffect.bottom == "wrap") {
-                object.y = 0;
-                gameInstance.camera.snapToPlayer();
-            }
+      }
+    });
+  }
 
+  checkSlopeCollisions(object, slopeObjects) {
+    let collisionCount = 0;
+
+    slopeObjects.forEach((collisionObject) => {
+      if (!collisionObject.enabled) return;
+      const slopeElement = collisionObject.element;
+      const slopeRole = this.getSlopeRole(slopeElement);
+
+      const playerRect = object.element.getBoundingClientRect();
+      const slopeRect = slopeElement.getBoundingClientRect();
+      if (!intersects(playerRect, slopeRect)) return;
+
+      const surfaceY = this.getSlopeSurfaceY(slopeElement, playerRect);
+      if (surfaceY == null) return;
+
+      const playerBottom = playerRect.bottom;
+      const playerTop = playerRect.top;
+
+      // Floor collision (player on top of slope)
+      const floorGap = playerBottom - surfaceY;
+      const isDescending = object.velocityY >= 0;
+      const isCloseToFloor = floorGap >= -8 && floorGap <= 24;
+      const isSunkIntoSlope = floorGap > 0 && floorGap <= playerRect.height;
+
+      if (
+        slopeRole === "floor" &&
+        ((isDescending && isCloseToFloor) || isSunkIntoSlope)
+      ) {
+        const snapOffset = surfaceY - playerBottom;
+        if (Math.abs(snapOffset) > 0.001) {
+          object.y += snapOffset;
+          object.velocityY = 0;
+          this.state.bottom = Math.max(0, -snapOffset);
+          object.updateTransform?.();
+          collisionCount++;
+          return;
         }
+      }
+
+      // Ceiling collision (player hitting slope from below)
+      const ceilingGap = surfaceY - playerTop;
+      const isAscending = object.velocityY < 0;
+      const isSunkIntoCeiling = ceilingGap > 0 && ceilingGap <= playerRect.height;
+
+      if (
+        slopeRole === "ceiling" &&
+        isAscending &&
+        isSunkIntoCeiling
+      ) {
+        const snapOffset = surfaceY - playerTop;
+        if (Math.abs(snapOffset) > 0.001) {
+          object.y += snapOffset;
+          object.velocityY = 0;
+          this.state.top = Math.max(0, snapOffset);
+          object.updateTransform?.();
+          collisionCount++;
+          return;
+        }
+      }
+    });
+    return collisionCount;
+  }
+
+  isGrounded(object, collisionObjects) {
+    const trackedObjects = this.getTrackedObjects(collisionObjects);
+    const groundProbeObjects = [
+      ...trackedObjects.solidObjects,
+      ...trackedObjects.slopeObjects,
+    ];
+    const playerRect = object.element.getBoundingClientRect();
+    const probeRect = {
+      left: playerRect.left,
+      right: playerRect.right,
+      top: playerRect.bottom,
+      bottom: playerRect.bottom + 1,
+    };
+    let groundedObj = null;
+    const grounded = groundProbeObjects.some((collisionObject) => {
+      const el = collisionObject.element;
+      if (
+        el.classList.contains("slope") &&
+        this.getSlopeRole(el) === "ceiling"
+      ) {
+        return false;
+      }
+      const hit = intersects(probeRect, el.getBoundingClientRect());
+      if (hit) groundedObj = collisionObject;
+      return hit;
+    });
+    object.groundedObject = groundedObj;
+    return grounded;
+  }
+
+  checkOutOfBounds(object) {
+    const playerRect = object.element.getBoundingClientRect();
+    const levelRect = gameInstance.level.element.getBoundingClientRect();
+    const outOfBoundEffect = gameInstance.level.outOfBoundEffect;
+    if (playerRect.left < levelRect.left) {
+      debugLog("Out of bounds left");
+      if (outOfBoundEffect.left == "contain") {
+        object.x -= playerRect.left - levelRect.left;
+        object.updateTransform?.();
+      } else if (outOfBoundEffect.left == "respawn") {
+        object.respawnAtCheckpoint?.();
+      } else if (outOfBoundEffect.left == "wrap") {
+        object.x = levelRect.width - playerRect.width * 1.25;
+        gameInstance.camera.snapToPlayer();
+        object.updateTransform?.();
+      }
+    } else if (playerRect.right > levelRect.right) {
+      debugLog("Out of bounds right");
+      if (outOfBoundEffect.right == "contain") {
+        object.x -= playerRect.right - levelRect.right;
+        object.updateTransform?.();
+      } else if (outOfBoundEffect.right == "respawn") {
+        object.respawnAtCheckpoint?.();
+      } else if (outOfBoundEffect.right == "wrap") {
+        object.x = 0 + playerRect.width / 4;
+        gameInstance.camera.snapToPlayer();
+        object.updateTransform?.();
+      }
     }
+    if (playerRect.top < levelRect.top) {
+      debugLog("Out of bounds top");
+      if (outOfBoundEffect.top == "contain") {
+        object.y -= playerRect.top - levelRect.top;
+        object.updateTransform?.();
+      } else if (outOfBoundEffect.top == "respawn") {
+        object.respawnAtCheckpoint?.();
+      } else if (outOfBoundEffect.top == "wrap") {
+        object.y = levelRect.height - (playerRect.height + 1);
+        gameInstance.camera.snapToPlayer();
+        object.updateTransform?.();
+      }
+    } else if (playerRect.bottom > levelRect.bottom) {
+      debugLog("Out of bounds bottom");
+      if (outOfBoundEffect.bottom == "contain") {
+        object.y -= playerRect.height - (levelRect.bottom - playerRect.top);
+        object.updateTransform?.();
+      } else if (outOfBoundEffect.bottom == "respawn") {
+        object.respawnAtCheckpoint?.();
+      } else if (outOfBoundEffect.bottom == "wrap") {
+        object.y = 0;
+        gameInstance.camera.snapToPlayer();
+        object.updateTransform?.();
+      }
+    }
+  }
 }

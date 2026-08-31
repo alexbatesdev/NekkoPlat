@@ -8,7 +8,6 @@ const syncBackgrounds = () => {
     for (let i = 0; i < backgrounds.length; i++) {
         const element = backgrounds[i];
         const elementRect = element.getBoundingClientRect();
-        console.log(elementRect.x, elementRect.y, elementRect.width, elementRect.height)
         element.style.backgroundPositionX = "-" + elementRect.x + "px";
         element.style.backgroundPositionY = "-" + elementRect.y + "px";
         element.style.setProperty("--background-size", backgroundWidth + "px")

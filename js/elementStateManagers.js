@@ -1,5 +1,6 @@
 import { debugLog } from './tools.js';
 import gameInstance from './game.js';
+import { executeOnclickWithContext, getOnclickHandlerFromElement } from './onclickExecutor.js';
 
 export default class ToggleManager {
     constructor(element, startOn = false) {
@@ -36,12 +37,12 @@ export default class ToggleManager {
         });
     }
 
-    toggle() {
+    toggle(event) {
         debugLog('Toggled', this.parent_element);
         if (this.toggledOn) {
-            this.setToggledOff();
+            this.setToggledOff(false, event);
         } else {
-            this.setToggledOn();
+            this.setToggledOn(false, event);
         }
     }
 
@@ -53,26 +54,79 @@ export default class ToggleManager {
         }
     }
 
-    setToggledOn(noClick = false) {
+    buildOnclickHelpers(event, additionalHelpers = {}) {
+        return {
+            manager: this,
+            parentElement: this.parent_element,
+            onElement: this.on_element,
+            offElement: this.off_element,
+            game: gameInstance,
+            player: gameInstance.player,
+            level: gameInstance.level,
+            camera: gameInstance.camera,
+            window,
+            document,
+            globalThis,
+            location,
+            toggle: (nextEvent = event) => this.toggle(nextEvent),
+            setOn: (nextEvent = event) => this.setToggledOn(false, nextEvent),
+            setOff: (nextEvent = event) => this.setToggledOff(false, nextEvent),
+            getState: () => this.getState(),
+            broadcastSignal: (channel, signal) => gameInstance.signalManager.broadcastSignal(channel, signal),
+            navigate: (url) => { window.location.href = url; },
+            event,
+            ...additionalHelpers,
+        };
+    }
+
+    executeElementOnclick(element, event, helpers = {}) {
+        const onclick = getOnclickHandlerFromElement(element);
+        if (!onclick) return false;
+
+        return executeOnclickWithContext({
+            onclick,
+            event,
+            thisArg: this,
+            helpers: this.buildOnclickHelpers(event, helpers),
+            errorLabel: `onclick for toggle element ${element?.id || element?.className || 'unknown'}`,
+        });
+    }
+
+    setToggledOn(noClick = false, event) {
         debugLog('Toggled On');
         this.toggledOn = true;
         this.on_element.style.visibility = 'visible';
         this.off_element.style.visibility = 'hidden';
-        if (!noClick) this.on_element.click();
+        if (!noClick) this.executeElementOnclick(this.on_element, event, { toggledOn: true });
         this.on_broadcasts.forEach(broadcast => gameInstance.signalManager.broadcastSignal(broadcast[0], broadcast[1]));
     }
     
-    setToggledOff(noClick = false) {
+    setToggledOff(noClick = false, event) {
         debugLog('Toggled Off');
         this.toggledOn = false;
         this.on_element.style.visibility = 'hidden';
         this.off_element.style.visibility = 'visible';
-        if (!noClick) this.off_element.click();
+        if (!noClick) this.executeElementOnclick(this.off_element, event, { toggledOn: false });
         this.off_broadcasts.forEach(broadcast => gameInstance.signalManager.broadcastSignal(broadcast[0], broadcast[1]));
     }
 
     getState() {
         return this.toggledOn;
+    }
+
+    listenToBroadcast(channel, onSignal = 'on', offSignal = 'off') {
+        gameInstance.signalManager.addListener(channel, (signal) => {
+            if (signal === onSignal && !this.toggledOn) {
+                this.toggledOn = true;
+                this.on_element.style.visibility = 'visible';
+                this.off_element.style.visibility = 'hidden';
+            }
+            if (signal === offSignal && this.toggledOn) {
+                this.toggledOn = false;
+                this.on_element.style.visibility = 'hidden';
+                this.off_element.style.visibility = 'visible';
+            }
+        });
     }
 }
 
@@ -101,10 +155,11 @@ export class MultiStateManager {
         return this.currentState;
     }
 
-    syncStateToBroadcast(channel) {
-        const state = gameInstance.signalManager.checkBroadcast(channel);
-        if (state) {
-            this.setState(state);
-        }
+    listenToBroadcast(channel) {
+        gameInstance.signalManager.addListener(channel, (signal) => {
+            if (signal) {
+                this.setState(signal);
+            }
+        });
     }
 }
