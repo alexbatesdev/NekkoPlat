@@ -4,9 +4,10 @@ A browser-based platformer engine built with plain JavaScript, HTML and CSS. Lev
 
 ## Getting Started
 
-1. Include the engine script and styles in your HTML:
+1. Include the engine script and styles in your HTML. `global.css` is required — it holds structural rules the engine's JS depends on (viewport sizing, object positioning, etc.). `platformer.css` is this project's own visual theme for levels/objects (stone textures, backgrounds, etc.); you can swap it for your own stylesheet as long as you cover the same object/solid classes your level uses. See `examples/minimal-import/` for a level that supplies its own minimal theme instead of `platformer.css`.
 
 ```html
+<link rel="stylesheet" href="css/global.css">
 <link rel="stylesheet" href="css/platformer.css">
 <script type="module" src="js/platformer.js" defer></script>
 ```
@@ -51,8 +52,24 @@ A browser-based platformer engine built with plain JavaScript, HTML and CSS. Lev
 * Grid dimensions are defined on the `.level` element via a `grid-colsxrows` class.
 * Add `dynamic` or `initial` on `.level` to control how `--screen-width`/`--screen-height` are initialized (`dynamic` updates on resize).
 * Out-of-bounds behavior is controlled by classes on the `.level` element such as `contain`, `respawn` or `wrap` with optional direction suffixes (e.g. `wrap-vert`).
+* Level-wide decorative parallax can be authored as direct children of `.level` using `.parallax-layer`; these layers persist across all screens and are updated from camera scroll instead of screen ownership.
 * Player spawn can be set via URL fragment target IDs (for example `#door-1`), which aligns with normal DOM anchor-style syntax.
 * Filters and camera behavior are controlled with classes on `#viewport` (e.g. `no-follow`, `scroll-bar`).
+
+Example level-wide parallax layer:
+
+```html
+<div class="level contain grid-3x1" id="level-one">
+  <div class="parallax-layer grassland-skyline z-6 noplax-y" data-plax-scale="1.08"></div>
+  <div class="screen">...</div>
+</div>
+```
+
+Authoring notes:
+- Negative `z-*` values behave like distant backgrounds and move more slowly than the world.
+- Positive `z-*` values can be used for foreground decorative layers that move faster than the world.
+- Use `data-plax-depth`, `data-plax-depth-x`, or `data-plax-depth-y` to override the z-derived depth when needed.
+- Use `data-plax-scale` for optional scale, `data-plax-offset-x` / `data-plax-offset-y` for static offsets, and `noplax-x` / `noplax-y` to lock an axis.
 
 ## Module Overview
 
@@ -77,8 +94,13 @@ Also wires inventory runtime dependencies:
 ### `level.js`
 Represents the level grid. Discovers `.screen` elements, wraps them as `Screen` objects, configures grid dimensions from `grid-CxR`, and initializes screen sizing variables (`--screen-width`, `--screen-height`) based on `initial`/`dynamic` classes. It stores per-side out-of-bounds policy that collision handling applies at runtime.
 
+Also discovers level-wide `.parallax-layer` children, moves them under an internal `.level-parallax-root`, and updates them separately from screen-local objects.
+
 ### `screen.js`
-Represents a single screen within the level. Collects solid objects, interactables, receivers and parallax objects, registers nearby solids/interactables with the player and updates objects when the player is present.
+Represents a single screen within the level. Collects solid objects, interactables, receivers and screen-local parallax props, registers nearby solids/interactables with the player and updates objects when the player is present.
+
+### `levelParallax.js`
+Level-wide decorative parallax runtime. Interprets `z-index` or `z-*` classes as the default depth control, then converts camera scroll into stable layer transforms without requiring layers to live inside `.screen` elements.
 
 ### `levelObjects.js`
 Defines in‑level object types:

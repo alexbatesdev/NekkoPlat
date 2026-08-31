@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Planet Piinro - Dolphin Island Port</title>
+    <link rel="stylesheet" href="../../../css/reset.css" />
+    <link rel="stylesheet" href="../../../css/global.css" />
+    <link rel="stylesheet" href="../planet-piinro.css" />
+      <link rel="stylesheet" href="./room-5-dolphin-island-port.css" />
+    <script type="module" src="../../../js/platformer.js" defer></script>
+  </head>
+  <body>
+    <div id="viewport">
+      <div class="level grid-1x1 contain" id="level-one">
+        <div class="screen">
+          <div class="room-number">Room 5</div>
+          <h1 class="room-title">Dolphin Island Port</h1>
+          <div
+            id="player"
+            style="width: 50px; height: 50px; background: hotpink"
+          >
+            <div class="interaction-indicator question-indicator">?</div>
+            <div id="interactionBox"></div>
+          </div>
+          <div class="object solid floor"></div>
+          <div
+            id="arrival-from-3"
+            class="door object interactable clickable exit-1"
+            onclick="
+              location.href = '../room-3-star-isle-port/#arrival-from-5'
+            "
+          ></div>
+          <div
+            id="arrival-from-6"
+            class="door object interactable clickable exit-2"
+            onclick="
+              location.href = '../room-6-little-big-city/#arrival-from-5'
+            "
+          ></div>
+          <div
+            id="arrival-from-7"
+            class="door object interactable clickable exit-3"
+            onclick="
+              location.href = '../room-7-little-big-beach/#arrival-from-5'
+            "
+          ></div>
+          <div
+            id="arrival-from-14"
+            class="door object interactable clickable exit-4"
+            onclick="
+              location.href = '../room-14-giant-robot-harbor/#arrival-from-5'
+            "
+          ></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

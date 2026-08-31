@@ -120,6 +120,7 @@ class Game {
                 this.player.update();
                 this.level.update();
                 this.camera.update();
+                this.level.updateParallaxLayers(this.camera.element);
             }
             this.accumulator -= this.fixedDelta;
         }

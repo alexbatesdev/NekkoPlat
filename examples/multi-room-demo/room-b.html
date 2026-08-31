@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NekkoPlat - Multi-Room Demo (Room B)</title>
+
+    <link rel="stylesheet" href="../../css/reset.css">
+    <link rel="stylesheet" href="../../css/global.css">
+    <link rel="stylesheet" href="./multi-room-demo.css">
+    <script type="module" src="../../js/platformer.js" defer></script>
+    <style>
+        :root {
+            --player-spawn-x: 300px;
+            --player-spawn-y: 300px;
+        }
+    </style>
+</head>
+
+<body class="room-b">
+    <div id="viewport">
+        <div class="level grid-1x1 contain" id="level-one">
+            <div class="screen">
+                <div id="player" style="width: 50px; height: 50px; background: hotpink;">
+                    <div class="interaction-indicator question-indicator">?</div>
+                    <div id="interactionBox"></div>
+                    <span class="config">
+                        <span class="maxVelocity">10</span>
+                        <span class="sprintMaxVelocity">18</span>
+                        <span class="acceleration">1</span>
+                        <span class="sprintAcceleration">2</span>
+                        <span class="maxAirJumps">1</span>
+                        <span class="gravity">0.9</span>
+                        <span class="fallingGravity">3</span>
+                        <span class="preJumpAllowance">10</span>
+                        <span class="jumpForce">25</span>
+                        <span class="coyoteTime">100</span>
+                    </span>
+                </div>
+                <div class="object solid floor" id="floor-1"></div>
+                <div class="door object interactable clickable door-left" id="door-to-a"
+                    onclick="window.location.href='./room-a.html#door-to-b'"></div>
+                <div class="door object interactable clickable door-right" id="door-to-c"
+                    onclick="window.location.href='./room-c.html#door-to-b'"></div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

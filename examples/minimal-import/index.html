@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NekkoPlat - Minimal Import Example</title>
+
+    <!--
+        This file lives outside the engine's own html/ folder on purpose.
+        It only pulls in css/global.css and js/platformer.js, the engine's required files,
+        via the same kind of relative path an external project would use once it has
+        copied/vendored the css/ and js/ folders next to its own page. It supplies its own
+        object/solid appearance via minimal-import.css rather than the site's platformer.css theme.
+    -->
+    <link rel="stylesheet" href="../../css/reset.css">
+    <link rel="stylesheet" href="../../css/global.css">
+    <link rel="stylesheet" href="./minimal-import.css">
+    <script type="module" src="../../js/platformer.js" defer></script>
+    <style>
+        /* This level has no "initial"/"dynamic" class, so --screen-width/height fall back to
+           global.css's 100vw/100vh; override the vh-based --player-spawn-y default here in px
+           so it doesn't spawn the player below the floor. */
+        :root {
+            --player-spawn-x: 300px;
+            --player-spawn-y: 300px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="viewport">
+        <div class="level grid-1x1 contain" id="level-one">
+            <div class="screen">
+                <!-- width/height are required on the player element; the engine doesn't set them -->
+                <div id="player" style="width: 50px; height: 50px; background: hotpink;">
+                    <div id="interactionBox"></div>
+                    <span class="config">
+                        <span class="maxVelocity">10</span>
+                        <span class="sprintMaxVelocity">18</span>
+                        <span class="acceleration">1</span>
+                        <span class="sprintAcceleration">2</span>
+                        <span class="maxAirJumps">1</span>
+                        <span class="gravity">0.9</span>
+                        <span class="fallingGravity">3</span>
+                        <span class="preJumpAllowance">10</span>
+                        <span class="jumpForce">25</span>
+                        <span class="coyoteTime">100</span>
+                    </span>
+                </div>
+                <div class="object solid floor" id="floor-1"></div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

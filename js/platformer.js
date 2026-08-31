@@ -4,7 +4,6 @@ import Level from "./level.js";
 import { hasSubstringInClassList } from "./tools.js";
 // Animation Implementation Discussion
 // https://chatgpt.com/c/d6c3427f-edfa-4d17-bb39-a9a15b01fda5
-// Usage
 
 document.addEventListener('DOMContentLoaded', () => {
     const playerElement = document.getElementById('player');

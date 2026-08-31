@@ -1,4 +1,5 @@
 import Screen from './screen.js';
+import LevelParallaxLayer from './levelParallax.js';
 
 export default class Level {
     constructor(element_id) {
@@ -17,8 +18,12 @@ export default class Level {
         this.rows = 1;
         this.columns = 1;
         this.screens = [];
+        this.parallaxLayers = [];
+        this.parallaxRoot = null;
         this.initScreenGrid();
+        this.initParallaxRoot();
         this.initScreens();
+        this.initParallaxLayers();
         this.checkScreenCount();
         if (this.element.classList.contains('dynamic')) {
             this.initScreensDynamicWindowSize();
@@ -107,7 +112,7 @@ export default class Level {
 
     initScreens() {
         // Grab all of the screen elements
-        const screenElements = document.querySelectorAll('.screen');
+        const screenElements = this.element.querySelectorAll(':scope > .screen');
         let index = 0;
         this.screens = Array.from(screenElements).map(screen => {
             let column = index % this.columns;
@@ -115,6 +120,29 @@ export default class Level {
             index++;
             return new Screen(this, screen, column, row)
         });
+    }
+
+    initParallaxRoot() {
+        this.parallaxRoot = Array.from(this.element.children).find(child => child.classList?.contains('level-parallax-root'));
+        if (!this.parallaxRoot) {
+            this.parallaxRoot = document.createElement('div');
+            this.parallaxRoot.className = 'level-parallax-root';
+            this.element.prepend(this.parallaxRoot);
+        }
+    }
+
+    initParallaxLayers() {
+        const directChildLayers = Array.from(this.element.children)
+            .filter(child => child !== this.parallaxRoot && child.classList?.contains('parallax-layer'));
+
+        directChildLayers.forEach(layer => {
+            this.parallaxRoot.appendChild(layer);
+        });
+
+        const layerElements = Array.from(this.parallaxRoot.children)
+            .filter(child => child.classList?.contains('parallax-layer'));
+
+        this.parallaxLayers = layerElements.map(layer => new LevelParallaxLayer(layer));
     }
 
     reinitStyles() {
@@ -126,6 +154,14 @@ export default class Level {
     update() {
         this.screens.forEach(screen => {
             screen.update();
+        });
+    }
+
+    updateParallaxLayers(cameraElement) {
+        if (!cameraElement || this.parallaxLayers.length === 0) return;
+
+        this.parallaxLayers.forEach(layer => {
+            layer.update(cameraElement.scrollLeft, cameraElement.scrollTop);
         });
     }
 

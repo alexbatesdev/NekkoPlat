@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Planet Piinro - Observatory</title>
+    <link rel="stylesheet" href="../../../css/reset.css" />
+    <link rel="stylesheet" href="../../../css/global.css" />
+    <link rel="stylesheet" href="../planet-piinro.css" />
+      <link rel="stylesheet" href="./room-2-observatory.css" />
+    <script type="module" src="../../../js/platformer.js" defer></script>
+  </head>
+  <body>
+    <div id="viewport">
+      <div class="level grid-1x1 contain" id="level-one">
+        <div class="screen">
+          <div class="room-number">Room 2</div>
+          <h1 class="room-title">Observatory</h1>
+          <div
+            id="player"
+            style="width: 50px; height: 50px; background: hotpink"
+          >
+            <div class="interaction-indicator question-indicator">?</div>
+            <div id="interactionBox"></div>
+          </div>
+          <div class="object solid floor"></div>
+          <div
+            id="arrival-from-1"
+            class="door object interactable clickable exit-1"
+            onclick="location.href = '../room-1-space-port/#arrival-from-2'"
+          ></div>
+          <div
+            id="arrival-from-3"
+            class="door object interactable clickable exit-2"
+            onclick="
+              location.href = '../room-3-star-isle-port/#arrival-from-2'
+            "
+          ></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
