@@ -51,52 +51,24 @@ export class CollisionDetection {
     return trackedObjects;
   }
 
+  // Called once per game-loop frame, before the position-integration substeps,
+  // so a contact detected in an earlier substep survives to the end of the frame
+  // instead of being wiped out by a later substep that no longer overlaps.
+  resetState() {
+    this.state = { left: 0, right: 0, top: 0, bottom: 0 };
+  }
+
   applyCollisions(object, collisionObjects) {
     this.checkOutOfBounds(object);
     object.updateTransform?.();
     const trackedObjects = this.getTrackedObjects(collisionObjects);
     this.checkTriggerCollisions(object, trackedObjects.triggerObjects);
-    const { horizontalCollisionCount, verticalCollisionCount } = this.checkSolidCollisions(
-      object,
-      trackedObjects.solidObjects
-    );
-    let horizontal_collision_count = horizontalCollisionCount;
-    let vertical_collision_count = verticalCollisionCount;
-    let slope_collision_count = this.checkSlopeCollisions(
-      object,
-      trackedObjects.slopeObjects
-    );
-    if (horizontal_collision_count <= 0) {
-      this.state = {
-        left: 0,
-        right: 0,
-        top: this.state.top,
-        bottom: this.state.bottom,
-      };
-    }
-    if (vertical_collision_count <= 0 && slope_collision_count <= 0) {
-      this.state = {
-        left: this.state.left,
-        right: this.state.right,
-        top: 0,
-        bottom: 0,
-      };
-    }
-    if (
-      vertical_collision_count == 0 &&
-      horizontal_collision_count == 0 &&
-      slope_collision_count == 0
-    ) {
-      this.state = {
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0,
-      };
-    }
+    this.checkSolidCollisions(object, trackedObjects.solidObjects);
+    this.checkSlopeCollisions(object, trackedObjects.slopeObjects);
 
     this.queueSlopeDebugDraw(object, trackedObjects.slopeObjects);
   }
+
 
   checkTriggerCollisions(object, triggerObjects) {
     const playerRect = object.element.getBoundingClientRect();

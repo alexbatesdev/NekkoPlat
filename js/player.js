@@ -306,6 +306,7 @@ export default class Player {
 
         const steps = Math.ceil(Math.max(Math.abs(this.velocityX), Math.abs(this.velocityY)));
         const iterations = Math.max(1, steps);
+        this.collision.resetState();
         for (let i = 0; i < iterations; i++) {
             this.x += this.velocityX / iterations;
             this.y += this.velocityY / iterations;
@@ -424,10 +425,12 @@ export default class Player {
             if (!this.grounded && !(this.collision.state.left > 0 || this.collision.state.right > 0 || this.coyoteTimeActive)) {
                 this.airJumps += 1;
             }
-            if (this.collision.state.left > 0) {
+            // Only kick off a wall when jumping from the air - a grounded jump next to
+            // a wall is just a normal jump, not a wall jump.
+            if (!this.grounded && this.collision.state.left > 0) {
                 this.velocityX = this.wallJumpForce;
                 this.wallJumpBoostTimer = 10;
-            } else if (this.collision.state.right > 0) {
+            } else if (!this.grounded && this.collision.state.right > 0) {
                 this.velocityX = -this.wallJumpForce;
                 this.wallJumpBoostTimer = 10;
             }
