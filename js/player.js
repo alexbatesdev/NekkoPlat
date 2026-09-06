@@ -38,6 +38,7 @@ export default class Player {
         this.preJumpAllowance = null;
         this.maxAirJumps = null;
         this.wallJumpForce = null;
+        this.airJumpNudgeForce = null;
         this.initConfig();
         // Character state variables
         //   Position/Respawn
@@ -155,6 +156,7 @@ export default class Player {
         this.preJumpAllowance = this.setConfigItem('preJumpAllowance', 10);
         this.maxAirJumps = this.setConfigItem('maxAirJumps', 1);
         this.wallJumpForce = this.setConfigItem('wallJumpForce', 12);
+        this.airJumpNudgeForce = this.setConfigItem('airJumpNudgeForce', 6);
     }
 
     initStyles() {
@@ -422,16 +424,23 @@ export default class Player {
         ) {
             this.jumpProcessed = true;
             this.jumpInProgress = true;
-            if (!this.grounded && !(this.collision.state.left > 0 || this.collision.state.right > 0 || this.coyoteTimeActive)) {
+            const isAirJump = !this.grounded && !(this.collision.state.left > 0 || this.collision.state.right > 0 || this.coyoteTimeActive);
+            if (isAirJump) {
                 this.airJumps += 1;
+                const input = gameInstance.inputManager;
+                if (input.isActionActive('moveLeft')) {
+                    this.velocityX -= this.airJumpNudgeForce;
+                } else if (input.isActionActive('moveRight')) {
+                    this.velocityX += this.airJumpNudgeForce;
+                }
             }
             // Only kick off a wall when jumping from the air - a grounded jump next to
             // a wall is just a normal jump, not a wall jump.
             if (!this.grounded && this.collision.state.left > 0) {
-                this.velocityX = this.wallJumpForce;
+                this.velocityX += this.wallJumpForce;
                 this.wallJumpBoostTimer = 10;
             } else if (!this.grounded && this.collision.state.right > 0) {
-                this.velocityX = -this.wallJumpForce;
+                this.velocityX += -this.wallJumpForce;
                 this.wallJumpBoostTimer = 10;
             }
             this.velocityY = -this.jumpForce;
