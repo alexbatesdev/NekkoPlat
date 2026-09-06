@@ -97,14 +97,16 @@ class Game {
         }
     }
 
-    start() {
+    async start() {
         this.initCamera();
         this.initPauseScreen();
         this.lastTime = performance.now();
         this.accumulator = 0;
         this.fixedDelta = 1 / 60; // 60 FPS simulation step
+        if (this.player) {
+            await this.player.start();
+        }
         requestAnimationFrame(this.update.bind(this));
-        this.player.start();
     }
 
     update(timestamp) {

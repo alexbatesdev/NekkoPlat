@@ -4,11 +4,17 @@ import { getCollisionOverlap } from "./tools.js";
 export default class InteractionBox {
     constructor(player) {
         this.player = player;
-        this.element = document.getElementById('interactionBox');
-        this.initialWidth = this.element.offsetWidth;
-        this.initialHeight = this.element.offsetHeight;
         this.interactables = [];
         this.interacting = false;
+        this.initElements();
+    }
+
+    initElements() {
+        this.element = this.player.element.querySelector('#interactionBox') || document.getElementById('interactionBox');
+        if (this.element) {
+            this.initialWidth = this.element.offsetWidth;
+            this.initialHeight = this.element.offsetHeight;
+        }
         this.interactionIndicatorElement = this.player.element.querySelector('.interaction-indicator');
         if (this.interactionIndicatorElement) {
             this.interactionIndicatorElement.style.display = 'none';

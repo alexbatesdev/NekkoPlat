@@ -81,6 +81,57 @@ export default class Player {
         window.player = this;
     }
 
+    async loadTemplate() {
+        let src = this.element.getAttribute('data-src') ||
+                  this.element.getAttribute('src') ||
+                  this.element.getAttribute('data-template');
+
+        if (src) {
+            try {
+                const response = await fetch(src);
+                if (response.ok) {
+                    const htmlText = await response.text();
+                    const temp = document.createElement('div');
+                    temp.innerHTML = htmlText.trim();
+
+                    const rootEl = temp.querySelector('#player') || temp.firstElementChild;
+                    if (rootEl && temp.children.length === 1 && rootEl.tagName.toLowerCase() === 'div') {
+                        Array.from(rootEl.attributes).forEach(attr => {
+                            if (attr.name !== 'id' && attr.name !== 'src' && attr.name !== 'data-src' && attr.name !== 'data-template') {
+                                if (attr.name === 'class') {
+                                    this.element.classList.add(...attr.value.split(/\s+/).filter(Boolean));
+                                } else if (attr.name === 'style') {
+                                    this.element.style.cssText += ';' + attr.value;
+                                } else {
+                                    this.element.setAttribute(attr.name, attr.value);
+                                }
+                            }
+                        });
+                        this.element.innerHTML = rootEl.innerHTML;
+                    } else {
+                        this.element.innerHTML = htmlText;
+                    }
+                } else {
+                    console.warn(`Failed to fetch player template from ${src}: HTTP ${response.status}`);
+                }
+            } catch (e) {
+                console.warn(`Failed to fetch player template from ${src}:`, e);
+            }
+        }
+
+        this.animationElement = this.element.querySelector(".animation-container");
+        if (!this.animationElement) {
+            this.animationElement = document.createElement("div");
+            this.element.appendChild(this.animationElement);
+        }
+        this.animationManager = new GifAnimationManager(this.animationElement);
+
+        this.initConfig();
+        if (this.interactionBox) {
+            this.interactionBox.initElements();
+        }
+    }
+
     initConfig() {
         this.configElement = this.element.querySelector(".config");
         if (!this.configElement) {
@@ -115,26 +166,21 @@ export default class Player {
 
     setConfigItem(configItem, default_value) {
         if (!this.configElement) {
-            console.warn(
-                `No player config element found for ${configItem}, using default value: ${default_value}`,
-            );
             return default_value;
         }
         const configItemElement = this.configElement.querySelector(`.${configItem}`);
         if (configItemElement) {
             return Number(configItemElement.innerHTML);
         } else {
-            console.warn(
-                `No config element found for ${configItem}, using default value: ${default_value}`,
-            );
             return default_value;
         }
     }
 
-    start() {
+    async start() {
         this.respawnScreen = this.element.closest('.screen') ||
                              document.querySelector('.level > .screen') ||
                              document.querySelector('.screen');
+        await this.loadTemplate();
         this.spawn();
     }
 

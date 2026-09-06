@@ -30,24 +30,37 @@ A browser-based platformer engine built with plain JavaScript, HTML and CSS. Lev
 
 ## Configuration
 
-* Player physics can be configured with a `.config` block inside `#player`:
+The player element (size, sprites, interaction indicator, `#interactionBox`, and `.config` physics parameters) can be configured in two ways:
 
-```html
-<div id="player">
-  <span class="config">
-    <span class="maxVelocity">10</span>
-    <span class="sprintMaxVelocity">18</span>
-    <span class="acceleration">1</span>
-    <span class="sprintAcceleration">2</span>
-    <span class="maxAirJumps">1</span>
-    <span class="gravity">0.9</span>
-    <span class="fallingGravity">3</span>
-    <span class="preJumpAllowance">10</span>
-    <span class="jumpForce">25</span>
-    <span class="coyoteTime">100</span>
-  </span>
-</div>
-```
+1. **External HTML Player Template**:
+   Keep the player's full HTML markup in an external HTML file (e.g., `html/player.html` or `html/player_cat.html`) and point `#player` to it via `src` or `data-src`:
+   ```html
+   <div id="player" src="../../html/player.html"></div>
+   ```
+
+2. **Inline Player HTML**:
+   Embed the player's markup directly in the level HTML:
+   ```html
+   <div class="cat" id="player">
+     <div class="interaction-indicator question-indicator">?</div>
+     <div id="interactionBox"></div>
+     <span class="config">
+       <span class="maxVelocity">10</span>
+       <span class="sprintMaxVelocity">18</span>
+       <span class="acceleration">1</span>
+       <span class="sprintAcceleration">2</span>
+       <span class="maxAirJumps">1</span>
+       <span class="gravity">0.9</span>
+       <span class="fallingGravity">3</span>
+       <span class="preJumpAllowance">10</span>
+       <span class="jumpForce">25</span>
+       <span class="coyoteTime">100</span>
+     </span>
+   </div>
+   ```
+
+3. **Zero Configuration**:
+   Omit the config block entirely and the engine will automatically supply standard default platformer physics!
 
 * Grid dimensions are defined on `.level` via `grid-colsxrows` or vanilla CSS layout rules.
 * Grid layout origin and wrap order are driven directly by vanilla CSS rendering:
