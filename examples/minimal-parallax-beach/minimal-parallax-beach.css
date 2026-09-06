@@ -1,0 +1,85 @@
+/*
+    Same rationale as ../minimal-import/minimal-import.css: this project's platformer.css
+    theme isn't imported, so this level supplies its own minimal object appearance.
+
+    The wave paths (.wave-back/.wave-mid/.wave-front/.wave-shore) were generated offline with
+    a sine-based version of the "gradientwaves-svg" codepen algorithm (see the example's
+    index.html header comment for the source) — one static bezier path per layer instead of
+    the codepen's runtime dat.gui/chroma.js generator, since a level's background only needs
+    to be authored once.
+*/
+
+.floor {
+    --height: 60px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: var(--height);
+    background-color: #e8d29a;
+}
+
+.solid {
+    background-color: rebeccapurple;
+}
+
+/* Beats .solid's color for elements that are both (sand should stay sand-colored). */
+.floor.solid {
+    background-color: #e8d29a;
+}
+
+.palm-tree {
+    bottom: 60px;
+    width: 40px;
+    height: 140px;
+    background-color: #6b4423;
+}
+
+.palm-tree::before {
+    content: '';
+    position: absolute;
+    top: -30px;
+    left: -30px;
+    width: 100px;
+    height: 60px;
+    background-color: #2f8f4e;
+    border-radius: 50% 50% 20% 20%;
+}
+
+/* Level-wide parallax background: sky sits behind everything, then wave bands stack front-to-back. */
+.sky-gradient {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, #bdeaff 0%, #eaf7ff 55%, #f7ecc8 100%);
+}
+
+.wave-layer {
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60%;
+}
+
+.wave-layer svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.wave-back path {
+    fill: #a7dff2;
+}
+
+.wave-mid path {
+    fill: #6ec3e0;
+}
+
+.wave-front path {
+    fill: #3ea4cc;
+}
+
+.wave-shore path {
+    fill: #1f7fa8;
+}
