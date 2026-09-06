@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NekkoPlat - Minimal Camera Zone (Overlap) Example</title>
+
+    <!--
+        Same import setup as ../minimal-import/: only css/global.css (structural) and
+        js/platformer.js (engine) are required, plus this example's own object styling.
+
+        Two overlapping camera-zone elements on one screen: a big "room" zone covering
+        the whole (fixed-size, larger-than-viewport) screen, and a smaller "focus area"
+        zone nested inside it (the dashed highlight). Camera zones combine by
+        intersection, not by whichever ran last, so:
+        - Outside the focus area (but still in the room): only the room zone applies,
+          camera follows the player normally but can't scroll past the room's edges.
+        - Inside the focus area: BOTH zones apply. Since the focus area is entirely
+          inside the room, the intersection of the two ranges is just the focus area's
+          own (tighter) range, so the camera's framing visibly tightens onto it.
+        - Leaving the focus area eases back out to the room's framing (never snaps),
+          same smoothing as any other zone transition.
+    -->
+    <link rel="stylesheet" href="../../css/reset.css">
+    <link rel="stylesheet" href="../../css/global.css">
+    <link rel="stylesheet" href="./minimal-camera-zone-overlap.css">
+    <script type="module" src="../../js/platformer.js" defer></script>
+    <style>
+        /* This level has no "initial"/"dynamic" class, so --screen-width/height would
+           otherwise fall back to global.css's 100vw/100vh, which is exactly the camera's
+           viewport size and leaves the room zone with no room to actually scroll in (it'd
+           collapse straight to a single point, same as examples/minimal-camera-zone/).
+           Fixing the screen to a size larger than the viewport gives the outer "room" zone
+           real scrollable space, so the nested "focus area" zone's tighter framing is
+           visibly different from the room's framing. */
+        :root {
+            --screen-width: 1600px;
+            --screen-height: 1000px;
+            --player-spawn-x: 100px;
+            --player-spawn-y: 300px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="viewport">
+        <div class="level grid-1x1 contain" id="level-one">
+            <div class="screen">
+                <!-- width/height are required on the player element; the engine doesn't set them -->
+                <div id="player" style="width: 50px; height: 50px; background: hotpink;">
+                    <div id="interactionBox"></div>
+                    <span class="config">
+                        <span class="maxVelocity">10</span>
+                        <span class="sprintMaxVelocity">18</span>
+                        <span class="acceleration">1</span>
+                        <span class="sprintAcceleration">2</span>
+                        <span class="maxAirJumps">1</span>
+                        <span class="gravity">0.9</span>
+                        <span class="fallingGravity">3</span>
+                        <span class="preJumpAllowance">10</span>
+                        <span class="jumpForce">25</span>
+                        <span class="coyoteTime">100</span>
+                    </span>
+                </div>
+                <div class="object solid floor"></div>
+
+                <!-- Purely cosmetic: highlights where the nested focus-area zone is, so it's
+                     visible even without toggling debug mode. Not a level object. -->
+                <div class="focus-marker" style="left: 600px; top: 700px; width: 400px; height: 250px;"></div>
+
+                <!-- The whole-room zone, spanning the entire (larger-than-viewport) screen. -->
+                <div class="object camera-zone" style="left: 0; top: 0; width: 100%; height: 100%;"></div>
+                <!-- The nested focus-area zone, entirely inside the room zone above, at floor
+                     level so the player actually walks through it instead of over/under it. -->
+                <div class="object camera-zone" style="left: 600px; top: 700px; width: 400px; height: 250px;"></div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -77,13 +77,38 @@ export default class Camera {
         this.debugProvider = debugProvider;
     }
 
-    // Merges in any provided axis bounds (in scroll px). Pass undefined to leave an axis untouched.
+    // Narrows in any provided axis bounds (in scroll px) toward their intersection with
+    // whatever's already set this frame, so overlapping zones combine deterministically
+    // instead of the last zone to run simply overwriting the others. Pass undefined to
+    // leave an axis untouched. A zone narrower than the camera viewport reports its min/max
+    // reversed (its own "collapse to center" quirk), so each pair is normalized before merging.
     setBounds({ minX, maxX, minY, maxY } = {}) {
         if (!this.bounds) this.bounds = { minX: null, maxX: null, minY: null, maxY: null };
-        if (minX !== undefined) this.bounds.minX = minX;
-        if (maxX !== undefined) this.bounds.maxX = maxX;
-        if (minY !== undefined) this.bounds.minY = minY;
-        if (maxY !== undefined) this.bounds.maxY = maxY;
+        if (minX !== undefined && maxX !== undefined) {
+            const lo = Math.min(minX, maxX);
+            const hi = Math.max(minX, maxX);
+            this.bounds.minX = this.bounds.minX == null ? lo : Math.max(this.bounds.minX, lo);
+            this.bounds.maxX = this.bounds.maxX == null ? hi : Math.min(this.bounds.maxX, hi);
+        }
+        if (minY !== undefined && maxY !== undefined) {
+            const lo = Math.min(minY, maxY);
+            const hi = Math.max(minY, maxY);
+            this.bounds.minY = this.bounds.minY == null ? lo : Math.max(this.bounds.minY, lo);
+            this.bounds.maxY = this.bounds.maxY == null ? hi : Math.min(this.bounds.maxY, hi);
+        }
+        this.warnIfBoundsConflict();
+    }
+
+    // If two overlapping zones disagree so hard there's no valid range left, surface that
+    // instead of silently collapsing the camera to a single point.
+    warnIfBoundsConflict() {
+        if (!gameInstance.debug) return;
+        if (this.bounds.minX != null && this.bounds.maxX != null && this.bounds.minX > this.bounds.maxX) {
+            console.warn("Camera zones conflict on the X axis: active zones share no overlapping range.");
+        }
+        if (this.bounds.minY != null && this.bounds.maxY != null && this.bounds.minY > this.bounds.maxY) {
+            console.warn("Camera zones conflict on the Y axis: active zones share no overlapping range.");
+        }
     }
 
     // Called once per frame before level objects run, so zones can re-apply bounds while active.
