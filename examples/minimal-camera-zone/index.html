@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NekkoPlat - Minimal Camera Zone Example</title>
+
+    <!--
+        Same import setup as ../minimal-import/: only css/global.css (structural) and
+        js/platformer.js (engine) are required, plus this example's own object styling.
+        Demonstrates camera-zone: a "room" (the middle screen) that locks the camera in
+        place while the player is inside it. Walk from room 1 into room 2 and the camera
+        stops following the player, framing the whole room instead; walk into room 3 and
+        it resumes following normally.
+    -->
+    <link rel="stylesheet" href="../../css/reset.css">
+    <link rel="stylesheet" href="../../css/global.css">
+    <link rel="stylesheet" href="./minimal-camera-zone.css">
+    <script type="module" src="../../js/platformer.js" defer></script>
+    <style>
+        /* This level has no "initial"/"dynamic" class, so --screen-width/height fall back to
+           global.css's 100vw/100vh; override the vh-based --player-spawn-y default here in px
+           so it doesn't spawn the player below the floor. */
+        :root {
+            --player-spawn-x: 300px;
+            --player-spawn-y: 300px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="viewport">
+        <div class="level grid-3x1 contain" id="level-one">
+            <div class="screen">
+                <!-- width/height are required on the player element; the engine doesn't set them -->
+                <div id="player" style="width: 50px; height: 50px; background: hotpink;">
+                    <div id="interactionBox"></div>
+                    <span class="config">
+                        <span class="maxVelocity">10</span>
+                        <span class="sprintMaxVelocity">18</span>
+                        <span class="acceleration">1</span>
+                        <span class="sprintAcceleration">2</span>
+                        <span class="maxAirJumps">1</span>
+                        <span class="gravity">0.9</span>
+                        <span class="fallingGravity">3</span>
+                        <span class="preJumpAllowance">10</span>
+                        <span class="jumpForce">25</span>
+                        <span class="coyoteTime">100</span>
+                    </span>
+                </div>
+                <div class="object solid floor" id="floor-1"></div>
+            </div>
+            <div class="screen">
+                <!-- Fills the whole room: while the player is anywhere in here, the camera
+                     is clamped to this room's bounds and holds still framing it entirely. -->
+                <div class="object camera-zone" style="left: 0; top: 0; width: 100%; height: 100%;"></div>
+                <div class="object solid floor room" id="floor-2"></div>
+            </div>
+            <div class="screen">
+                <div class="object solid floor" id="floor-3"></div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

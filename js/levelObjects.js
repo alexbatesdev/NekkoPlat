@@ -1,5 +1,5 @@
 import gameInstance from "./game.js";
-import { debugLog, loadInventoryItemFragment } from "./tools.js";
+import { debugLog, loadInventoryItemFragment, intersects } from "./tools.js";
 import ToggleManager, { MultiStateManager } from "./elementStateManagers.js";
 import { InventoryItem } from "./services/inventoryItem.js";
 import {
@@ -287,6 +287,59 @@ export class TriggerArea extends LevelObject {
   reinitStyles() {
     if (gameInstance.debug) {
       this.element.style.outline = "3px solid plum";
+      this.element.style.outlineOffset = "-3px";
+    } else {
+      this.element.style.outline = "none";
+    }
+  }
+}
+
+// Camera Zone - constrains the camera's scroll position to this element's
+// bounds while the player overlaps it. Add "no-constrain-x"/"no-constrain-y"
+// to only constrain one axis. Bounds are re-applied every frame the player is
+// inside, and cleared automatically once the player leaves (see Camera.resetBounds).
+export class CameraZone extends LevelObject {
+  constructor(element) {
+    super(element);
+    this.element.style.pointerEvents = "none";
+    this.constrainX = !this.element.classList.contains("no-constrain-x");
+    this.constrainY = !this.element.classList.contains("no-constrain-y");
+  }
+
+  update() {
+    if (this.enabled && this.overlapsPlayer()) {
+      gameInstance.camera.setBounds(this.computeBounds());
+    }
+    super.update();
+  }
+
+  overlapsPlayer() {
+    return intersects(
+      gameInstance.player.element.getBoundingClientRect(),
+      this.element.getBoundingClientRect()
+    );
+  }
+
+  computeBounds() {
+    const zoneRect = this.element.getBoundingClientRect();
+    const cameraRect = gameInstance.camera.element.getBoundingClientRect();
+    const scrollLeft = gameInstance.camera.element.scrollLeft;
+    const scrollTop = gameInstance.camera.element.scrollTop;
+    const bounds = {};
+    if (this.constrainX) {
+      bounds.minX = scrollLeft + (zoneRect.left - cameraRect.left);
+      bounds.maxX = bounds.minX + (zoneRect.width - cameraRect.width);
+    }
+    if (this.constrainY) {
+      bounds.minY = scrollTop + (zoneRect.top - cameraRect.top);
+      bounds.maxY = bounds.minY + (zoneRect.height - cameraRect.height);
+    }
+    return bounds;
+  }
+
+  reinitStyles() {
+    if (gameInstance.debug) {
+      this.element.style.outline = "3px solid cyan";
       this.element.style.outlineOffset = "-3px";
     } else {
       this.element.style.outline = "none";

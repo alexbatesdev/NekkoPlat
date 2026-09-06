@@ -158,6 +158,7 @@ position: absolute
 
 .grid-1x1 { --cols: 1; --rows: 1; }
 .grid-2x1 { --cols: 2; --rows: 1; }
+.grid-2x2 { --cols: 2; --rows: 2; }
 .grid-3x1 { --cols: 3; --rows: 1; }
 .grid-3x2 { --cols: 3; --rows: 2; }
 .grid-3x3 { --cols: 3; --rows: 3; }

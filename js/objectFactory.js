@@ -1,4 +1,4 @@
-import { SolidObject, InteractableObject, InteractableToggle, Receiver, LevelObject, TriggerArea, MovingPlatform, SaggingPlatform, OneWaySolidObject, ItemPickup } from "./levelObjects.js";
+import { SolidObject, InteractableObject, InteractableToggle, Receiver, LevelObject, TriggerArea, MovingPlatform, SaggingPlatform, OneWaySolidObject, ItemPickup, CameraZone } from "./levelObjects.js";
 import { debugLog } from "./tools.js";
 
 const objectFactory = {
@@ -11,7 +11,8 @@ const objectFactory = {
     'moving-platform': MovingPlatform,
     'oneway': OneWaySolidObject,
     'sag-platform': SaggingPlatform,
-    item: ItemPickup
+    item: ItemPickup,
+    'camera-zone': CameraZone
 };
 
 export function createObject(element) {

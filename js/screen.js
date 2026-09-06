@@ -18,7 +18,7 @@ export default class Screen {
         this.element.style.position = 'relative';
         if (gameInstance.debug) this.element.style.outline = '1px solid yellow';
         else this.element.style.outline = 'none';
-        this.getObjectsByTypes('solid', 'trigger').forEach(obj => {
+        this.getObjectsByTypes('solid', 'trigger', 'camera-zone').forEach(obj => {
             obj.reinitStyles();
         });
     }
@@ -88,6 +88,9 @@ export default class Screen {
             });
             this.getObjectsByTypes('solid').forEach(solid => {
                 if (typeof solid.update === 'function') solid.update();
+            });
+            this.getObjectsByTypes('camera-zone').forEach(cameraZone => {
+                cameraZone.update();
             });
         }
         this.getObjectsByTypes('plax').forEach(parallaxObject => {

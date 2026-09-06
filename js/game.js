@@ -120,6 +120,7 @@ class Game {
             this.processInput();
             if (!this.paused) {
                 this.player.update();
+                this.camera.resetBounds();
                 this.level.update();
                 this.camera.update();
                 this.level.updateParallaxLayers(this.camera.element);

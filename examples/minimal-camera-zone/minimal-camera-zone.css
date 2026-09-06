@@ -1,0 +1,25 @@
+/*
+    This example intentionally does NOT import css/platformer.css, since that file is
+    this project's specific visual theme (stone textures, underground background, etc.),
+    not part of the engine's required CSS. Only css/global.css (structural) is required.
+    Every level author is expected to supply their own object/solid appearance, like this.
+*/
+
+.floor {
+    --height: 50px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: var(--height);
+    background-color: #5b3a29;
+}
+
+.solid {
+    background-color: rebeccapurple;
+}
+
+/* The "locked" room's floor is tinted differently so it reads as a distinct space. */
+.floor.room {
+    background-color: #a3391f;
+}

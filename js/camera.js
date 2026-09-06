@@ -29,6 +29,8 @@ export default class Camera {
         this.maxOffset = 1 - this.offsetBounds;
         this.minOffset = this.offsetBounds;
         this.lookahead = 0.05;
+        // Scroll-space constraints (in px), set by camera zones. Null axis = unconstrained.
+        this.bounds = null;
         this.initStyles();
 
         // References to game dependencies
@@ -75,6 +77,37 @@ export default class Camera {
         this.debugProvider = debugProvider;
     }
 
+    // Merges in any provided axis bounds (in scroll px). Pass undefined to leave an axis untouched.
+    setBounds({ minX, maxX, minY, maxY } = {}) {
+        if (!this.bounds) this.bounds = { minX: null, maxX: null, minY: null, maxY: null };
+        if (minX !== undefined) this.bounds.minX = minX;
+        if (maxX !== undefined) this.bounds.maxX = maxX;
+        if (minY !== undefined) this.bounds.minY = minY;
+        if (maxY !== undefined) this.bounds.maxY = maxY;
+    }
+
+    // Called once per frame before level objects run, so zones can re-apply bounds while active.
+    resetBounds() {
+        this.bounds = null;
+    }
+
+    clampScrollPosition(x, y) {
+        if (!this.bounds) return { x, y };
+        let clampedX = x;
+        let clampedY = y;
+        if (this.bounds.minX != null && this.bounds.maxX != null) {
+            const min = Math.min(this.bounds.minX, this.bounds.maxX);
+            const max = Math.max(this.bounds.minX, this.bounds.maxX);
+            clampedX = Math.min(Math.max(x, min), max);
+        }
+        if (this.bounds.minY != null && this.bounds.maxY != null) {
+            const min = Math.min(this.bounds.minY, this.bounds.maxY);
+            const max = Math.max(this.bounds.minY, this.bounds.maxY);
+            clampedY = Math.min(Math.max(y, min), max);
+        }
+        return { x: clampedX, y: clampedY };
+    }
+
     update() {
         // TODO: 🐢💭
         // I'm thinking instead of a "following player" boolean
@@ -102,19 +135,24 @@ export default class Camera {
         this.targetX = (this.player.x + (this.player.element.getBoundingClientRect().width / 2)) - (this.element.getBoundingClientRect().width - 80) * this.offsetX;
         this.targetY = (this.player.y + (this.player.element.getBoundingClientRect().height / 2)) - (this.element.getBoundingClientRect().height - 80) * this.offsetY;
 
+        // Clamp the target (not the eased result) so entering/leaving a bounded zone eases
+        // toward the boundary via the normal smoothing instead of snapping instantly.
+        const clampedTarget = this.clampScrollPosition(this.targetX, this.targetY);
+
         this.element.scrollTo(
-            currentX + (this.targetX - currentX) * this.smoothing,
-            currentY + (this.targetY - currentY) * this.smoothing
+            currentX + (clampedTarget.x - currentX) * this.smoothing,
+            currentY + (clampedTarget.y - currentY) * this.smoothing
         );
     }
 
     snapToPlayer() {
         if (!this.player) return;
         this.followPlayer = false;
-        this.element.scrollTo(
+        const next = this.clampScrollPosition(
             (this.player.x + (this.player.element.getBoundingClientRect().width / 2)) - (this.element.getBoundingClientRect().width - 80) * this.offsetX,
             (this.player.y + (this.player.element.getBoundingClientRect().height / 2)) - (this.element.getBoundingClientRect().height - 80) * this.offsetY
         );
+        this.element.scrollTo(next.x, next.y);
         this.followPlayer = true;
     }
 
