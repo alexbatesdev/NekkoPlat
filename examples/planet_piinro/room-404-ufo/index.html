@@ -3,19 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Planet Piinro - Giant Robot City</title>
+    <title>Planet Piinro - UFO</title>
     <link rel="stylesheet" href="../../../css/reset.css" />
     <link rel="stylesheet" href="../../../css/global.css" />
     <link rel="stylesheet" href="../planet-piinro.css" />
-      <link rel="stylesheet" href="./room-13-giant-robot-city.css" />
+      <link rel="stylesheet" href="./room-404-ufo.css" />
     <script type="module" src="../../../js/platformer.js" defer></script>
   </head>
   <body>
     <div id="viewport">
       <div class="level grid-1x1 contain" id="level-one">
         <div class="screen">
-          <div class="room-number">Room 13</div>
-          <h1 class="room-title">Giant Robot City</h1>
+          <div class="room-number">Room 404</div>
+          <h1 class="room-title">&lt;=UFO=&gt;</h1>
           <div
             id="player"
             style="width: 50px; height: 50px; background: hotpink"
@@ -25,29 +25,11 @@
           </div>
           <div class="object solid floor"></div>
           <div
-            id="arrival-from-12"
             class="door object interactable clickable exit-1"
-            title="Halloween Hills"
+            title="Crash Site"
+            data-one-way="true"
             onclick="
-              location.href = '../room-12-halloween-hills/#arrival-from-13'
-            "
-          ></div>
-          <div
-            id="arrival-from-14"
-            class="door object interactable clickable exit-2"
-            title="Giant Robot Harbor"
-            onclick="
-              location.href =
-                '../room-14-giant-robot-harbor/#arrival-from-13'
-            "
-          ></div>
-          <div
-            id="arrival-from-16"
-            class="door object interactable clickable exit-3"
-            title="Giant Robot Innards"
-            onclick="
-              location.href =
-                '../room-16-giant-robot-innards/#arrival-from-13'
+              location.href = '../room-4-crash-site/#arrival-from-404'
             "
           ></div>
         </div>

@@ -5,7 +5,7 @@
 1: Space Port
 2: Observatory
 3: Star Isle Port
-4: UFO
+4: Crash Site
 
 ## Dolphin Island Rooms
 5: Dolphin Island Port
@@ -19,6 +19,7 @@
 13: Giant Robot City
 14: Giant Robot Harbor
 15: Secret Gulf
+404: UFO
 
 # Room Relationships
 0 - Space Station
@@ -31,16 +32,20 @@
 
 2 - Observatory
   - 1
-  - 3
+  - 4
 
 3 - Star Isle Port
-  - 1
-  - 2
+  - 4
   - 5
   - 14
 
-4 - UFO
-  - 0
+4 - Crash Site
+  - 1
+  - 2
+  - 3
+
+404 - UFO
+  - 4
   - Special Rule: UFO is the 404 Room. It is not reachable by normal means, and is only accessible via going to a non-existent room URL.
 
 5 - Dolphin Island Port
