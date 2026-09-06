@@ -57,19 +57,18 @@ export default class Screen {
     addAdjacentSolidObjectsToPlayer() {
         const currentCollisionObjects = this.getObjectsByTypes('solid', 'trigger');
         if (!isSubset(currentCollisionObjects, gameInstance.player.collisionObjects)) {
-            let solidObjectsToAdd = currentCollisionObjects;
-            if (this.x > 0) {
-                solidObjectsToAdd = solidObjectsToAdd.concat(this.level.getScreen(this.x - 1, this.y).getObjectsByTypes('solid', 'trigger'));
-            }
-            if (this.y > 0) {
-                solidObjectsToAdd = solidObjectsToAdd.concat(this.level.getScreen(this.x, this.y - 1).getObjectsByTypes('solid', 'trigger'));
-            }
-            if (this.x < this.level.columns - 1) {
-                solidObjectsToAdd = solidObjectsToAdd.concat(this.level.getScreen(this.x + 1, this.y).getObjectsByTypes('solid', 'trigger'));
-            }
-            if (this.y < this.level.rows - 1) {
-                solidObjectsToAdd = solidObjectsToAdd.concat(this.level.getScreen(this.x, this.y + 1).getObjectsByTypes('solid', 'trigger'));
-            }
+            let solidObjectsToAdd = [...currentCollisionObjects];
+            const adjacentScreens = [
+                this.level.getScreen(this.x - 1, this.y),
+                this.level.getScreen(this.x + 1, this.y),
+                this.level.getScreen(this.x, this.y - 1),
+                this.level.getScreen(this.x, this.y + 1)
+            ];
+            adjacentScreens.forEach(adjScreen => {
+                if (adjScreen) {
+                    solidObjectsToAdd = solidObjectsToAdd.concat(adjScreen.getObjectsByTypes('solid', 'trigger'));
+                }
+            });
             gameInstance.player.setSolidObjects(solidObjectsToAdd);
         }
     }

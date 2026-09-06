@@ -137,6 +137,8 @@ position: absolute
 }
 
 .screen {
+    width: var(--screen-width);
+    height: var(--screen-height);
     pointer-events: none;
     z-index: 1;
 }
