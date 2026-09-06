@@ -132,7 +132,9 @@ export default class Player {
     }
 
     start() {
-        this.respawnScreen = this.element.parentNode;
+        this.respawnScreen = this.element.closest('.screen') ||
+                             document.querySelector('.level > .screen') ||
+                             document.querySelector('.screen');
         this.spawn();
     }
 
