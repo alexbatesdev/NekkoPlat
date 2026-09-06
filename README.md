@@ -132,6 +132,7 @@ Defines in‑level object types:
 - `Slope`: ramp geometry. Combine classes `object`, `solid` and `slope` and set `data-slope` to `up-right`, `up-left`, `down-right` or `down-left`.
 - `Slope` also supports `data-slope-equation` (`y=...`) and optional `data-slope-role="ceiling"` for ceiling collisions.
 - `OneWaySolid`: blocks movement from one side. Use classes `object solid oneway-DIR` where `DIR` is `up`, `down`, `left` or `right`. Add `dropthrough` to an `oneway-up` element to allow falling through by holding `S` and pressing a jump key; each platform maintains its own drop timer.
+- `CameraZone`: constrains the camera's scroll position to its own bounds while the player overlaps it, and releases automatically the instant the player leaves. See [Camera Zones](#camera-zones) below.
 
 Example sloped surface:
 
@@ -189,7 +190,7 @@ Event-driven HUD adapter that renders icon/count displays for `.hud-item` target
 Event-driven pause-menu adapter that renders inventory rows and wires use/inspect interactions.
 
 ### `camera.js`
-Controls the viewport. Follows the player with smoothing and lookahead, allows offset adjustment with arrow keys, manages overlay elements and display filters via the `Filter` helper class.
+Controls the viewport. Follows the player with smoothing and lookahead, allows offset adjustment with arrow keys, manages overlay elements and display filters via the `Filter` helper class. Also supports optional scroll-position bounds (`setBounds`/`resetBounds`) used by `CameraZone` objects to constrain camera movement; bounds are clamped on the follow *target* rather than the eased result, so entering/leaving a bounds zone eases in smoothly instead of snapping. See [Camera Zones](#camera-zones).
 
 ### `collisionDetector.js`
 Performs collision checks between the player and level objects, handles trigger activation, applies side-specific out-of-bounds effects from the level config, and resolves both AABB solids and slope surfaces.
@@ -218,6 +219,30 @@ Utility to align and animate hex‑pattern backgrounds. Call `syncBackgrounds()`
 Collection of helpers for geometry (`intersects`, `getCollisionOverlap`), logging (`debugLog`), class list checks and transform manipulation.
 
 Also includes `loadInventoryItemFragment(itemName)` for loading item fragment data from `/items/*.html`.
+
+## Camera Zones
+
+`camera-zone` objects constrain the camera's scroll position to their own bounds while the player overlaps them, and release automatically the instant the player leaves — the camera then eases back to normal player-following rather than snapping.
+
+```html
+<div class="object camera-zone" style="left: 0; top: 0; width: 1200px; height: 800px;"></div>
+```
+
+- Add `no-constrain-x` to only lock vertical scroll, or `no-constrain-y` to only lock horizontal scroll.
+- If a zone is smaller than the camera viewport on a given axis, that axis' bounds collapse to a single value and the camera holds still centered on the zone for that axis instead of jittering.
+- Bounds are re-applied every frame the player overlaps the zone and reset each frame before level objects run, so leaving all zones releases the camera on the very next frame.
+- Zones are drawn with a cyan debug outline when debug mode (`3`) is toggled on, like other level objects.
+
+A common pattern is locking a level's camera Y position per "floor" in a multi-row level, while leaving a vertical shaft column free of any zone so the camera can still follow the player between floors:
+
+```html
+<!-- Solid ground on either side of a shaft: lock Y, leave X free -->
+<div class="object camera-zone no-constrain-x" style="left: 0; top: 0; width: 150px; height: 100%;"></div>
+<div class="object camera-zone no-constrain-x" style="left: 350px; top: 0; width: calc(100% - 350px); height: 100%;"></div>
+<!-- The 150px-350px gap has no camera-zone at all, so the camera scrolls freely there -->
+```
+
+See `examples/minimal-camera-zone/` for a single locked room, and `examples/minimal-camera-zone-floors/` for a 2x2 grid demonstrating per-floor Y locking with a shaft that stays free to scroll between floors.
 
 ## Inventory Helper Providers
 
