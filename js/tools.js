@@ -16,8 +16,6 @@ export const getCollisionOverlap = (rect1, rect2) => {
     const rect2RightSide = rect2LeftSide + rect2.width;
     const rect2TopSide = rect2.top;
     const rect2BottomSide = rect2TopSide + rect2.height;
-    const rect1CenterX = rect1.left + rect1.width / 2;
-    const rect1CenterY = rect1.top + rect1.height / 2;
     // This may be useful for slopes
     // const rect2CenterX = rect2.left + rect2.width / 2;
     // const rect2CenterY = rect2.top + rect2.height / 2;
@@ -31,16 +29,16 @@ export const getCollisionOverlap = (rect1, rect2) => {
 
     if (rect1RightSide > rect2LeftSide
         && rect1LeftSide < rect2LeftSide
-        && rect1CenterY > rect2TopSide
-        && rect1CenterY < rect2BottomSide
+        && rect1BottomSide > rect2TopSide
+        && rect1TopSide < rect2BottomSide
     ) {
         collisionDirections.right = rect1RightSide - rect2LeftSide;
     }
 
     if (rect1LeftSide < rect2RightSide
         && rect1RightSide > rect2RightSide
-        && rect1CenterY > rect2TopSide
-        && rect1CenterY < rect2BottomSide
+        && rect1BottomSide > rect2TopSide
+        && rect1TopSide < rect2BottomSide
     ) {
         collisionDirections.left = rect2RightSide - rect1LeftSide;
     }

@@ -37,6 +37,7 @@ export default class Player {
         this.coyoteTime = null;
         this.preJumpAllowance = null;
         this.maxAirJumps = null;
+        this.wallJumpForce = null;
         this.initConfig();
         // Character state variables
         //   Position/Respawn
@@ -61,6 +62,8 @@ export default class Player {
         this.coyoteTimer = 0;
         this.coyoteTimeActive = false;
         this.dropTimer = 0;
+        // Frames left where the wall-jump kick is exempt from the max-velocity clamp
+        this.wallJumpBoostTimer = 0;
         //   Animation
         this.currentAnimation = 'idle';
         //   Interaction
@@ -151,6 +154,7 @@ export default class Player {
         this.coyoteTime = this.setConfigItem('coyoteTime', 100);
         this.preJumpAllowance = this.setConfigItem('preJumpAllowance', 10);
         this.maxAirJumps = this.setConfigItem('maxAirJumps', 1);
+        this.wallJumpForce = this.setConfigItem('wallJumpForce', 12);
     }
 
     initStyles() {
@@ -298,6 +302,7 @@ export default class Player {
     update() {
         this.processInput();
         this.physics.applyPhysics(this, this.collision.state);
+        if (this.wallJumpBoostTimer > 0) this.wallJumpBoostTimer--;
 
         const steps = Math.ceil(Math.max(Math.abs(this.velocityX), Math.abs(this.velocityY)));
         const iterations = Math.max(1, steps);
@@ -420,9 +425,11 @@ export default class Player {
                 this.airJumps += 1;
             }
             if (this.collision.state.left > 0) {
-                this.velocityX += 12;
+                this.velocityX = this.wallJumpForce;
+                this.wallJumpBoostTimer = 10;
             } else if (this.collision.state.right > 0) {
-                this.velocityX -= 12;
+                this.velocityX = -this.wallJumpForce;
+                this.wallJumpBoostTimer = 10;
             }
             this.velocityY = -this.jumpForce;
         } else if (this.airJumps >= this.maxAirJumps && !this.grounded) {

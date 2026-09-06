@@ -22,10 +22,14 @@ export class Physics {
             }
         }
 
-        if (object.velocityX > this.maxVelocity) {
-            object.velocityX = this.maxVelocity;
-        } else if (object.velocityX < -this.maxVelocity) {
-            object.velocityX = -this.maxVelocity;
+        // Skip the walk/run speed cap while a wall-jump kick is still active, otherwise
+        // the kick (which can exceed maxVelocity) gets clamped away the instant it's applied.
+        if (!(object.wallJumpBoostTimer > 0)) {
+            if (object.velocityX > this.maxVelocity) {
+                object.velocityX = this.maxVelocity;
+            } else if (object.velocityX < -this.maxVelocity) {
+                object.velocityX = -this.maxVelocity;
+            }
         }
     }
 

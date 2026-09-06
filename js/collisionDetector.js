@@ -56,14 +56,12 @@ export class CollisionDetection {
     object.updateTransform?.();
     const trackedObjects = this.getTrackedObjects(collisionObjects);
     this.checkTriggerCollisions(object, trackedObjects.triggerObjects);
-    let horizontal_collision_count = this.checkHorizontalCollisions(
+    const { horizontalCollisionCount, verticalCollisionCount } = this.checkSolidCollisions(
       object,
       trackedObjects.solidObjects
     );
-    let vertical_collision_count = this.checkVerticalCollisions(
-      object,
-      trackedObjects.solidObjects
-    );
+    let horizontal_collision_count = horizontalCollisionCount;
+    let vertical_collision_count = verticalCollisionCount;
     let slope_collision_count = this.checkSlopeCollisions(
       object,
       trackedObjects.slopeObjects
@@ -111,68 +109,55 @@ export class CollisionDetection {
     });
   }
 
-  checkVerticalCollisions(object, collisionObjects) {
-    let collisionCount = 0;
+  // Resolves each overlapping solid along whichever axis has the shallower
+  // penetration, so a corner graze during a jump/wall-slide only ever
+  // resolves as a floor/ceiling hit OR a wall hit, never both at once.
+  checkSolidCollisions(object, collisionObjects) {
+    let horizontalCollisionCount = 0;
+    let verticalCollisionCount = 0;
     collisionObjects.forEach((collisionObject) => {
       if (!collisionObject.enabled) return;
       const el = collisionObject.element;
       const playerRect = object.element.getBoundingClientRect();
       const collisionRect = el.getBoundingClientRect();
-      if (intersects(playerRect, collisionRect)) {
-        const collision = getCollisionOverlap(playerRect, collisionRect);
-        if (
-          collision.bottom > 0 &&
-          collisionObject.element.classList.contains("solid")
-        ) {
-          collisionCount++;
+      if (!intersects(playerRect, collisionRect)) return;
+
+      const collision = getCollisionOverlap(playerRect, collisionRect);
+      const horizontalDepth = collision.left || collision.right || 0;
+      const verticalDepth = collision.top || collision.bottom || 0;
+      if (!horizontalDepth && !verticalDepth) return;
+
+      const resolveVertical = verticalDepth > 0 && (!horizontalDepth || verticalDepth <= horizontalDepth);
+
+      if (resolveVertical) {
+        if (collision.bottom > 0) {
+          verticalCollisionCount++;
           this.state.bottom = collision.bottom;
           object.y -= collision.bottom;
           object.velocityY = 0;
         }
-        if (
-          collision.top > 0 &&
-          collisionObject.element.classList.contains("solid")
-        ) {
-          collisionCount++;
+        if (collision.top > 0) {
+          verticalCollisionCount++;
           this.state.top = collision.top;
           object.y += collision.top;
           object.velocityY = 0;
         }
-      }
-    });
-    return collisionCount;
-  }
-
-  checkHorizontalCollisions(object, collisionObjects) {
-    let collisionCount = 0;
-    collisionObjects.forEach((collisionObject) => {
-      if (!collisionObject.enabled) return;
-      const el = collisionObject.element;
-      const playerRect = object.element.getBoundingClientRect();
-      const collisionRect = el.getBoundingClientRect();
-      if (intersects(playerRect, collisionRect)) {
-        const collision = getCollisionOverlap(playerRect, collisionRect);
-        if (
-          collision.left > 0 &&
-          collisionObject.element.classList.contains("solid")
-        ) {
+      } else {
+        if (collision.left > 0) {
+          horizontalCollisionCount++;
           this.state.left = collision.left;
           object.x += collision.left;
           object.velocityX = 0;
-          collisionCount++;
         }
-        if (
-          collision.right > 0 &&
-          collisionObject.element.classList.contains("solid")
-        ) {
-          collisionCount++;
+        if (collision.right > 0) {
+          horizontalCollisionCount++;
           this.state.right = collision.right;
           object.x -= collision.right;
           object.velocityX = 0;
         }
       }
     });
-    return collisionCount;
+    return { horizontalCollisionCount, verticalCollisionCount };
   }
 
   evaluateSlopeEquation(slopeElement, x) {
