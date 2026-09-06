@@ -61,6 +61,7 @@ body {
     text-transform: uppercase;
     transform: translateX(-50%);
     pointer-events: none;
+    z-index: 1;
 }
 
 .exit-1,

@@ -5,8 +5,86 @@
     --player-spawn-y: 500px;
 }
 
+.solid {
+    background-color: rebeccapurple;
+    position: absolute;
+}
+
+.dropthrough {
+    background-color: green;
+}
+
 /* 7th screen attached to the 3x2 grid (attached to the right of (2,0) at x: 3, y: 0) */
 .attached-screen {
     grid-column: 4;
     grid-row: 1;
+    background-color: #160540;
+    color: white;
+    height: 100vh;
+    width: 100vw;
+}
+
+.whole-room {
+    left: 0;
+    bottom: 0;
+    right: 0;
+    top: 0;
+}
+
+#chunk-crater-base {
+    left: 0;
+    bottom: 0;
+    top: 400px;
+    width: 100%;
+}
+
+.chunk-crater-wall {
+    width: 150px;
+    height: 300px;
+    top: 175px;
+}
+
+.wall-left {
+    left: 0;
+}
+
+.wall-right {
+    right: 0;
+}
+
+#crashed-pod {
+    position: absolute;
+    width: 225px;
+    height: 325px;
+    left: 52.5%;
+    bottom: 214px;
+    transform: translateX(-50%) rotate(333deg);
+    background-color: #4d588d;
+}
+
+.star-isle-port-exit {
+    left: 5%;
+}
+
+.space-port-exit {
+    right: 5%;
+}
+
+#large-shelf-one {
+    left: 50px;
+    bottom: 200px;
+    width: 700px;
+    height: 40px;
+}
+
+#large-shelf-two {
+    right: 0;
+    top: 200px;
+    width: 700px;
+    height: 40px;
+}
+
+.observatory-exit {
+    right: 5%;
+    top: calc(100% - 625px);
 }

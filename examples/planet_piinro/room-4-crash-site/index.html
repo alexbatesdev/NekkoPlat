@@ -7,37 +7,71 @@
     <link rel="stylesheet" href="../../../css/reset.css" />
     <link rel="stylesheet" href="../../../css/global.css" />
     <link rel="stylesheet" href="../planet-piinro.css" />
-      <link rel="stylesheet" href="./room-4-crash-site.css" />
+    <link rel="stylesheet" href="./room-4-crash-site.css" />
     <script type="module" src="../../../js/platformer.js" defer></script>
   </head>
   <body>
     <div id="viewport">
       <div class="level grid-3x2 contain" id="level-one">
-        <div
-          id="player"
-          style="width: 50px; height: 50px; background: hotpink"
-        >
+        <div id="player" style="width: 50px; height: 50px; background: hotpink">
           <div class="interaction-indicator question-indicator">?</div>
           <div id="interactionBox"></div>
         </div>
-        
+
         <!-- 3x2 Grid (6 Screens) -->
         <!-- Screen 1 (0, 0) -->
         <div class="screen">
           <div class="room-number">Room 4 - Screen (0, 0)</div>
           <h1 class="room-title">Crash Site - Main 3x2</h1>
+          <div
+            class="object camera-zone no-constrain-x"
+            style="left: 0; top: 0; width: 100%; height: 100%"
+          ></div>
+
+          <div
+            id="arrival-from-3"
+            class="door object interactable clickable star-isle-port-exit"
+            title="Star Isle Port"
+            onclick="location.href = '../room-3-star-isle-port/#arrival-from-4'"
+          ></div>
           <div class="object solid floor"></div>
         </div>
 
         <!-- Screen 2 (1, 0) -->
         <div class="screen">
           <div class="room-number">Room 4 - Screen (1, 0)</div>
-          <div class="object solid floor"></div>
+          <!-- <div class="object solid floor"></div> -->
         </div>
 
         <!-- Screen 3 (2, 0) -->
         <div class="screen">
           <div class="room-number">Room 4 - Screen (2, 0)</div>
+          <div
+            class="object camera-zone no-constrain-x"
+            style="left: 0; top: 0; width: 100%; height: 100%"
+          ></div>
+
+          <div
+            id="large-shelf-one"
+            class="object solid oneway-up dropthrough"
+          ></div>
+          <div
+            id="arrival-from-2"
+            class="door object interactable clickable observatory-exit"
+            title="Observatory"
+            onclick="location.href = '../room-2-observatory/#arrival-from-4'"
+          ></div>
+          <div
+            id="large-shelf-two"
+            class="object solid oneway-up dropthrough"
+          ></div>
+
+          <div
+            id="arrival-from-1"
+            class="door object interactable clickable space-port-exit"
+            title="Space Port"
+            onclick="location.href = '../room-1-space-port/#arrival-from-4'"
+          ></div>
           <div class="object solid floor"></div>
         </div>
 
@@ -45,11 +79,18 @@
         <div class="screen">
           <div class="room-number">Room 4 - Screen (0, 1)</div>
           <div class="object solid floor"></div>
+          <div class="object solid whole-room"></div>
         </div>
 
         <!-- Screen 5 (1, 1) -->
         <div class="screen">
           <div class="room-number">Room 4 - Screen (1, 1)</div>
+
+          <div id="crashed-pod"></div>
+
+          <div class="object solid chunk-crater-wall wall-left"></div>
+          <div class="object solid chunk-crater-wall wall-right"></div>
+          <div id="chunk-crater-base" class="object solid"></div>
           <div class="object solid floor"></div>
         </div>
 
@@ -57,36 +98,19 @@
         <div class="screen">
           <div class="room-number">Room 4 - Screen (2, 1)</div>
           <div class="object solid floor"></div>
+          <div class="object solid whole-room"></div>
         </div>
 
         <!-- 7th Screen: Attached to the 3x2 grid via CSS (grid-column: 4, grid-row: 1) -->
-        <div class="screen attached-screen">
+        <!-- <div class="screen attached-screen">
+          <div
+            class="object camera-zone no-constrain-x"
+            style="left: 0; top: 0; width: 100%; height: 100%"
+          ></div>
           <div class="room-number">Attached Dev Screen (3, 0)</div>
           <h1 class="room-title">Crash Site Staging</h1>
           <div class="object solid floor"></div>
-          <div
-            id="arrival-from-1"
-            class="door object interactable clickable exit-1"
-            title="Space Port"
-            onclick="
-              location.href = '../room-1-space-port/#arrival-from-4'
-            "
-          ></div>
-          <div
-            id="arrival-from-2"
-            class="door object interactable clickable exit-2"
-            title="Observatory"
-            onclick="location.href = '../room-2-observatory/#arrival-from-4'"
-          ></div>
-          <div
-            id="arrival-from-3"
-            class="door object interactable clickable exit-3"
-            title="Star Isle Port"
-            onclick="
-              location.href = '../room-3-star-isle-port/#arrival-from-4'
-            "
-          ></div>
-        </div>
+        </div> -->
       </div>
     </div>
   </body>
