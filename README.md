@@ -232,6 +232,7 @@ Also includes `loadInventoryItemFragment(itemName)` for loading item fragment da
 - If a zone is smaller than the camera viewport on a given axis, that axis' bounds collapse to a single value and the camera holds still centered on the zone for that axis instead of jittering.
 - Bounds are re-applied every frame the player overlaps the zone and reset each frame before level objects run, so leaving all zones releases the camera on the very next frame.
 - Zones are drawn with a cyan debug outline when debug mode (`3`) is toggled on, like other level objects.
+- Overlapping zones combine by intersection rather than whichever ran last: each zone narrows the allowed range, so a smaller zone nested inside a bigger one tightens the camera further while the player's inside it, and reverts to the outer zone's framing on the way out. If two zones genuinely share no overlapping range, a console warning fires (in debug mode) instead of silently locking the camera to an arbitrary point.
 
 A common pattern is locking a level's camera Y position per "floor" in a multi-row level, while leaving a vertical shaft column free of any zone so the camera can still follow the player between floors:
 
@@ -242,7 +243,7 @@ A common pattern is locking a level's camera Y position per "floor" in a multi-r
 <!-- The 150px-350px gap has no camera-zone at all, so the camera scrolls freely there -->
 ```
 
-See `examples/minimal-camera-zone/` for a single locked room, and `examples/minimal-camera-zone-floors/` for a 2x2 grid demonstrating per-floor Y locking with a shaft that stays free to scroll between floors.
+See `examples/minimal-camera-zone/` for a single locked room, `examples/minimal-camera-zone-floors/` for a 2x2 grid demonstrating per-floor Y locking with a shaft that stays free to scroll between floors, and `examples/minimal-camera-zone-overlap/` for a nested "focus area" zone that further tightens the camera's framing within a larger room zone.
 
 ## Inventory Helper Providers
 
