@@ -12,17 +12,57 @@
   </head>
   <body>
     <div id="viewport">
-      <div class="level grid-1x1 contain" id="level-one">
+      <div class="level grid-3x2 contain" id="level-one">
+        <div
+          id="player"
+          style="width: 50px; height: 50px; background: hotpink"
+        >
+          <div class="interaction-indicator question-indicator">?</div>
+          <div id="interactionBox"></div>
+        </div>
+        
+        <!-- 3x2 Grid (6 Screens) -->
+        <!-- Screen 1 (0, 0) -->
         <div class="screen">
-          <div class="room-number">Room 4</div>
-          <h1 class="room-title">Crash Site</h1>
-          <div
-            id="player"
-            style="width: 50px; height: 50px; background: hotpink"
-          >
-            <div class="interaction-indicator question-indicator">?</div>
-            <div id="interactionBox"></div>
-          </div>
+          <div class="room-number">Room 4 - Screen (0, 0)</div>
+          <h1 class="room-title">Crash Site - Main 3x2</h1>
+          <div class="object solid floor"></div>
+        </div>
+
+        <!-- Screen 2 (1, 0) -->
+        <div class="screen">
+          <div class="room-number">Room 4 - Screen (1, 0)</div>
+          <div class="object solid floor"></div>
+        </div>
+
+        <!-- Screen 3 (2, 0) -->
+        <div class="screen">
+          <div class="room-number">Room 4 - Screen (2, 0)</div>
+          <div class="object solid floor"></div>
+        </div>
+
+        <!-- Screen 4 (0, 1) -->
+        <div class="screen">
+          <div class="room-number">Room 4 - Screen (0, 1)</div>
+          <div class="object solid floor"></div>
+        </div>
+
+        <!-- Screen 5 (1, 1) -->
+        <div class="screen">
+          <div class="room-number">Room 4 - Screen (1, 1)</div>
+          <div class="object solid floor"></div>
+        </div>
+
+        <!-- Screen 6 (2, 1) -->
+        <div class="screen">
+          <div class="room-number">Room 4 - Screen (2, 1)</div>
+          <div class="object solid floor"></div>
+        </div>
+
+        <!-- 7th Screen: Attached to the 3x2 grid via CSS (grid-column: 4, grid-row: 1) -->
+        <div class="screen attached-screen">
+          <div class="room-number">Attached Dev Screen (3, 0)</div>
+          <h1 class="room-title">Crash Site Staging</h1>
           <div class="object solid floor"></div>
           <div
             id="arrival-from-1"

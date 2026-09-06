@@ -1,0 +1,12 @@
+:root {
+    --screen-width: 1200px;
+    --screen-height: 675px;
+    --player-spawn-x: 280px;
+    --player-spawn-y: 500px;
+}
+
+/* 7th screen attached to the 3x2 grid (attached to the right of (2,0) at x: 3, y: 0) */
+.attached-screen {
+    grid-column: 4;
+    grid-row: 1;
+}
