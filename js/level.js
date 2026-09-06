@@ -20,16 +20,16 @@ export default class Level {
         this.screens = [];
         this.parallaxLayers = [];
         this.parallaxRoot = null;
-        this.initScreenGrid();
-        this.initParallaxRoot();
-        this.initScreens();
-        this.initParallaxLayers();
-        this.checkScreenCount();
         if (this.element.classList.contains('dynamic')) {
             this.initScreensDynamicWindowSize();
         } else if (this.element.classList.contains('initial')) {
             this.initScreensInitialWindowSize();
         }
+        this.initScreenGrid();
+        this.initParallaxRoot();
+        this.initScreens();
+        this.initParallaxLayers();
+        this.checkScreenCount();
         this.outOfBoundEffect = {
             top: null,
             right: null,
@@ -87,39 +87,45 @@ export default class Level {
     }
 
     initScreenGrid() {
-        const gridClass = Array.from(this.element.classList).find(className => /^grid-\d+x\d+$/.test(className));
+        this.element.style.position = 'relative';
+        this.element.style.width = "max-content";
 
-        if (gridClass) {
-            const match = gridClass.match(/^grid-(\d+)x(\d+)$/);
-            if (match) {
-                this.columns = parseInt(match[1], 10);
-                this.rows = parseInt(match[2], 10);
-                this.element.style.display = 'grid';
-                this.element.style.position = 'relative';
-                this.element.style.gridTemplateColumns = `repeat(${this.columns}, var(--screen-width))`;
-                this.element.style.gridTemplateRows = `repeat(${this.rows}, var(--screen-height))`;
-                this.element.style.width = "max-content";
-                return;
-            } else {
-                console.warn(`Invalid grid class "${gridClass}"`);
-            }
+        const computedStyle = window.getComputedStyle(this.element);
+        if (computedStyle.display === 'inline' || computedStyle.display === 'block') {
+            this.element.style.display = 'grid';
         }
-
-        console.warn("No grid dimensions specified, using linear grid layout");
-        this.element.style.gridTemplateColumns = `repeat(${this.screens.length}, var(--screen-width))`;
-        this.element.style.gridTemplateRows = `var(--screen-height)`;
     }
 
     initScreens() {
         // Grab all of the screen elements
         const screenElements = this.element.querySelectorAll(':scope > .screen');
-        let index = 0;
+        const levelRect = this.element.getBoundingClientRect();
+
         this.screens = Array.from(screenElements).map(screen => {
-            let column = index % this.columns;
-            let row = Math.floor(index / this.columns);
-            index++;
-            return new Screen(this, screen, column, row)
+            const screenRect = screen.getBoundingClientRect();
+
+            // Auto-detect 0-indexed column (x) and row (y) directly from rendered DOM layout position
+            const relativeX = screenRect.left - levelRect.left;
+            const relativeY = screenRect.top - levelRect.top;
+
+            const screenWidth = screenRect.width || parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--screen-width')) || window.innerWidth;
+            const screenHeight = screenRect.height || parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--screen-height')) || window.innerHeight;
+
+            const column = Math.round(relativeX / screenWidth);
+            const row = Math.round(relativeY / screenHeight);
+
+            return new Screen(this, screen, column, row);
         });
+
+        if (this.screens.length > 0) {
+            const maxCol = Math.max(...this.screens.map(s => s.x));
+            const maxRow = Math.max(...this.screens.map(s => s.y));
+            this.columns = maxCol + 1;
+            this.rows = maxRow + 1;
+        } else {
+            this.columns = 1;
+            this.rows = 1;
+        }
     }
 
     initParallaxRoot() {

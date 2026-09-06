@@ -145,6 +145,28 @@ position: absolute
     pointer-events: auto;
 }
 
+/* Level Base & Layout Shorthand CSS */
+.level {
+    display: grid;
+    position: relative;
+    width: max-content;
+    grid-template-columns: repeat(var(--cols, 1), var(--screen-width));
+    grid-template-rows: repeat(var(--rows, 1), var(--screen-height));
+}
+
+.grid-1x1 { --cols: 1; --rows: 1; }
+.grid-2x1 { --cols: 2; --rows: 1; }
+.grid-3x1 { --cols: 3; --rows: 1; }
+.grid-3x2 { --cols: 3; --rows: 2; }
+.grid-3x3 { --cols: 3; --rows: 3; }
+.grid-4x4 { --cols: 4; --rows: 4; }
+
+.level.wrap-up,
+.level.grid-bottom-left {
+    display: flex;
+    flex-wrap: wrap-reverse;
+}
+
 /* level.js always injects this element as a grid child of .level; it must stay out of grid flow */
 .level-parallax-root {
     position: absolute;

@@ -49,7 +49,11 @@ A browser-based platformer engine built with plain JavaScript, HTML and CSS. Lev
 </div>
 ```
 
-* Grid dimensions are defined on the `.level` element via a `grid-colsxrows` class.
+* Grid dimensions are defined on `.level` via `grid-colsxrows` or vanilla CSS layout rules.
+* Grid layout origin and wrap order are driven directly by vanilla CSS rendering:
+  * Default: Standard CSS Grid flowing top-left to bottom-right.
+  * `grid-bottom-left` or `wrap-up`: Uses `flex-wrap: wrap-reverse` to wrap screens upward starting from the bottom-left.
+  * Custom CSS: You can also use standard CSS Grid rules (`grid-template-areas`, `grid-row`/`grid-column`, `:nth-child()`, or flexbox) in your level stylesheet. The engine automatically calculates screen coordinates `(x, y)` based on where CSS renders each `.screen` element in the DOM.
 * Add `dynamic` or `initial` on `.level` to control how `--screen-width`/`--screen-height` are initialized (`dynamic` updates on resize).
 * Out-of-bounds behavior is controlled by classes on the `.level` element such as `contain`, `respawn` or `wrap` with optional direction suffixes (e.g. `wrap-vert`).
 * Level-wide decorative parallax can be authored as direct children of `.level` using `.parallax-layer`; these layers persist across all screens and are updated from camera scroll instead of screen ownership.
