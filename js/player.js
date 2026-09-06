@@ -106,6 +106,9 @@ export default class Player {
         let element = this.element;
         element.style.position = "absolute";
         element.style.zIndex = 2;
+        if (gameInstance.level && gameInstance.level.element && element.parentNode !== gameInstance.level.element) {
+            gameInstance.level.element.appendChild(element);
+        }
         const configElement = this.element.querySelector(".config");
         if (configElement) this.element.querySelector(".config").style.display = "none";
     }
@@ -157,7 +160,7 @@ export default class Player {
 
         const playerSpawnXRelativeToScreen = getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-x');
         const playerSpawnYRelativeToScreen = getComputedStyle(document.documentElement).getPropertyValue('--player-spawn-y');
-        const screenRect = this.respawnScreen.getBoundingClientRect();
+        const screenRect = this.respawnScreen ? this.respawnScreen.getBoundingClientRect() : { width: window.innerWidth, height: window.innerHeight };
         const width = this.element.getBoundingClientRect().width;
         const height = this.element.getBoundingClientRect().height;
 
@@ -202,24 +205,31 @@ export default class Player {
         let yValue = parseValue(playerSpawnYRelativeToScreen, 'y');
 
         debugLog(`Spawning player at (${xValue}, ${yValue}) relative to screen`);
-        this.x = xValue - (width / 2);
-        this.y = yValue - (height / 2);
+        this.spawnAt(xValue, yValue, this.respawnScreen);
         this.setCheckpoint(xValue, yValue, this.respawnScreen);
-        this.updateTransform();
     }
 
     spawnAt(playerSpawnXRelativeToScreen, playerSpawnYRelativeToScreen, screen) {
-        let screensToTheLeft = 0;
-        let screensToTheTop = 0;
-        screen.classList.forEach(className => {
-            if (className.includes("screen-")) {
-                screensToTheLeft = Number(className.split("-")[1]);
-                screensToTheTop = Number(className.split("-")[2]);
-            }
-        });
-        this.x = (playerSpawnXRelativeToScreen) + (screensToTheLeft * screen.getBoundingClientRect().width) - (this.element.getBoundingClientRect().width / 2);
-        this.y = (playerSpawnYRelativeToScreen) + (screensToTheTop * screen.getBoundingClientRect().height) - (this.element.getBoundingClientRect().height / 2);
+        if (!screen) return;
+        if (gameInstance.level && gameInstance.level.element && this.element.parentNode !== gameInstance.level.element) {
+            gameInstance.level.element.appendChild(this.element);
+        }
+        const levelElement = gameInstance.level ? gameInstance.level.element : document.querySelector('.level');
+        const levelRect = levelElement ? levelElement.getBoundingClientRect() : { left: 0, top: 0 };
+        const screenRect = screen.getBoundingClientRect();
+
+        const screenWorldX = screenRect.left - levelRect.left;
+        const screenWorldY = screenRect.top - levelRect.top;
+
+        const width = this.element.getBoundingClientRect().width;
+        const height = this.element.getBoundingClientRect().height;
+
+        this.x = screenWorldX + playerSpawnXRelativeToScreen - (width / 2);
+        this.y = screenWorldY + playerSpawnYRelativeToScreen - (height / 2);
         this.updateTransform();
+        if (gameInstance.camera) {
+            gameInstance.camera.snapToPlayer();
+        }
     }
 
     setCheckpointScreen(checkpoint_screen) {
