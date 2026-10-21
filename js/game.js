@@ -1,6 +1,7 @@
 import Camera, { Filter } from './camera.js';
 import BroadcastManager from './broadcastManager.js';
 import InputManager from './inputManager.js';
+import { renderMenu } from '../../js/menu/renderMenu.js';
 
 class Game {
     constructor() {
@@ -94,6 +95,15 @@ class Game {
         if (this.pauseElement) {
             this.camera.overlayElement.appendChild(this.pauseElement);
             this.initPauseElement();
+            const menuTarget = this.pauseElement.querySelector('.pause-content');
+            if (menuTarget) {
+                renderMenu(menuTarget, {
+                    mode: 'nekkoplat',
+                    onAction: (action) => {
+                        if (action === 'resume' && this.paused) this.togglePause();
+                    },
+                });
+            }
         }
     }
 

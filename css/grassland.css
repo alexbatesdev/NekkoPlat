@@ -531,7 +531,7 @@ body {
     z-index: 100;
 }
 
-.pause-text {
+.pause-content {
     position: absolute;
     top: 0;
     left: 0;
@@ -546,11 +546,11 @@ body {
     gap: 1rem;
 }
 
-.pause-text>h1 {
+.pause-content>h1 {
     font-size: 5rem;
 }
 
-.pause-text>p {
+.pause-content>p {
     font-size: 2rem;
 }
 
